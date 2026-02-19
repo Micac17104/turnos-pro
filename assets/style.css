@@ -1,0 +1,244 @@
+/* ===== RESET SUAVE ===== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+    background: #f4f7fb;
+    color: #1f2933;
+    line-height: 1.5;
+}
+
+/* ===== LAYOUT GENERAL ===== */
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 16px;
+}
+
+/* ===== CARDS ===== */
+.card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* ===== HEADER PANEL ===== */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-row h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+
+.header-row p {
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ===== BADGE CUENTA ACTIVA ===== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #ecfdf3;
+    color: #166534;
+    font-size: 12px;
+    border: 1px solid #bbf7d0;
+}
+
+.badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #22c55e;
+}
+
+/* ===== GRID PRINCIPAL ===== */
+.section-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.4fr;
+    gap: 18px;
+}
+
+@media (max-width: 900px) {
+    .section-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== TITULOS DE SECCIÓN ===== */
+.section-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+}
+
+.section-title-row h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.section-title-row small {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* ===== ITEMS (TURNOS / CLIENTES) ===== */
+.item {
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.item-title {
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 2px;
+}
+
+.item-meta {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ===== BOTONES ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.18s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #22c55e, #0ea5e9);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 8px 18px rgba(34, 197, 94, 0.25);
+}
+
+.btn-primary:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 10px 22px rgba(14, 165, 233, 0.28);
+    transform: translateY(-1px);
+}
+
+.btn-ghost {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #e2e8f0;
+}
+
+.btn-ghost:hover {
+    background: #e2e8f0;
+}
+
+.btn-big {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid #bae6fd;
+    transition: all 0.18s ease;
+}
+
+.btn-big:hover {
+    background: #bfdbfe;
+}
+
+/* ===== FORMULARIOS ===== */
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="email"],
+select {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    margin-bottom: 10px;
+    font-size: 14px;
+    outline: none;
+    background: #f9fafb;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+input:focus,
+select:focus {
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.35);
+    background: #ffffff;
+}
+
+/* ===== ALERTAS ===== */
+.alert-success {
+    background: #ecfdf3;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    color: #166534;
+    font-size: 13px;
+    border: 1px solid #bbf7d0;
+}
+
+/* ===== CHECKBOX ROW ===== */
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #111827;
+}
+
+.checkbox-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===== LINKS GENERALES ===== */
+a {
+    color: #0ea5e9;
+}
+
+a:hover {
+    color: #0284c7;
+}

@@ -1,0 +1,5 @@
+RewriteEngine On
+RewriteBase /turnos-pro/p/
+
+# Redirige /p/lo-que-sea → index.php?slug=lo-que-sea
+RewriteRule ^([^/]+)/?$ index.php?slug=$1 [L,QSA]
