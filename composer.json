@@ -3,3 +3,10 @@
         "mercadopago/dx-php": "^2.6"
     }
 }
+
+{
+  "require": {
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*"
+  }
+}
