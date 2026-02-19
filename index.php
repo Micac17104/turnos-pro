@@ -71,10 +71,13 @@
     <p>Elegí cómo querés ingresar</p>
 
     <!-- LOGIN UNIFICADO PROFESIONAL / CENTRO / SECRETARIA -->
-    <a href="/turnos-pro/auth/login.php" class="btn btn-prof">Soy profesional o centro</a>
+   <a href="auth/login.php" class="btn btn-prof">Soy profesional o centro</a>
+
 
     <!-- LOGIN PACIENTE -->
-    <a href="/turnos-pro/public/login-paciente.php" class="btn btn-pac">Soy paciente</a>
+   <a href="public/login-paciente.php" class="btn btn-pac">Soy paciente</a>
+
+
 </div>
 
 </body>

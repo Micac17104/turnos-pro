@@ -141,6 +141,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photo'])) {
                        class="w-full p-3 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-400">
             </div>
 
+            <div>
+
+            <label class="text-sm font-medium text-gray-700">URL pública</label>
+<input type="text" name="slug" value="<?= h($user['slug'] ?? '') ?>"
+       class="w-full p-3 border rounded-lg bg-gray-50 mb-4"
+       placeholder="ej: dr-gustavo-perez">
+
+        </div>
+
             <button type="submit"
                     class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
                 Guardar cambios

@@ -1,4 +1,4 @@
-<?php echo "<h1 style='color:red'>EJECUTANDO: " . __FILE__ . "</h1>"; exit; ?>
+
 
 <?php
 session_start();

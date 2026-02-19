@@ -17,8 +17,6 @@ $stmt = $pdo->prepare("SELECT * FROM clients WHERE id = ? AND user_id = ?");
 $stmt->execute([$patient_id, $user_id]);
 $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-var_dump("user_id:", $user_id, "session:", $_SESSION['user_id'], "paciente:", $paciente);
-exit;
 
 if (!$paciente) {
     die("Paciente no pertenece a este profesional.");
