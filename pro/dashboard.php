@@ -1,6 +1,26 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX DEFINITIVO PARA RAILWAY ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// -----------------------------------
+
+// VALIDAR SESIÓN DEL PROFESIONAL
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../auth/login.php");
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
@@ -83,7 +103,6 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $turnos_estado_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Traducir estados
 $turnos_estado = [];
 foreach ($turnos_estado_raw as $estado => $total) {
     $label = match ($estado) {
@@ -106,7 +125,6 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $metodos_pago_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Traducir métodos
 $metodos_pago = [];
 foreach ($metodos_pago_raw as $metodo => $total) {
     $label = match ($metodo) {
@@ -153,7 +171,7 @@ require __DIR__ . '/includes/sidebar.php';
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-semibold text-slate-900">Dashboard</h1>
 
-        <a href="/turnos-pro/pro/dashboard-preferencias.php"
+        <a href="dashboard-preferencias.php"
            class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-300">
             ⚙️ Personalizar Dashboard
         </a>

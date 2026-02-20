@@ -1,7 +1,18 @@
 <?php
-ob_start(); // evita que cualquier salida rompa los headers
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX DEFINITIVO PARA RAILWAY ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// -----------------------------------
 
 require '../config.php';
 
@@ -142,5 +153,3 @@ button:hover { opacity:0.9; }
 
 </body>
 </html>
-
-<?php ob_end_flush(); ?>
