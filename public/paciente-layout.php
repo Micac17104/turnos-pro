@@ -1,11 +1,11 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Siempre usar la carpeta de sesiones correcta
+session_save_path(__DIR__ . '/../sessions');
+session_start();
 
 // Verificar login del paciente
 if (!isset($_SESSION['paciente_id'])) {
-    header("Location: /turnos-pro/public/login-paciente.php");
+    header("Location: login-paciente.php");
     exit;
 }
 
@@ -33,22 +33,22 @@ $paciente_nombre = $_SESSION['paciente_nombre'] ?? 'Paciente';
 
         <nav class="flex-1 px-4 space-y-2">
 
-            <a href="/turnos-pro/public/paciente-dashboard.php"
+            <a href="paciente-dashboard.php"
                class="block px-4 py-2 rounded-lg hover:bg-slate-800">
                 🏠 Dashboard
             </a>
 
-            <a href="/turnos-pro/public/paciente-sacar-turno.php"
+            <a href="paciente-sacar-turno.php"
                class="block px-4 py-2 rounded-lg hover:bg-slate-800">
                 📅 Sacar turno
             </a>
 
-            <a href="/turnos-pro/public/paciente-historia.php"
+            <a href="paciente-historia.php"
                class="block px-4 py-2 rounded-lg hover:bg-slate-800">
                 📄 Historia clínica
             </a>
 
-            <a href="/turnos-pro/public/paciente-perfil.php"
+            <a href="paciente-perfil.php"
                class="block px-4 py-2 rounded-lg hover:bg-slate-800">
                 👤 Mi perfil
             </a>
@@ -56,7 +56,7 @@ $paciente_nombre = $_SESSION['paciente_nombre'] ?? 'Paciente';
         </nav>
 
         <div class="px-4 mt-auto">
-            <a href="/turnos-pro/public/paciente-logout.php"
+            <a href="paciente-logout.php"
                class="block px-4 py-2 rounded-lg bg-red-600 text-center hover:bg-red-700">
                 Cerrar sesión
             </a>
