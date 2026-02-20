@@ -38,7 +38,8 @@ $data = $_SESSION['last_booking'] ?? null;
             <p class="text-slate-600 mb-4">Tu turno fue registrado.</p>
         <?php endif; ?>
 
-        <a href="/turnos-pro/public/paciente-dashboard.php"
+        <!-- RUTA CORRECTA PARA RAILWAY -->
+        <a href="paciente-dashboard.php"
            class="text-sm text-slate-500 hover:text-slate-700">
             ← Ir a mis turnos
         </a>

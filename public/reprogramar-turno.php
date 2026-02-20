@@ -62,7 +62,7 @@ $pro_id = $turno['user_id'];
     </div>
 
     <!-- Selección de nueva fecha -->
-    <form action="/turnos-pro/public/reprogramar-turno-horarios.php" method="get" class="space-y-6">
+    <form action="reprogramar-turno-horarios.php" method="get" class="space-y-6">
 
         <input type="hidden" name="turno_id" value="<?= $turno_id ?>">
         <input type="hidden" name="pro" value="<?= $pro_id ?>">
@@ -79,7 +79,8 @@ $pro_id = $turno['user_id'];
 
     </form>
 
-    <a href="/turnos-pro/public/paciente-dashboard.php"
+    <!-- RUTA CORRECTA -->
+    <a href="paciente-dashboard.php"
        class="block mt-6 text-slate-600 hover:text-slate-900 text-sm">
         ← Volver al dashboard
     </a>
@@ -87,6 +88,5 @@ $pro_id = $turno['user_id'];
 </div>
 
 <?php
-// CIERRE DEL LAYOUT
 echo "</main></div></body></html>";
 ?>

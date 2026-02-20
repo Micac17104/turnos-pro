@@ -4,7 +4,7 @@ session_start();
 
 require __DIR__ . '/../config.php';
 
-// Verificar login
+// Verificar login del paciente
 if (!isset($_SESSION['paciente_id'])) {
     http_response_code(403);
     echo json_encode(["status" => "error", "message" => "NO_AUTH"]);
@@ -20,7 +20,7 @@ if (!$turno_id) {
     exit;
 }
 
-// Verificar turno
+// Verificar que el turno pertenece al paciente
 $stmt = $pdo->prepare("
     SELECT * FROM appointments 
     WHERE id = ? AND client_id = ?

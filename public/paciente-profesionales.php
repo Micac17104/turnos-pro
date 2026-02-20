@@ -17,28 +17,30 @@ if (!$paciente_city) {
     $paciente_city = "";
 }
 
-// Obtener todas las ciudades disponibles (CORREGIDO: account_type)
+// Obtener todas las ciudades disponibles (solo profesionales)
 $cities = $pdo->query("
     SELECT DISTINCT city 
     FROM users 
-    WHERE account_type = 'professional' AND city IS NOT NULL AND city != ''
+    WHERE account_type = 'professional' 
+      AND city IS NOT NULL 
+      AND city != ''
     ORDER BY city ASC
 ")->fetchAll(PDO::FETCH_COLUMN);
 
 // Ciudad seleccionada (si no elige, usamos la del paciente)
 $city = $_GET['city'] ?? $paciente_city;
 
-// Si no hay ciudad seleccionada, evitar errores
+// Si no hay ciudad seleccionada, usar la primera disponible
 if (!$city) {
-    $city = $cities[0] ?? ""; // primera ciudad disponible
+    $city = $cities[0] ?? "";
 }
 
-// Obtener profesionales filtrados (CORRECTO)
+// Obtener profesionales filtrados
 $stmt = $pdo->prepare("
     SELECT id, name, profession, city 
     FROM users
     WHERE account_type = 'professional'
-    AND city = ?
+      AND city = ?
 ");
 $stmt->execute([$city]);
 $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -77,8 +79,8 @@ $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <p class="text-slate-600"><?= htmlspecialchars($pro['profession']) ?></p>
             <p class="text-sm text-slate-500 mt-1"><?= htmlspecialchars($pro['city']) ?></p>
 
-            <!-- CORREGIDO: usar user_id en lugar de pro_id -->
-            <a href="/turnos-pro/public/reservar.php?user_id=<?= $pro['id'] ?>"
+            <!-- RUTA CORRECTA PARA RAILWAY -->
+            <a href="reservar.php?user_id=<?= $pro['id'] ?>"
                class="mt-4 inline-block px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
                 Ver disponibilidad
             </a>

@@ -44,7 +44,8 @@ if (!empty($_SESSION['paciente_id'])) {
         Turno con <?= h($pro['name']) ?> — <?= date('d/m/Y', strtotime($date)) ?> <?= $time ?> hs
     </p>
 
-    <form action="/turnos-pro/public/confirmar.php" method="post" class="space-y-4">
+    <!-- RUTA CORRECTA PARA RAILWAY -->
+    <form action="confirmar.php" method="post" class="space-y-4">
         <input type="hidden" name="pro"  value="<?= $pro_id ?>">
         <input type="hidden" name="date" value="<?= h($date) ?>">
         <input type="hidden" name="time" value="<?= h($time) ?>">

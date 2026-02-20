@@ -59,7 +59,7 @@ foreach ($rows as $r) {
     <!-- HEADER -->
     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
         <?php if (!empty($pro['profile_image'])): ?>
-            <img src="/turnos-pro/uploads/<?= h($pro['profile_image']) ?>"
+            <img src="uploads/<?= h($pro['profile_image']) ?>"
                  class="w-16 h-16 rounded-full object-cover border">
         <?php else: ?>
             <div class="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xl">
@@ -175,7 +175,7 @@ function selectDay(date) {
     document.getElementById("step1").classList.add("hidden");
     document.getElementById("step2").classList.remove("hidden");
 
-    fetch(`/turnos-pro/p/api/horarios.php?user_id=${proId}&date=${date}`)
+    fetch(`p/api/horarios.php?user_id=${proId}&date=${date}`)
         .then(res => res.json())
         .then(data => {
             const cont = document.getElementById("horarios");
@@ -219,7 +219,7 @@ function backToStep2() {
 document.getElementById("formReserva").addEventListener("submit", e => {
     e.preventDefault();
 
-    fetch("/turnos-pro/p/api/reservar-turno.php", {
+    fetch("p/api/reservar-turno.php", {
         method: "POST",
         body: new FormData(e.target)
     })

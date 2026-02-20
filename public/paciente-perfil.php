@@ -5,6 +5,12 @@ session_start();
 require __DIR__ . '/paciente-layout.php';
 require __DIR__ . '/../config.php';
 
+// Validar sesión del paciente
+if (!isset($_SESSION['paciente_id'])) {
+    header("Location: login-paciente.php");
+    exit;
+}
+
 $paciente_id = $_SESSION['paciente_id'];
 
 // Obtener datos del paciente
@@ -15,12 +21,12 @@ $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 // Guardar cambios
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $name = $_POST['name'] ?? null;
+    $name  = $_POST['name']  ?? null;
     $email = $_POST['email'] ?? null;
     $phone = $_POST['phone'] ?? null;
-    $city = $_POST['city'] ?? null;
+    $city  = $_POST['city']  ?? null;
 
-    // Si cambia contraseña
+    // Construcción dinámica del SQL si cambia contraseña
     $password_sql = "";
     $params = [$name, $email, $phone, $city];
 

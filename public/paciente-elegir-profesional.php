@@ -49,7 +49,8 @@ $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </p>
                 </div>
 
-                <a href="/turnos-pro/public/reservar.php?pro=<?= $p['id'] ?>"
+                <!-- RUTA CORRECTA PARA RAILWAY -->
+                <a href="reservar.php?pro=<?= $p['id'] ?>"
                    class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm hover:bg-slate-800">
                     Sacar turno
                 </a>

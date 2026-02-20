@@ -98,7 +98,8 @@ $turnos = generarTurnos($horarios, $date);
                         <?= $hora ?>
                     </div>
                 <?php else: ?>
-                    <a href="/turnos-pro/public/paciente-confirmar-turno.php?user_id=<?= $pro_id ?>&fecha=<?= $date ?>&hora=<?= $hora ?>"
+                    <!-- RUTA CORRECTA -->
+                    <a href="paciente-confirmar-turno.php?user_id=<?= $pro_id ?>&fecha=<?= $date ?>&hora=<?= $hora ?>"
                        class="px-4 py-3 bg-slate-900 text-white rounded-lg text-center hover:bg-slate-800 transition">
                         <?= $hora ?>
                     </a>
@@ -110,7 +111,8 @@ $turnos = generarTurnos($horarios, $date);
 
     <?php endif; ?>
 
-    <a href="/turnos-pro/public/reservar.php?pro=<?= $pro_id ?>"
+    <!-- RUTA CORRECTA -->
+    <a href="reservar.php?pro=<?= $pro_id ?>"
        class="block mt-8 text-slate-600 hover:text-slate-900 text-sm">
         ← Elegir otra fecha
     </a>

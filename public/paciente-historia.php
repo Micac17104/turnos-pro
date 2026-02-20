@@ -5,6 +5,12 @@ session_start();
 require __DIR__ . '/paciente-layout.php';
 require __DIR__ . '/../config.php';
 
+// Validación opcional (el layout ya expulsa si no hay sesión)
+if (!isset($_SESSION['paciente_id'])) {
+    header("Location: login-paciente.php");
+    exit;
+}
+
 $paciente_id = $_SESSION['paciente_id'];
 
 // Obtener historia clínica desde clinical_records

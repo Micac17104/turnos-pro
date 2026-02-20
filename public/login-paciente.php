@@ -18,8 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($paciente && password_verify($password, $paciente['password'])) {
 
-        session_start();
-
         // Si el paciente tiene user_id = 0, verificar si el profesional ya lo cargó
         if ($paciente['user_id'] == 0) {
 
@@ -36,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['paciente_id'] = $clienteProfesional['id'];
                 $_SESSION['paciente_nombre'] = $clienteProfesional['name'];
 
-                header("Location: /turnos-pro/public/paciente-dashboard.php");
+                header("Location: paciente-dashboard.php");
                 exit;
             }
         }
@@ -45,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['paciente_id'] = $paciente['id'];
         $_SESSION['paciente_nombre'] = $paciente['name'];
 
-        header("Location: /turnos-pro/public/paciente-dashboard.php");
+        header("Location: paciente-dashboard.php");
         exit;
 
     } else {
@@ -122,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button class="btn-primary">Ingresar</button>
     </form>
 
-    <a class="link" href="/turnos-pro/public/registro-paciente.php">Crear cuenta</a>
+    <a class="link" href="registro-paciente.php">Crear cuenta</a>
 
 </div>
 

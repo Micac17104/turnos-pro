@@ -50,7 +50,7 @@ $stmt = $pdo->prepare("
     WHERE user_id = ?
       AND date = ?
       AND status IN ('confirmed', 'pending')
-      AND id != ?  -- excluir el turno actual
+      AND id != ?
 ");
 $stmt->execute([$pro_id, $date, $turno_id]);
 $reservados = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -105,7 +105,8 @@ $turnos = generarTurnos($horarios, $date);
                         <?= $hora ?>
                     </div>
                 <?php else: ?>
-                    <a href="/turnos-pro/public/reprogramar-turno-confirmar.php?turno_id=<?= $turno_id ?>&fecha=<?= $date ?>&hora=<?= $hora ?>"
+                    <!-- RUTA CORRECTA -->
+                    <a href="reprogramar-turno-confirmar.php?turno_id=<?= $turno_id ?>&fecha=<?= $date ?>&hora=<?= $hora ?>"
                        class="px-4 py-3 bg-slate-900 text-white rounded-lg text-center hover:bg-slate-800 transition">
                         <?= $hora ?>
                     </a>
@@ -117,7 +118,8 @@ $turnos = generarTurnos($horarios, $date);
 
     <?php endif; ?>
 
-    <a href="/turnos-pro/public/reprogramar-turno.php?id=<?= $turno_id ?>"
+    <!-- RUTA CORRECTA -->
+    <a href="reprogramar-turno.php?id=<?= $turno_id ?>"
        class="block mt-8 text-slate-600 hover:text-slate-900 text-sm">
         ← Elegir otra fecha
     </a>
@@ -125,6 +127,5 @@ $turnos = generarTurnos($horarios, $date);
 </div>
 
 <?php
-// CIERRE DEL LAYOUT
 echo "</main></div></body></html>";
 ?>

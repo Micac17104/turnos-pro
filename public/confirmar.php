@@ -109,5 +109,6 @@ $_SESSION['last_booking'] = [
     'mensaje_final' => $mensaje_final
 ];
 
-header("Location: /turnos-pro/public/gracias.php");
+// REDIRECCIÓN CORRECTA PARA RAILWAY
+header("Location: gracias.php");
 exit;

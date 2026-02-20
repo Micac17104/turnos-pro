@@ -6,7 +6,7 @@ require __DIR__ . '/../config.php';
 
 // Verificar login del paciente
 if (!isset($_SESSION['paciente_id'])) {
-    header("Location: /turnos-pro/public/login-paciente.php");
+    header("Location: login-paciente.php");
     exit;
 }
 
@@ -44,7 +44,7 @@ $reservados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $reservados_map = [];
 foreach ($reservados as $r) {
     $hora_normalizada = substr($r['time'], 0, 5);
-$reservados_map[$r['date'] . ' ' . $hora_normalizada] = true;
+    $reservados_map[$r['date'] . ' ' . $hora_normalizada] = true;
 }
 
 // Generar turnos automáticos
@@ -151,16 +151,17 @@ $dias = [
                 foreach ($turnos as $t):
                     if ($t['fecha'] !== $fecha) continue;
 
-                   $hora_normalizada = substr($t['hora'], 0, 5);
-$clave = $t['fecha'] . ' ' . $hora_normalizada;
-$ocupado = isset($reservados_map[$clave]);
+                    $hora_normalizada = substr($t['hora'], 0, 5);
+                    $clave = $t['fecha'] . ' ' . $hora_normalizada;
+                    $ocupado = isset($reservados_map[$clave]);
                 ?>
 
                     <?php if ($ocupado): ?>
                         <div class="turno-ocupado"><?= $t['hora'] ?></div>
                     <?php else: ?>
+                        <!-- RUTA CORRECTA -->
                         <a class="turno-btn"
-                           href="/turnos-pro/public/paciente-confirmar-turno.php?user_id=<?= $user_id ?>&fecha=<?= $t['fecha'] ?>&hora=<?= $t['hora'] ?>">
+                           href="paciente-confirmar-turno.php?user_id=<?= $user_id ?>&fecha=<?= $t['fecha'] ?>&hora=<?= $t['hora'] ?>">
                            <?= $t['hora'] ?>
                         </a>
                     <?php endif; ?>
@@ -175,7 +176,8 @@ $ocupado = isset($reservados_map[$clave]);
         ?>
     </div>
 
-    <a class="back" href="/turnos-pro/public/paciente-sacar-turno.php">← Elegir otro profesional</a>
+    <!-- RUTA CORRECTA -->
+    <a class="back" href="paciente-sacar-turno.php">← Elegir otro profesional</a>
 </div>
 
 <script>

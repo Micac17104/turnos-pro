@@ -45,7 +45,8 @@ $pro_id = $pro['id'];
 
 <div class="bg-white p-8 rounded-xl shadow border max-w-lg">
 
-    <form action="/turnos-pro/public/horarios.php" method="get" class="space-y-6">
+    <!-- RUTA CORRECTA -->
+    <form action="horarios.php" method="get" class="space-y-6">
 
         <input type="hidden" name="pro" value="<?= $pro_id ?>">
 

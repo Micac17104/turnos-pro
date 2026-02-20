@@ -6,7 +6,7 @@ require __DIR__ . '/../config.php';
 
 // Si el paciente está logueado → NO usar este archivo
 if (isset($_SESSION['paciente_id'])) {
-    header("Location: /turnos-pro/public/paciente-sacar-turno.php");
+    header("Location: paciente-sacar-turno.php");
     exit;
 }
 
@@ -71,7 +71,8 @@ if (!$pro) {
     <p>Turno con <strong><?= htmlspecialchars($pro['name']) ?></strong></p>
     <p><?= date("d/m/Y", strtotime($fecha)) ?> — <?= $hora ?> hs</p>
 
-    <form method="post" action="/turnos-pro/public/confirmar-turno.php">
+    <!-- RUTA CORRECTA PARA RAILWAY -->
+    <form method="post" action="confirmar-turno.php">
         <input type="hidden" name="user_id" value="<?= $user_id ?>">
         <input type="hidden" name="fecha" value="<?= $fecha ?>">
         <input type="hidden" name="hora" value="<?= $hora ?>">

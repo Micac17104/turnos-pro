@@ -43,7 +43,7 @@ foreach ($reservados as $r) {
     $reservados_map[$r['date'] . ' ' . substr($r['time'], 0, 5)] = true;
 }
 
-// Generar turnos automáticos según schedules
+// Generar turnos automáticos
 function generarTurnos($horarios) {
     $turnos = [];
     $hoy = date("Y-m-d");
@@ -156,11 +156,11 @@ h2 { margin-bottom:10px; font-size:24px; font-weight:700; color:#0f172a; }
 
     <!-- MODO RÁPIDO / LOGIN -->
     <?php if (!$modo): ?>
-        <a href="/turnos-pro/public/paciente-turnos.php?user_id=<?= $user_id ?>&modo=rapido" class="btn-primary">
+        <a href="paciente-turnos.php?user_id=<?= $user_id ?>&modo=rapido" class="btn-primary">
             Sacar turno sin registrarme
         </a>
 
-        <a href="/turnos-pro/public/login-paciente.php?user_id=<?= $user_id ?>" class="btn-ghost">
+        <a href="login-paciente.php?user_id=<?= $user_id ?>" class="btn-ghost">
             Iniciar sesión o crear cuenta
         </a>
 
@@ -210,7 +210,7 @@ h2 { margin-bottom:10px; font-size:24px; font-weight:700; color:#0f172a; }
                         <div class="turno-ocupado"><?= $t['hora'] ?></div>
                     <?php else: ?>
                         <a class="turno-btn"
-                           href="/turnos-pro/public/datos-paciente.php?user_id=<?= $user_id ?>&fecha=<?= $t['fecha'] ?>&hora=<?= $t['hora'] ?>">
+                           href="datos-paciente.php?user_id=<?= $user_id ?>&fecha=<?= $t['fecha'] ?>&hora=<?= $t['hora'] ?>">
                            <?= $t['hora'] ?>
                         </a>
                     <?php endif; ?>

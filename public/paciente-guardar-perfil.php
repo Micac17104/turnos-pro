@@ -4,8 +4,9 @@ session_start();
 
 require __DIR__ . '/../config.php';
 
+// Verificar login del paciente
 if (!isset($_SESSION['paciente_id'])) {
-    header("Location: /turnos-pro/public/login-paciente.php");
+    header("Location: login-paciente.php");
     exit;
 }
 
@@ -61,7 +62,7 @@ if ($paciente['user_id'] == 0) {
         $_SESSION['paciente_id'] = $clienteProfesional['id'];
         $_SESSION['paciente_nombre'] = $name;
 
-        header("Location: /turnos-pro/public/paciente-perfil.php?ok=1");
+        header("Location: paciente-perfil.php?ok=1");
         exit;
     }
 }
@@ -88,5 +89,5 @@ if ($password !== '') {
 
 $_SESSION['paciente_nombre'] = $name;
 
-header("Location: /turnos-pro/public/paciente-perfil.php?ok=1");
+header("Location: paciente-perfil.php?ok=1");
 exit;

@@ -8,9 +8,9 @@ $mensaje = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $nombre = $_POST['nombre'] ?? '';
+    $nombre   = $_POST['nombre'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
-    $email = $_POST['email'] ?? '';
+    $email    = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
     // Verificar si el paciente YA tiene una cuenta creada por él mismo
@@ -40,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ");
             $stmt->execute([$telefono, $hash, $clienteExistente['id']]);
 
-            session_start();
             $_SESSION['paciente_id'] = $clienteExistente['id'];
             $_SESSION['paciente_nombre'] = $clienteExistente['name'];
 
@@ -53,12 +52,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ");
             $stmt->execute([$nombre, $telefono, $email, $hash]);
 
-            session_start();
             $_SESSION['paciente_id'] = $pdo->lastInsertId();
             $_SESSION['paciente_nombre'] = $nombre;
         }
 
-        header("Location: /turnos-pro/public/paciente-dashboard.php");
+        // RUTA CORRECTA PARA RAILWAY
+        header("Location: paciente-dashboard.php");
         exit;
     }
 }

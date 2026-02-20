@@ -60,7 +60,8 @@ $centros = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <p class="text-slate-600"><?= htmlspecialchars($c['address']) ?></p>
             <p class="text-sm text-slate-500 mt-1"><?= htmlspecialchars($c['city']) ?></p>
 
-            <a href="/turnos-pro/public/centro.php?id=<?= $c['id'] ?>"
+            <!-- RUTA CORRECTA PARA RAILWAY -->
+            <a href="centro.php?id=<?= $c['id'] ?>"
                class="mt-4 inline-block px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
                 Ver profesionales
             </a>

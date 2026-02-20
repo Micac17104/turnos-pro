@@ -55,7 +55,7 @@ $stmt->execute([$turno_id]);
         <p class="font-semibold text-slate-900"><?= substr($turno['time'], 0, 5) ?> hs</p>
     </div>
 
-    <a href="/turnos-pro/public/paciente-dashboard.php"
+    <a href="paciente-dashboard.php"
        class="block w-full text-center py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition">
         Volver al panel
     </a>

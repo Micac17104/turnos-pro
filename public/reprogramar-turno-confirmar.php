@@ -6,7 +6,7 @@ require __DIR__ . '/../config.php';
 
 // Verificar login
 if (!isset($_SESSION['paciente_id'])) {
-    header("Location: /turnos-pro/public/login-paciente.php");
+    header("Location: login-paciente.php");
     exit;
 }
 
@@ -114,7 +114,8 @@ require __DIR__ . '/paciente-layout.php';
         </a>
     <?php endif; ?>
 
-    <a href="/turnos-pro/public/paciente-dashboard.php"
+    <!-- RUTA CORRECTA -->
+    <a href="paciente-dashboard.php"
        class="block mt-6 text-slate-600 hover:text-slate-900 text-sm text-center">
         ← Volver al panel
     </a>

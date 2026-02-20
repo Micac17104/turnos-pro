@@ -60,7 +60,8 @@ if (!$pro) {
 
     </div>
 
-    <form action="/turnos-pro/public/paciente-confirmar-turno-guardar.php" method="post" class="space-y-4">
+    <!-- RUTA CORRECTA PARA RAILWAY -->
+    <form action="paciente-confirmar-turno-guardar.php" method="post" class="space-y-4">
 
         <input type="hidden" name="user_id" value="<?= $user_id ?>">
         <input type="hidden" name="fecha" value="<?= $fecha ?>">
@@ -72,7 +73,8 @@ if (!$pro) {
 
     </form>
 
-    <a href="/turnos-pro/public/horarios.php?pro=<?= $user_id ?>&date=<?= $fecha ?>"
+    <!-- RUTA CORRECTA -->
+    <a href="horarios.php?pro=<?= $user_id ?>&date=<?= $fecha ?>"
        class="block mt-6 text-slate-600 hover:text-slate-900 text-sm">
         ← Elegir otro horario
     </a>

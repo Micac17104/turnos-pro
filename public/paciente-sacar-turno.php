@@ -46,7 +46,8 @@ $independientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?= htmlspecialchars($c['name']) ?>
                 </div>
 
-                <a href="/turnos-pro/public/paciente-elegir-profesional.php?center_id=<?= $c['id'] ?>"
+                <!-- RUTA CORRECTA -->
+                <a href="paciente-elegir-profesional.php?center_id=<?= $c['id'] ?>"
                    class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm hover:bg-slate-800">
                     Ver profesionales
                 </a>
@@ -71,7 +72,8 @@ $independientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <p class="text-sm text-slate-500"><?= htmlspecialchars($p['profession']) ?></p>
                 </div>
 
-                <a href="/turnos-pro/public/reservar.php?pro=<?= $p['id'] ?>"
+                <!-- RUTA CORRECTA -->
+                <a href="reservar.php?pro=<?= $p['id'] ?>"
                    class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm hover:bg-slate-800">
                     Sacar turno
                 </a>
