@@ -36,35 +36,35 @@ $hoy = date("Y-m-d");
 <!-- ACCIONES RÁPIDAS -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
 
-    <a href="/turnos-pro/public/paciente-profesionales.php"
+    <a href="paciente-profesionales.php"
        class="bg-white p-6 rounded-xl shadow border hover:shadow-md transition">
         <div class="text-3xl mb-3">👨‍⚕️</div>
         <h3 class="font-semibold text-lg">Buscar profesionales</h3>
         <p class="text-slate-500 text-sm mt-1">Encontrá especialistas por ciudad</p>
     </a>
 
-    <a href="/turnos-pro/public/paciente-centros.php"
+    <a href="paciente-centros.php"
        class="bg-white p-6 rounded-xl shadow border hover:shadow-md transition">
         <div class="text-3xl mb-3">🏥</div>
         <h3 class="font-semibold text-lg">Centros médicos</h3>
         <p class="text-slate-500 text-sm mt-1">Clínicas y centros cerca tuyo</p>
     </a>
 
-    <a href="/turnos-pro/public/paciente-sacar-turno.php"
+    <a href="paciente-sacar-turno.php"
        class="bg-white p-6 rounded-xl shadow border hover:shadow-md transition">
         <div class="text-3xl mb-3">📅</div>
         <h3 class="font-semibold text-lg">Sacar un turno</h3>
         <p class="text-slate-500 text-sm mt-1">Elegí profesional, fecha y horario</p>
     </a>
 
-    <a href="/turnos-pro/public/paciente-historia.php"
+    <a href="paciente-historia.php"
        class="bg-white p-6 rounded-xl shadow border hover:shadow-md transition">
         <div class="text-3xl mb-3">📄</div>
         <h3 class="font-semibold text-lg">Historia clínica</h3>
         <p class="text-slate-500 text-sm mt-1">Consultá tus evoluciones</p>
     </a>
 
-    <a href="/turnos-pro/public/paciente-perfil.php"
+    <a href="paciente-perfil.php"
        class="bg-white p-6 rounded-xl shadow border hover:shadow-md transition">
         <div class="text-3xl mb-3">👤</div>
         <h3 class="font-semibold text-lg">Mi perfil</h3>
@@ -102,12 +102,12 @@ $hoy = date("Y-m-d");
 
                 <?php if ($t['date'] >= $hoy): ?>
                     <div class="mt-3 flex gap-3">
-                        <a href="/turnos-pro/public/cancelar-turno.php?id=<?= $t['id'] ?>"
+                        <a href="cancelar-turno.php?id=<?= $t['id'] ?>"
                            class="px-3 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700">
                             Cancelar
                         </a>
 
-                        <a href="/turnos-pro/public/reprogramar-turno.php?id=<?= $t['id'] ?>"
+                        <a href="reprogramar-turno.php?id=<?= $t['id'] ?>"
                            class="px-3 py-2 bg-slate-900 text-white rounded-lg text-sm hover:bg-slate-800">
                             Reprogramar
                         </a>
