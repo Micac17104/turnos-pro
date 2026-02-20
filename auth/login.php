@@ -1,4 +1,5 @@
 <?php
+ob_start(); // evita que cualquier salida rompa los headers
 session_save_path(__DIR__ . '/../sessions');
 session_start();
 
@@ -141,3 +142,5 @@ button:hover { opacity:0.9; }
 
 </body>
 </html>
+
+<?php ob_end_flush(); ?>
