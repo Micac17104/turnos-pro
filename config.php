@@ -1,3 +1,4 @@
+<?php
 echo "<pre>";
 echo "HOST: " . getenv("MYSQLHOST") . "\n";
 echo "DB: " . getenv("MYSQLDATABASE") . "\n";
@@ -6,7 +7,6 @@ echo "PASS: " . (getenv("MYSQLPASSWORD") ? "OK" : "VACIO") . "\n";
 echo "PORT: " . getenv("MYSQLPORT") . "\n";
 echo "</pre>";
 
-<?php
 $host = getenv("MYSQLHOST");
 $dbname = getenv("MYSQLDATABASE");
 $user = getenv("MYSQLUSER");
