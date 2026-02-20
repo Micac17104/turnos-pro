@@ -1,10 +1,22 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX DEFINITIVO PARA RAILWAY ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// -----------------------------------
 
 require __DIR__ . '/../config.php';
 
-// VALIDAR SESIÓN ANTES DE CARGAR EL LAYOUT
+// VALIDAR SESIÓN ANTES DEL LAYOUT
 if (!isset($_SESSION['paciente_id'])) {
     header("Location: login-paciente.php");
     exit;
@@ -31,7 +43,6 @@ $turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $hoy = date("Y-m-d");
 ?>
 
-<!-- CONTENIDO DEL DASHBOARD -->
 <h1 class="text-2xl font-bold text-slate-900 mb-6">
     Hola <?= htmlspecialchars($_SESSION['paciente_nombre']) ?> 👋
 </h1>
@@ -40,7 +51,6 @@ $hoy = date("Y-m-d");
     Este es tu panel personal. Desde aquí podés ver tus próximos turnos, acceder a tu historia clínica y gestionar tu perfil.
 </p>
 
-<!-- ACCIONES RÁPIDAS -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
 
     <a href="paciente-profesionales.php"
@@ -80,7 +90,6 @@ $hoy = date("Y-m-d");
 
 </div>
 
-<!-- PRÓXIMOS TURNOS -->
 <div class="bg-white p-6 rounded-xl shadow border mb-10">
     <h2 class="text-xl font-semibold mb-4">Tus próximos turnos</h2>
 
