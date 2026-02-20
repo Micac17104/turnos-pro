@@ -2,8 +2,15 @@
 session_save_path(__DIR__ . '/../sessions');
 session_start();
 
-require __DIR__ . '/paciente-layout.php';
 require __DIR__ . '/../config.php';
+
+// VALIDAR SESIÓN ANTES DE CARGAR EL LAYOUT
+if (!isset($_SESSION['paciente_id'])) {
+    header("Location: login-paciente.php");
+    exit;
+}
+
+require __DIR__ . '/paciente-layout.php';
 
 $paciente_id = $_SESSION['paciente_id'];
 
