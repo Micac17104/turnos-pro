@@ -1,9 +1,9 @@
 <?php
-// /pro/includes/auth.php
+session_save_path(__DIR__ . '/../../sessions');
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /turnos-pro/index.php");
+    header("Location: ../auth/login.php");
     exit;
 }
 
