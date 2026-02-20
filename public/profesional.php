@@ -1,4 +1,7 @@
 <?php
+session_save_path(__DIR__ . '/../sessions');
+session_start();
+
 require __DIR__ . '/../config.php';
 
 $prof_id = $_GET['id'] ?? null;

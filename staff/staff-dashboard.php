@@ -1,5 +1,7 @@
 <?php
+session_save_path(__DIR__ . '/../sessions');
 session_start();
+
 require '../config.php';
 
 $center_id = $_SESSION['center_id'] ?? null;

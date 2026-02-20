@@ -1,4 +1,7 @@
 <?php
+session_save_path(__DIR__ . '/../sessions');
+session_start();
+
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';
