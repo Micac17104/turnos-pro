@@ -1,9 +1,17 @@
+echo "<pre>";
+echo "HOST: " . getenv("MYSQLHOST") . "\n";
+echo "DB: " . getenv("MYSQLDATABASE") . "\n";
+echo "USER: " . getenv("MYSQLUSER") . "\n";
+echo "PASS: " . (getenv("MYSQLPASSWORD") ? "OK" : "VACIO") . "\n";
+echo "PORT: " . getenv("MYSQLPORT") . "\n";
+echo "</pre>";
+
 <?php
-$host = getenv("MYSQL_HOST");
-$dbname = getenv("MYSQL_DATABASE");
-$user = getenv("MYSQL_USER");
-$pass = getenv("MYSQL_PASSWORD");
-$port = getenv("MYSQL_PORT");
+$host = getenv("MYSQLHOST");
+$dbname = getenv("MYSQLDATABASE");
+$user = getenv("MYSQLUSER");
+$pass = getenv("MYSQLPASSWORD");
+$port = getenv("MYSQLPORT");
 
 try {
     $pdo = new PDO(
