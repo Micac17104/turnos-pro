@@ -1,4 +1,6 @@
 <?php
+var_dump(session_save_path());
+var_dump(is_writable(session_save_path()));
 session_save_path(__DIR__ . '/../sessions');
 session_start();
 
