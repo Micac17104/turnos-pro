@@ -4,8 +4,9 @@ session_start();
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
+require __DIR__ . '/includes/helpers.php';
 
-$id = $_POST['id'];
+$id     = $_POST['id'];
 $status = $_POST['payment_status'];
 $method = $_POST['payment_method'];
 $amount = $_POST['amount'] ?: null;
@@ -17,5 +18,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$status, $method, $amount, $id, $user_id]);
 
-header("Location: /turnos-pro/pro/pagos.php?ok=1");
-exit;
+// Redirección corregida (ruta relativa)
+redirect("pagos.php?ok=1");

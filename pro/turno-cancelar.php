@@ -33,4 +33,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$turno_id]);
 
-redirect('/turnos-pro/pro/agenda.php?cancel=1');
+// Redirección corregida (ruta relativa)
+redirect('agenda.php?cancel=1');

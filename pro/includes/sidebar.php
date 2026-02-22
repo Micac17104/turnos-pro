@@ -12,49 +12,49 @@ $current = $current ?? ''; // ej: 'dashboard', 'agenda', 'pacientes', etc.
     <nav class="flex-1 px-4 py-4 space-y-1">
 
         <!-- DASHBOARD -->
-        <a href="/turnos-pro/pro/dashboard.php"
+        <a href="dashboard.php"
            class="flex items-center px-3 py-2 rounded-lg text-sm <?= $current === 'dashboard' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' ?>">
             Dashboard
         </a>
 
         <!-- AGENDA -->
-        <a href="/turnos-pro/pro/agenda.php"
+        <a href="agenda.php"
            class="flex items-center px-3 py-2 rounded-lg text-sm <?= $current === 'agenda' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' ?>">
             Agenda
         </a>
 
         <!-- PACIENTES -->
-        <a href="/turnos-pro/pro/pacientes.php"
+        <a href="pacientes.php"
            class="flex items-center px-3 py-2 rounded-lg text-sm <?= $current === 'pacientes' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' ?>">
             Pacientes
         </a>
 
         <!-- PAGOS -->
-        <a href="/turnos-pro/pro/pagos.php"
+        <a href="pagos.php"
            class="flex items-center px-3 py-2 rounded-lg text-sm <?= $current === 'pagos' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' ?>">
             Pagos
         </a>
 
         <!-- ESTADÍSTICAS -->
-        <a href="/turnos-pro/pro/estadisticas.php"
+        <a href="estadisticas.php"
            class="flex items-center px-3 py-2 rounded-lg text-sm <?= $current === 'estadisticas' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' ?>">
             Estadísticas
         </a>
 
         <!-- NOTIFICACIONES -->
-        <a href="/turnos-pro/pro/notificaciones.php"
+        <a href="notificaciones.php"
            class="flex items-center px-3 py-2 rounded-lg text-sm <?= $current === 'notificaciones' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' ?>">
             Notificaciones
         </a>
 
         <!-- PERFIL -->
-        <a href="/turnos-pro/pro/perfil.php"
+        <a href="perfil.php"
            class="flex items-center px-3 py-2 rounded-lg text-sm <?= $current === 'perfil' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' ?>">
             Perfil
         </a>
 
         <!-- HORARIOS -->
-        <a href="/turnos-pro/pro/horarios.php"
+        <a href="horarios.php"
            class="flex items-center px-3 py-2 rounded-lg text-sm <?= $current === 'horarios' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' ?>">
             Horarios
         </a>
@@ -62,7 +62,7 @@ $current = $current ?? ''; // ej: 'dashboard', 'agenda', 'pacientes', etc.
     </nav>
 
     <div class="px-4 py-4 border-t border-slate-200">
-        <a href="/turnos-pro/auth/logout.php"
+        <a href="../auth/logout.php"
            class="block w-full text-left text-sm text-red-600 hover:text-red-700">
             Cerrar sesión
         </a>

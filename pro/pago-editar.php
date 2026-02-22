@@ -32,7 +32,7 @@ require __DIR__ . '/includes/sidebar.php';
 
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Editar pago</h1>
 
-    <form method="POST" action="/turnos-pro/pro/pago-guardar.php"
+    <form method="POST" action="pago-guardar.php"
           class="bg-white p-6 rounded-xl shadow border max-w-lg">
 
         <input type="hidden" name="id" value="<?= $id ?>">
@@ -64,7 +64,7 @@ require __DIR__ . '/includes/sidebar.php';
                class="w-full px-3 py-2 border rounded-lg bg-slate-50 mb-6">
 
         <div class="flex justify-end gap-3">
-            <a href="/turnos-pro/pro/pagos.php"
+            <a href="pagos.php"
                class="px-4 py-2 bg-slate-200 rounded-lg text-slate-700 text-sm">
                 Cancelar
             </a>

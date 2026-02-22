@@ -21,5 +21,5 @@ if (!$task) {
 $stmt = $pdo->prepare("DELETE FROM professional_tasks WHERE id = ? AND user_id = ?");
 $stmt->execute([$id, $user_id]);
 
-header("Location: /turnos-pro/pro/agenda.php?view=day&fecha=" . urlencode($task['date']));
-exit;
+// Redirección corregida (ruta relativa)
+redirect("agenda.php?view=day&fecha=" . urlencode($task['date']));

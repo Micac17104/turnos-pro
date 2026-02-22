@@ -30,5 +30,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$title, $date, $time ?: null, $description, $id, $user_id]);
 
-header("Location: /turnos-pro/pro/agenda.php?view=day&fecha=" . urlencode($date));
-exit;
+// Redirección corregida (ruta relativa)
+redirect("agenda.php?view=day&fecha=" . urlencode($date));

@@ -54,4 +54,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$client_id, $date, $time, $turno_id]);
 
-redirect('/turnos-pro/pro/agenda.php?edit=1');
+// Redirección corregida (ruta relativa)
+redirect('agenda.php?edit=1');

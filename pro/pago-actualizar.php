@@ -28,4 +28,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$payment_status, $payment_method, $turno_id]);
 
-redirect('/turnos-pro/pro/agenda.php?pay=1');
+// Redirección corregida (ruta relativa)
+redirect('agenda.php?pay=1');

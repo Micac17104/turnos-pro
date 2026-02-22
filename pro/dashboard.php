@@ -7,27 +7,19 @@ if (!is_dir($path)) {
 }
 
 if (!is_writable($path)) {
-    chmod($path, 0777);
+    @chmod($path, 0777);
 }
 
 session_save_path($path);
 session_start();
 // -----------------------------------
 
-// VALIDAR SESIÓN DEL PROFESIONAL
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
-
-$user_id = $_SESSION['user_id'];
-
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';
 
 $page_title = 'Dashboard';
-$current = 'dashboard';
+$current    = 'dashboard';
 
 // --- CARGAR PREFERENCIAS DEL USUARIO ---
 $stmt = $pdo->prepare("SELECT dashboard_prefs FROM users WHERE id = ?");
@@ -35,10 +27,10 @@ $stmt->execute([$user_id]);
 $prefs_json = $stmt->fetchColumn();
 
 $prefs = $prefs_json ? json_decode($prefs_json, true) : [
-    "mostrar_tarjetas" => true,
-    "mostrar_graficos" => true,
-    "mostrar_proximos_turnos" => true,
-    "mostrar_ultimos_pagos" => true
+    "mostrar_tarjetas"         => true,
+    "mostrar_graficos"         => true,
+    "mostrar_proximos_turnos"  => true,
+    "mostrar_ultimos_pagos"    => true
 ];
 
 // --- ESTADÍSTICAS DEL MES ---
@@ -193,7 +185,9 @@ require __DIR__ . '/includes/sidebar.php';
 
         <div class="bg-white p-6 rounded-xl shadow border">
             <p class="text-sm text-slate-500">Ingresos del mes</p>
-            <p class="text-3xl font-bold text-green-600">$<?= number_format($stats['ingresos_mes'], 2, ',', '.') ?></p>
+            <p class="text-3xl font-bold text-green-600">
+                $<?= number_format($stats['ingresos_mes'], 2, ',', '.') ?>
+            </p>
         </div>
 
     </div>
@@ -232,7 +226,9 @@ require __DIR__ . '/includes/sidebar.php';
 
         <?php foreach ($proximos as $t): ?>
             <div class="p-4 border rounded-lg mb-3 bg-slate-50">
-                <p class="font-medium"><?= $t['date'] ?> — <?= substr($t['time'], 0, 5) ?> hs</p>
+                <p class="font-medium">
+                    <?= $t['date'] ?> — <?= substr($t['time'], 0, 5) ?> hs
+                </p>
                 <p class="text-sm text-slate-600"><?= h($t['paciente']) ?></p>
             </div>
         <?php endforeach; ?>
@@ -250,9 +246,13 @@ require __DIR__ . '/includes/sidebar.php';
 
         <?php foreach ($pagos as $p): ?>
             <div class="p-4 border rounded-lg mb-3 bg-slate-50">
-                <p class="font-medium"><?= $p['date'] ?> — <?= substr($p['time'], 0, 5) ?> hs</p>
+                <p class="font-medium">
+                    <?= $p['date'] ?> — <?= substr($p['time'], 0, 5) ?> hs
+                </p>
                 <p class="text-sm text-slate-600"><?= h($p['paciente']) ?></p>
-                <p class="text-sm text-green-600 font-semibold">$<?= number_format($p['amount'], 2, ',', '.') ?></p>
+                <p class="text-sm text-green-600 font-semibold">
+                    $<?= number_format($p['amount'], 2, ',', '.') ?>
+                </p>
             </div>
         <?php endforeach; ?>
     </div>

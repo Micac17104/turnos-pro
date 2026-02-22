@@ -1,6 +1,18 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX DEFINITIVO PARA RAILWAY ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    @chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// -----------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
@@ -39,7 +51,7 @@ require __DIR__ . '/includes/sidebar.php';
         </p>
     </div>
 
-    <form method="post" action="/turnos-pro/pro/evolucion-guardar.php"
+    <form method="post" action="evolucion-guardar.php"
           class="space-y-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
 
         <input type="hidden" name="patient_id" value="<?= $patient_id ?>">
@@ -69,7 +81,7 @@ require __DIR__ . '/includes/sidebar.php';
         </div>
 
         <div class="flex justify-end gap-3 pt-4">
-            <a href="/turnos-pro/pro/paciente-historia.php?id=<?= $patient_id ?>"
+            <a href="paciente-historia.php?id=<?= $patient_id ?>"
                class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm hover:bg-slate-300">
                 Cancelar
             </a>

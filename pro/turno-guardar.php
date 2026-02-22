@@ -69,7 +69,8 @@ if ($turno_id) {
     ");
     $stmt->execute([$client_id, $date, $time, $turno_id]);
 
-    redirect('/turnos-pro/pro/agenda.php?edit=1');
+    // Redirección corregida
+    redirect('agenda.php?edit=1');
 }
 
 // SI ES NUEVO → INSERT
@@ -79,4 +80,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id, $client_id, $date, $time]);
 
-redirect('/turnos-pro/pro/agenda.php?ok=1');
+// Redirección corregida
+redirect('agenda.php?ok=1');

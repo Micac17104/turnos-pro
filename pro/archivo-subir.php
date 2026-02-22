@@ -1,6 +1,18 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX SESSIONS (igual que en agenda.php) ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    @chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// ----------------------------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
@@ -10,7 +22,8 @@ $record_id = $_POST['record_id'] ?? null;
 if (!$record_id) die("Evolución no encontrada.");
 
 $stmt = $pdo->prepare("
-    SELECT patient_id FROM clinical_records
+    SELECT patient_id 
+    FROM clinical_records
     WHERE id = ? AND user_id = ?
 ");
 $stmt->execute([$record_id, $user_id]);
@@ -30,9 +43,12 @@ $ext = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
 
 if (!in_array($ext, $permitidos)) die("Formato no permitido.");
 
-$upload_dir = __DIR__ . "/../uploads/";
+// Ruta correcta (estabas un nivel arriba de más)
+$upload_dir = __DIR__ . "/../../uploads/";
 
-if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+if (!is_dir($upload_dir)) {
+    mkdir($upload_dir, 0777, true);
+}
 
 $nombre_final = uniqid("file_") . "." . $ext;
 $ruta_final = $upload_dir . $nombre_final;
@@ -47,5 +63,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$record_id, $nombre_final, $archivo['name']]);
 
-header("Location: /turnos-pro/pro/paciente-historia.php?id=" . $patient_id);
-exit;
+// Redirección corregida (ruta relativa)
+redirect("paciente-historia.php?id=" . $patient_id);

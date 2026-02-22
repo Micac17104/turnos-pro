@@ -67,5 +67,5 @@ if (!empty($_FILES['profile_image']['name'])) {
     }
 }
 
-header("Location: /turnos-pro/pro/perfil.php?ok=1");
-exit;
+// Redirección corregida (ruta relativa)
+redirect("perfil.php?ok=1");

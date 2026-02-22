@@ -70,8 +70,8 @@ if ($turno_id) {
     ");
     $stmt->execute([$client_id, $date, $time, $status, $turno_id]);
 
-    header("Location: /turnos-pro/pro/agenda.php?view=day&fecha=" . urlencode($date));
-    exit;
+    // Redirección corregida
+    redirect("agenda.php?view=day&fecha=" . urlencode($date));
 }
 
 // SI ES NUEVO → INSERT
@@ -81,5 +81,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id, $client_id, $date, $time, $status]);
 
-header("Location: /turnos-pro/pro/agenda.php?view=day&fecha=" . urlencode($date));
-exit;
+// Redirección corregida
+redirect("agenda.php?view=day&fecha=" . urlencode($date));

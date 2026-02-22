@@ -1,6 +1,18 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX DEFINITIVO PARA RAILWAY ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// -----------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
@@ -38,8 +50,7 @@ function nombreDia($fecha) {
         'Saturday'  => 'Sábado',
         'Sunday'    => 'Domingo'
     ];
-    $ingles = date('l', strtotime($fecha));
-    return $dias[$ingles] ?? $ingles;
+    return $dias[date('l', strtotime($fecha))];
 }
 function nombreMes($fecha) {
     $meses = [
@@ -56,8 +67,7 @@ function nombreMes($fecha) {
         'November'  => 'noviembre',
         'December'  => 'diciembre'
     ];
-    $ingles = date('F', strtotime($fecha));
-    return $meses[$ingles] ?? $ingles;
+    return $meses[date('F', strtotime($fecha))];
 }
 
 // Vista diaria
@@ -166,22 +176,22 @@ $pacientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Estilos
 function claseTurnoEstado($status) {
-    switch ($status) {
-        case 'confirmed': return 'border-green-200 bg-green-50';
-        case 'pending':   return 'border-amber-200 bg-amber-50';
-        case 'attended':  return 'border-blue-200 bg-blue-50';
-        case 'cancelled': return 'border-gray-200 bg-gray-100 text-gray-400 line-through';
-        default:          return 'border-gray-200 bg-gray-50';
-    }
+    return match ($status) {
+        'confirmed' => 'border-green-200 bg-green-50',
+        'pending'   => 'border-amber-200 bg-amber-50',
+        'attended'  => 'border-blue-200 bg-blue-50',
+        'cancelled' => 'border-gray-200 bg-gray-100 text-gray-400 line-through',
+        default     => 'border-gray-200 bg-gray-50',
+    };
 }
 function etiquetaEstado($status) {
-    switch ($status) {
-        case 'confirmed': return 'Confirmado';
-        case 'pending':   return 'Pendiente';
-        case 'attended':  return 'Atendido';
-        case 'cancelled': return 'Cancelado';
-        default:          return ucfirst($status);
-    }
+    return match ($status) {
+        'confirmed' => 'Confirmado',
+        'pending'   => 'Pendiente',
+        'attended'  => 'Atendido',
+        'cancelled' => 'Cancelado',
+        default     => ucfirst($status),
+    };
 }
 
 require __DIR__ . '/includes/header.php';
@@ -193,7 +203,7 @@ require __DIR__ . '/includes/sidebar.php';
     <div class="flex items-center justify-between mb-8">
         <h1 class="text-2xl font-semibold text-slate-900">Agenda</h1>
 
-        <a href="/turnos-pro/pro/dashboard.php"
+        <a href="dashboard.php"
            class="text-sm text-slate-600 hover:text-slate-900">
             ← Volver al panel
         </a>
@@ -222,6 +232,7 @@ require __DIR__ . '/includes/sidebar.php';
             $fechaAnterior  = date('Y-m-d', strtotime($hoy . ' -1 day'));
             $fechaSiguiente = date('Y-m-d', strtotime($hoy . ' +1 day'));
             ?>
+
             <?php if ($view === 'day'): ?>
                 <a href="?view=day&fecha=<?= h($fechaAnterior) ?>"
                    class="px-3 py-2 rounded-lg border bg-white text-slate-700 border-slate-300">
@@ -236,6 +247,7 @@ require __DIR__ . '/includes/sidebar.php';
                    class="px-3 py-2 rounded-lg border bg-white text-slate-700 border-slate-300">
                     Día siguiente →
                 </a>
+
             <?php elseif ($view === 'week'): ?>
                 <?php
                 $inicioSemana   = startOfWeek($hoy);
@@ -243,6 +255,7 @@ require __DIR__ . '/includes/sidebar.php';
                 $semanaAnterior = date('Y-m-d', strtotime($inicioSemana . ' -7 days'));
                 $semanaSiguiente= date('Y-m-d', strtotime($inicioSemana . ' +7 days'));
                 ?>
+
                 <a href="?view=week&fecha=<?= h($semanaAnterior) ?>"
                    class="px-3 py-2 rounded-lg border bg-white text-slate-700 border-slate-300">
                     ← Semana anterior
@@ -256,12 +269,14 @@ require __DIR__ . '/includes/sidebar.php';
                    class="px-3 py-2 rounded-lg border bg-white text-slate-700 border-slate-300">
                     Semana siguiente →
                 </a>
+
             <?php elseif ($view === 'month'): ?>
                 <?php
                 $inicioMes    = startOfMonth($hoy);
                 $mesAnterior  = date('Y-m-d', strtotime($inicioMes . ' -1 month'));
                 $mesSiguiente = date('Y-m-d', strtotime($inicioMes . ' +1 month'));
                 ?>
+
                 <a href="?view=month&fecha=<?= h($mesAnterior) ?>"
                    class="px-3 py-2 rounded-lg border bg-white text-slate-700 border-slate-300">
                     ← Mes anterior
@@ -296,137 +311,138 @@ require __DIR__ . '/includes/sidebar.php';
     <!-- VISTA DIARIA -->
     <?php if ($view === 'day'): ?>
 
-<div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-3 gap-6">
 
-    <!-- COLUMNA PRINCIPAL (AGENDA) -->
-    <div class="col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <!-- COLUMNA PRINCIPAL -->
+        <div class="col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
 
-        <?php if (count($turnosDia) === 0 && count($tareasDia) === 0): ?>
-            <p class="text-slate-500 text-sm">
-                No tenés turnos ni tareas para este día.
-            </p>
-        <?php endif; ?>
+            <?php if (count($turnosDia) === 0 && count($tareasDia) === 0): ?>
+                <p class="text-slate-500 text-sm">
+                    No tenés turnos ni tareas para este día.
+                </p>
+            <?php endif; ?>
 
-        <div class="space-y-3">
-            <?php foreach ($turnosDia as $t): ?>
+            <div class="space-y-3">
+                <?php foreach ($turnosDia as $t): ?>
 
-                <?php 
-                    $clase = claseTurnoEstado($t['status']);
-                    $nombre = $t['paciente'] ?: $t['name'];
-                ?>
+                    <?php 
+                        $clase = claseTurnoEstado($t['status']);
+                        $nombre = $t['paciente'] ?: $t['name'];
+                    ?>
 
-                <div class="flex justify-between items-center p-3 border rounded-lg text-sm <?= $clase ?>">
-                    <div>
-                        <p class="font-semibold text-slate-900">
-                            <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
-                        </p>
+                    <div class="flex justify-between items-center p-3 border rounded-lg text-sm <?= $clase ?>">
+                        <div>
+                            <p class="font-semibold text-slate-900">
+                                <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
+                            </p>
 
-                        <p class="text-xs text-slate-600 mt-1">
-                            Estado: <?= etiquetaEstado($t['status']) ?>
-                        </p>
-                    </div>
+                            <p class="text-xs text-slate-600 mt-1">
+                                Estado: <?= etiquetaEstado($t['status']) ?>
+                            </p>
+                        </div>
 
-                    <div class="flex flex-col items-end text-xs">
-                        <button
-                            class="text-slate-900 hover:underline"
-                            onclick="abrirEditarTurno(
-                                <?= (int)$t['id'] ?>,
-                                '<?= h($t['date']) ?>',
-                                '<?= h($t['time']) ?>',
-                                '<?= h($nombre, ENT_QUOTES) ?>',
-                                '<?= (int)$t['client_id'] ?>',
-                                '<?= h($t['status']) ?>'
-                            )">
-                            Editar
-                        </button>
-
-                        <a href="/turnos-pro/pro/turno-cancelar.php?id=<?= (int)$t['id'] ?>"
-                           class="text-red-600 hover:underline mt-1">
-                            Cancelar
-                        </a>
-                    </div>
-                </div>
-
-            <?php endforeach; ?>
-
-            <?php if (count($tareasDia) > 0): ?>
-                <div class="mt-4">
-                    <p class="text-sm font-semibold text-slate-800 mb-2">Tareas</p>
-
-                    <?php foreach ($tareasDia as $task): ?>
-                        <div class="flex justify-between items-start p-3 border rounded-lg bg-slate-50 text-sm">
-                            <div>
-                                <p class="font-medium text-slate-900">
-                                    <?= h($task['title']) ?>
-                                </p>
-                                <?php if ($task['time']): ?>
-                                    <p class="text-xs text-slate-600 mt-1">
-                                        <?= substr($task['time'], 0, 5) ?> hs
-                                    </p>
-                                <?php endif; ?>
-                            </div>
-
+                        <div class="flex flex-col items-end text-xs">
                             <button
-                                class="text-slate-900 text-xs hover:underline ml-2"
-                                onclick="abrirEditarTarea(
-                                    <?= (int)$task['id'] ?>,
-                                    '<?= h($task['title'], ENT_QUOTES) ?>',
-                                    '<?= h($task['date']) ?>',
-                                    '<?= h($task['time']) ?>',
-                                    `<?= h($task['description'] ?? '', ENT_QUOTES) ?>`
+                                class="text-slate-900 hover:underline"
+                                onclick="abrirEditarTurno(
+                                    <?= (int)$t['id'] ?>,
+                                    '<?= h($t['date']) ?>',
+                                    '<?= h($t['time']) ?>',
+                                    '<?= h($nombre, ENT_QUOTES) ?>',
+                                    '<?= (int)$t['client_id'] ?>',
+                                    '<?= h($t['status']) ?>'
                                 )">
                                 Editar
                             </button>
+
+                            <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>"
+                               class="text-red-600 hover:underline mt-1">
+                                Cancelar
+                            </a>
                         </div>
-                    <?php endforeach; ?>
-                </div>
+                    </div>
+
+                <?php endforeach; ?>
+
+                <?php if (count($tareasDia) > 0): ?>
+                    <div class="mt-4">
+                        <p class="text-sm font-semibold text-slate-800 mb-2">Tareas</p>
+
+                        <?php foreach ($tareasDia as $task): ?>
+                            <div class="flex justify-between items-start p-3 border rounded-lg bg-slate-50 text-sm">
+                                <div>
+                                    <p class="font-medium text-slate-900">
+                                        <?= h($task['title']) ?>
+                                    </p>
+                                    <?php if ($task['time']): ?>
+                                        <p class="text-xs text-slate-600 mt-1">
+                                            <?= substr($task['time'], 0, 5) ?> hs
+                                        </p>
+                                    <?php endif; ?>
+                                </div>
+
+                                <button
+                                    class="text-slate-900 text-xs hover:underline ml-2"
+                                    onclick="abrirEditarTarea(
+                                        <?= (int)$task['id'] ?>,
+                                        '<?= h($task['title'], ENT_QUOTES) ?>',
+                                        '<?= h($task['date']) ?>',
+                                        '<?= h($task['time']) ?>',
+                                        `<?= h($task['description'] ?? '', ENT_QUOTES) ?>`
+                                    )">
+                                    Editar
+                                </button>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- SIDEBAR DERECHA -->
+        <div class="col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+
+            <h3 class="text-lg font-semibold text-slate-900 mb-4">Turnos del día</h3>
+
+            <?php if (count($turnosDia) === 0): ?>
+                <p class="text-slate-500 text-sm">No hay turnos para hoy.</p>
             <?php endif; ?>
-        </div>
-    </div>
 
-    <!-- SIDEBAR DERECHA: TURNOS DEL DÍA -->
-    <div class="col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+            <div class="space-y-4">
+                <?php foreach ($turnosDia as $t): ?>
 
-        <h3 class="text-lg font-semibold text-slate-900 mb-4">Turnos del día</h3>
+                    <?php 
+                        $nombre = $t['paciente'] ?: $t['name'];
+                    ?>
 
-        <?php if (count($turnosDia) === 0): ?>
-            <p class="text-slate-500 text-sm">No hay turnos para hoy.</p>
-        <?php endif; ?>
-
-        <div class="space-y-4">
-            <?php foreach ($turnosDia as $t): ?>
-
-                <?php 
-                    $nombre = $t['paciente'] ?: $t['name'];
-                ?>
-
-                <div class="border rounded-lg p-3 bg-slate-50">
-                    <p class="font-semibold text-slate-900 text-sm">
-                        <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
-                    </p>
-
-                    <?php if ($t['phone']): ?>
-                        <p class="text-xs text-slate-700 mt-1">
-                            Tel: <?= h($t['phone']) ?>
+                    <div class="border rounded-lg p-3 bg-slate-50">
+                        <p class="font-semibold text-slate-900 text-sm">
+                            <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
                         </p>
-                    <?php endif; ?>
 
-                    <?php if ($t['email']): ?>
-                        <p class="text-xs text-slate-700">
-                            Email: <?= h($t['email']) ?>
-                        </p>
-                    <?php endif; ?>
-                </div>
+                        <?php if ($t['phone']): ?>
+                            <p class="text-xs text-slate-700 mt-1">
+                                Tel: <?= h($t['phone']) ?>
+                            </p>
+                        <?php endif; ?>
 
-            <?php endforeach; ?>
+                        <?php if ($t['email']): ?>
+                            <p class="text-xs text-slate-700">
+                                Email: <?= h($t['email']) ?>
+                            </p>
+                        <?php endif; ?>
+                    </div>
+
+                <?php endforeach; ?>
+            </div>
+
         </div>
 
     </div>
 
-</div>
+    <?php endif; ?>
 
-<?php endif; ?>
-        <!-- VISTA SEMANAL -->
+    <!-- VISTA SEMANAL -->
     <?php if ($view === 'week'): ?>
         <div class="grid grid-cols-1 md:grid-cols-7 gap-4 items-stretch">
             <?php foreach ($diasSemana as $dia): ?>
@@ -466,7 +482,7 @@ require __DIR__ . '/includes/sidebar.php';
                                         Editar
                                     </button>
 
-                                    <a href="/turnos-pro/pro/turno-cancelar.php?id=<?= (int)$t['id'] ?>"
+                                    <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>"
                                        class="text-red-600 hover:underline mt-1">
                                         Cancelar
                                     </a>
@@ -537,7 +553,7 @@ require __DIR__ . '/includes/sidebar.php';
                                 <span class="text-[11px]">
                                     <?= substr($t['time'], 0, 5) ?> — <?= h($t['paciente'] ?? 'Paciente sin registrar') ?>
                                 </span>
-                                <a href="/turnos-pro/pro/turno-cancelar.php?id=<?= (int)$t['id'] ?>"
+                                <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>"
                                    class="text-red-600 hover:underline text-[11px]">
                                     Cancelar
                                 </a>
@@ -560,7 +576,7 @@ require __DIR__ . '/includes/sidebar.php';
         <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
             <h3 class="text-lg font-semibold mb-4 text-slate-900">Nueva tarea</h3>
 
-            <form method="POST" action="/turnos-pro/pro/tarea-guardar.php">
+            <form method="POST" action="tarea-guardar.php">
                 <input type="hidden" name="date" value="<?= h($hoy) ?>">
 
                 <label class="text-xs font-medium text-slate-700">Título</label>
@@ -595,7 +611,7 @@ require __DIR__ . '/includes/sidebar.php';
         <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
             <h3 class="text-lg font-semibold mb-4 text-slate-900">Nuevo turno</h3>
 
-            <form method="POST" action="/turnos-pro/pro/turno-guardar.php">
+            <form method="POST" action="turno-guardar.php">
                 <label class="text-xs font-medium text-slate-700">Paciente</label>
                 <select name="client_id" required
                         class="w-full px-3 py-2 border rounded-lg bg-slate-50 mb-3 text-sm">
@@ -637,73 +653,61 @@ require __DIR__ . '/includes/sidebar.php';
     </div>
 
     <!-- MODAL EDITAR TURNO -->
-<div id="modalEditarTurno" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-        <h3 class="text-lg font-semibold mb-4 text-slate-900">Editar turno</h3>
+    <div id="modalEditarTurno" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
+            <h3 class="text-lg font-semibold mb-4 text-slate-900">Editar turno</h3>
 
-        <!-- AHORA APUNTA AL ARCHIVO CORRECTO -->
-        <form method="POST" action="/turnos-pro/pro/turno-guardar-agenda.php">
+            <form method="POST" action="turno-guardar-agenda.php">
+                <input type="hidden" name="turno_id" id="edit_id">
 
-            <input type="hidden" name="turno_id" id="edit_id">
+                <label class="text-xs font-medium text-slate-700">Paciente</label>
+                <select name="client_id" id="edit_client_id"
+                        class="w-full px-3 py-2 border rounded-lg bg-slate-50 mb-3 text-sm">
+                    <option value="">Paciente no registrado</option>
+                    <?php foreach ($pacientes as $p): ?>
+                        <option value="<?= (int)$p['id'] ?>"><?= h($p['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
 
-            <label class="text-xs font-medium text-slate-700">Paciente</label>
-            <select name="client_id" id="edit_client_id"
-                    class="w-full px-3 py-2 border rounded-lg bg-slate-50 mb-3 text-sm">
-                <option value="">Paciente no registrado</option>
-                <?php foreach ($pacientes as $p): ?>
-                    <option value="<?= (int)$p['id'] ?>"><?= h($p['name']) ?></option>
-                <?php endforeach; ?>
-            </select>
+                <label class="text-xs font-medium text-slate-700">Fecha</label>
+                <input type="date" name="date" id="edit_date"
+                       class="w-full px-3 py-2 border rounded-lg bg-slate-50 mb-3 text-sm">
 
-            <label class="text-xs font-medium text-slate-700">Fecha</label>
-            <input type="date" name="date" id="edit_date"
-                   class="w-full px-3 py-2 border rounded-lg bg-slate-50 mb-3 text-sm">
+                <label class="text-xs font-medium text-slate-700">Hora</label>
+                <input type="text" name="time" id="edit_time"
+                       class="w-full px-3 py-2 border rounded-lg bg-slate-50 mb-3 text-sm"
+                       placeholder="HH:MM" maxlength="5" pattern="[0-9]{2}:[0-9]{2}">
 
-            <label class="text-xs font-medium text-slate-700">Hora</label>
-            <input type="text" name="time" id="edit_time"
-                   class="w-full px-3 py-2 border rounded-lg bg-slate-50 mb-3 text-sm"
-                   placeholder="HH:MM" maxlength="5" pattern="[0-9]{2}:[0-9]{2}">
+                <label class="text-xs font-medium text-slate-700">Estado</label>
+                <select name="status" id="edit_status"
+                        class="w-full px-3 py-2 border rounded-lg bg-slate-50 mb-4 text-sm">
+                    <option value="pending">Pendiente</option>
+                    <option value="confirmed">Confirmado</option>
+                    <option value="attended">Atendido</option>
+                    <option value="cancelled">Cancelado</option>
+                </select>
 
-            <label class="text-xs font-medium text-slate-700">Estado</label>
-            <select name="status" id="edit_status"
-                    class="w-full px-3 py-2 border rounded-lg bg-slate-50 mb-4 text-sm">
-                <option value="pending">Pendiente</option>
-                <option value="confirmed">Confirmado</option>
-                <option value="attended">Atendido</option>
-                <option value="cancelled">Cancelado</option>
-            </select>
+                <div class="flex justify-end gap-3">
+                    <button type="button"
+                            onclick="document.getElementById('modalEditarTurno').classList.add('hidden')"
+                            class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm">
+                        Cerrar
+                    </button>
 
-            <div class="flex justify-end gap-3">
-                <button type="button"
-                        onclick="document.getElementById('modalEditarTurno').classList.add('hidden')"
-                        class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm">
-                    Cerrar
-                </button>
-
-                <button class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm">
-                    Guardar cambios
-                </button>
-            </div>
-        </form>
+                    <button class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm">
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<script>
-// Permitir escribir la hora libremente
-document.querySelectorAll('#edit_time').forEach(input => {
-    input.addEventListener('input', e => {
-        let v = e.target.value.replace(/[^0-9]/g, '');
-        if (v.length >= 3) v = v.slice(0,2) + ':' + v.slice(2,4);
-        e.target.value = v;
-    });
-});
-</script>
     <!-- MODAL EDITAR TAREA -->
     <div id="modalEditarTarea" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
             <h3 class="text-lg font-semibold mb-4 text-slate-900">Editar tarea</h3>
 
-            <form method="POST" action="/turnos-pro/pro/tarea-editar.php">
+            <form method="POST" action="tarea-editar.php">
                 <input type="hidden" name="id" id="task_id">
 
                 <label class="text-xs font-medium text-slate-700">Título</label>
@@ -747,6 +751,15 @@ document.querySelectorAll('#edit_time').forEach(input => {
 </main>
 
 <script>
+// Permitir escribir la hora libremente en el campo de edición
+document.querySelectorAll('#edit_time').forEach(input => {
+    input.addEventListener('input', e => {
+        let v = e.target.value.replace(/[^0-9]/g, '');
+        if (v.length >= 3) v = v.slice(0,2) + ':' + v.slice(2,4);
+        e.target.value = v;
+    });
+});
+
 function abrirEditarTurno(id, fecha, hora, paciente, clientId, status) {
     document.getElementById('edit_id').value = id;
     document.getElementById('edit_date').value = fecha;
@@ -764,7 +777,7 @@ function abrirEditarTarea(id, title, date, time, description) {
     document.getElementById('task_description').value = description || '';
 
     document.getElementById('task_delete_link').href =
-        "/turnos-pro/pro/tarea-eliminar.php?id=" + id;
+        "tarea-eliminar.php?id=" + id;
 
     document.getElementById('modalEditarTarea').classList.remove('hidden');
 }

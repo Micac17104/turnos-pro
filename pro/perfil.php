@@ -40,7 +40,7 @@ require __DIR__ . '/includes/sidebar.php';
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Mi perfil</h1>
 
     <form method="post" enctype="multipart/form-data"
-          action="/turnos-pro/pro/perfil-guardar.php"
+          action="perfil-guardar.php"
           class="space-y-10">
 
         <!-- DATOS PERSONALES -->
@@ -136,7 +136,7 @@ require __DIR__ . '/includes/sidebar.php';
                     <input type="file" name="profile_image" accept="image/*" class="text-sm">
 
                     <?php if ($user['profile_image']): ?>
-                        <img src="/turnos-pro/uploads/<?= h($user['profile_image']) ?>"
+                        <img src="../uploads/<?= h($user['profile_image']) ?>"
                              class="mt-3 w-24 h-24 rounded-full object-cover border">
                     <?php endif; ?>
                 </div>
@@ -146,7 +146,7 @@ require __DIR__ . '/includes/sidebar.php';
 
         <!-- BOTONES -->
         <div class="flex justify-end gap-3">
-            <a href="/turnos-pro/pro/agenda.php"
+            <a href="agenda.php"
                class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm hover:bg-slate-300">
                 Cancelar
             </a>

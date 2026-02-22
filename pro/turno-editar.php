@@ -43,7 +43,7 @@ require __DIR__ . '/includes/sidebar.php';
 
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Editar turno</h1>
 
-    <form method="post" action="/turnos-pro/pro/turno-guardar-agenda.php"
+    <form method="post" action="turno-guardar-agenda.php"
           class="space-y-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
 
         <input type="hidden" name="turno_id" value="<?= $turno_id ?>">
@@ -92,13 +92,13 @@ require __DIR__ . '/includes/sidebar.php';
         </div>
 
         <div class="flex justify-between items-center pt-4">
-            <a href="/turnos-pro/pro/pago-editar.php?id=<?= $turno_id ?>"
+            <a href="pago-editar.php?id=<?= $turno_id ?>"
                class="text-sm text-blue-600 hover:underline">
                 Editar pago →
             </a>
 
             <div class="flex gap-3">
-                <a href="/turnos-pro/pro/agenda.php"
+                <a href="agenda.php"
                    class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm hover:bg-slate-300">
                     Cancelar
                 </a>

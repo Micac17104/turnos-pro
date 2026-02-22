@@ -85,15 +85,15 @@ require __DIR__ . '/includes/sidebar.php';
                             WhatsApp
                         </a>
 
-                        <a href="/turnos-pro/pro/paciente-historia.php?id=<?= $c['id'] ?>"
+                        <a href="paciente-historia.php?id=<?= $c['id'] ?>"
                            class="px-3 py-1 bg-slate-200 text-slate-700 rounded text-sm hover:bg-slate-300">
                             Historia
                         </a>
 
-                       <a href="/turnos-pro/pro/paciente-datos-editar.php?id=<?= $c['id'] ?>"
-                          class="px-3 py-1 bg-slate-200 text-slate-700 rounded text-sm hover:bg-slate-300">
+                        <a href="paciente-datos-editar.php?id=<?= $c['id'] ?>"
+                           class="px-3 py-1 bg-slate-200 text-slate-700 rounded text-sm hover:bg-slate-300">
                             Editar
-            </a>    
+                        </a>
 
                     </div>
 
@@ -112,7 +112,7 @@ require __DIR__ . '/includes/sidebar.php';
 
         <h3 class="text-xl font-semibold mb-4">Agregar paciente</h3>
 
-        <form method="POST" action="/turnos-pro/pro/paciente-guardar.php">
+        <form method="POST" action="paciente-guardar.php">
 
             <input type="text" name="name" placeholder="Nombre completo" required
                    class="w-full p-3 mb-3 border rounded">

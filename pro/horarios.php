@@ -1,6 +1,18 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX DEFINITIVO PARA RAILWAY ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    @chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// -----------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
@@ -37,7 +49,7 @@ require __DIR__ . '/includes/sidebar.php';
 
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Horarios de atención</h1>
 
-    <form method="post" action="/turnos-pro/pro/horarios-guardar.php" class="space-y-10">
+    <form method="post" action="horarios-guardar.php" class="space-y-10">
 
         <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-semibold text-slate-900 mb-4">Disponibilidad semanal</h2>
@@ -46,9 +58,9 @@ require __DIR__ . '/includes/sidebar.php';
 
                 <?php foreach ($dias as $dow => $label): 
                     $h = $horarios[$dow] ?? [
-                        'start_time'      => '09:00',
-                        'end_time'        => '17:00',
-                        'interval_minutes'=> 30
+                        'start_time'       => '09:00',
+                        'end_time'         => '17:00',
+                        'interval_minutes' => 30
                     ];
                 ?>
 
@@ -90,7 +102,7 @@ require __DIR__ . '/includes/sidebar.php';
         </section>
 
         <div class="flex justify-end gap-3">
-            <a href="/turnos-pro/pro/agenda.php"
+            <a href="agenda.php"
                class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm hover:bg-slate-300">
                 Cancelar
             </a>

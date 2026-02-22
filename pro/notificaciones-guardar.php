@@ -1,6 +1,18 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX DEFINITIVO PARA RAILWAY ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    @chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// -----------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
@@ -43,7 +55,7 @@ require __DIR__ . '/includes/sidebar.php';
 
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Notificaciones</h1>
 
-    <form method="post" action="/turnos-pro/pro/notificaciones-guardar.php"
+    <form method="post" action="notificaciones-guardar.php"
           class="space-y-10">
 
         <!-- NOTIFICACIONES AL PACIENTE -->
@@ -143,7 +155,7 @@ require __DIR__ . '/includes/sidebar.php';
 
         <!-- BOTONES -->
         <div class="flex justify-end gap-3">
-            <a href="/turnos-pro/pro/index.php"
+            <a href="index.php"
                class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm hover:bg-slate-300">
                 Cancelar
             </a>

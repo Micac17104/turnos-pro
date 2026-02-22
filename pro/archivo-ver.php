@@ -1,9 +1,22 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX SESSIONS (igual que en agenda.php) ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    @chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// ----------------------------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
+require __DIR__ . '/includes/helpers.php';
 
 $file_id = require_param($_GET, 'id', 'Archivo no encontrado.');
 

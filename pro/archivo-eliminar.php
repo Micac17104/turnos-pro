@@ -1,9 +1,22 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX SESSIONS (mismo criterio que agenda.php) ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    @chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// ----------------------------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
+require __DIR__ . '/includes/helpers.php';
 
 $file_id = require_param($_GET, 'id');
 
@@ -31,4 +44,5 @@ if (file_exists($ruta)) {
 $stmt = $pdo->prepare("DELETE FROM clinical_files WHERE id = ?");
 $stmt->execute([$file_id]);
 
-redirect("/turnos-pro/pro/paciente-historia.php?id=" . $file['patient_id']);
+// Ruta relativa, sin /turnos-pro para que funcione igual en Railway
+redirect("paciente-historia.php?id=" . $file['patient_id']);

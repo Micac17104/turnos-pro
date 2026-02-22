@@ -1,6 +1,18 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX SESSIONS (igual que en agenda.php) ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    @chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// ----------------------------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
@@ -14,10 +26,10 @@ $stmt->execute([$user_id]);
 $prefs_json = $stmt->fetchColumn();
 
 $prefs = $prefs_json ? json_decode($prefs_json, true) : [
-    "mostrar_tarjetas" => true,
-    "mostrar_graficos" => true,
-    "mostrar_proximos_turnos" => true,
-    "mostrar_ultimos_pagos" => true
+    "mostrar_tarjetas"         => true,
+    "mostrar_graficos"         => true,
+    "mostrar_proximos_turnos"  => true,
+    "mostrar_ultimos_pagos"    => true
 ];
 
 require __DIR__ . '/includes/header.php';

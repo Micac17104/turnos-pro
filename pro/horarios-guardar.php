@@ -1,9 +1,22 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX DEFINITIVO PARA RAILWAY ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    @chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// -----------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
+require __DIR__ . '/includes/helpers.php';
 
 $enabled  = $_POST['enabled']  ?? [];
 $start    = $_POST['start']    ?? [];
@@ -21,7 +34,7 @@ $stmt = $pdo->prepare("
 ");
 
 foreach ($enabled as $dow => $val) {
-    // Validación mínima
+
     if (empty($start[$dow]) || empty($end[$dow]) || empty($interval[$dow])) {
         continue;
     }
@@ -35,5 +48,5 @@ foreach ($enabled as $dow => $val) {
     ]);
 }
 
-header("Location: /turnos-pro/pro/horarios.php?ok=1");
-exit;
+// Redirección corregida (ruta relativa)
+redirect("horarios.php?ok=1");

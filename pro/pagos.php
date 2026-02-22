@@ -27,8 +27,6 @@ require __DIR__ . '/includes/sidebar.php';
 
 <main class="flex-1 p-8">
 
-
-
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Pagos</h1>
 
     <div class="bg-white p-6 rounded-xl shadow border">
@@ -69,7 +67,7 @@ require __DIR__ . '/includes/sidebar.php';
                         </td>
 
                         <td>
-                            <a href="/turnos-pro/pro/pago-editar.php?id=<?= $p['id'] ?>"
+                            <a href="pago-editar.php?id=<?= $p['id'] ?>"
                                class="text-blue-600 hover:underline">
                                 Editar
                             </a>

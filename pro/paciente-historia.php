@@ -33,7 +33,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$patient_id]);
 $extra = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-// Evoluciones + archivos (JOIN optimizado)
+// Evoluciones + archivos
 $stmt = $pdo->prepare("
     SELECT cr.id AS record_id, cr.fecha, cr.motivo, cr.evolucion, cr.indicaciones, cr.diagnostico,
            cf.id AS file_id, cf.file_name, cf.file_path
@@ -85,7 +85,7 @@ require __DIR__ . '/includes/sidebar.php';
             </p>
         </div>
 
-        <a href="/turnos-pro/pro/pacientes.php"
+        <a href="pacientes.php"
            class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm hover:bg-slate-300">
             ← Volver
         </a>
@@ -96,7 +96,7 @@ require __DIR__ . '/includes/sidebar.php';
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-slate-900">Datos clínicos</h2>
 
-            <a href="/turnos-pro/pro/paciente-datos-editar.php?id=<?= $patient_id ?>"
+            <a href="paciente-datos-editar.php?id=<?= $patient_id ?>"
                class="px-3 py-1 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700">
                 Editar
             </a>
@@ -117,7 +117,7 @@ require __DIR__ . '/includes/sidebar.php';
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-slate-900">Evoluciones</h2>
 
-            <a href="/turnos-pro/pro/evolucion-nueva.php?patient_id=<?= $patient_id ?>"
+            <a href="evolucion-nueva.php?patient_id=<?= $patient_id ?>"
                class="px-3 py-1 rounded-lg bg-emerald-600 text-white text-sm hover:bg-emerald-700">
                 Nueva evolución
             </a>
@@ -144,11 +144,11 @@ require __DIR__ . '/includes/sidebar.php';
                                 <ul class="list-disc ml-6 mt-2 text-blue-700 text-sm">
                                     <?php foreach ($e['archivos'] as $f): ?>
                                         <li>
-                                            <a href="/turnos-pro/pro/archivo-ver.php?id=<?= $f['id'] ?>" target="_blank">
+                                            <a href="archivo-ver.php?id=<?= $f['id'] ?>" target="_blank">
                                                 <?= h($f['file_name']) ?>
                                             </a>
 
-                                            <a href="/turnos-pro/pro/archivo-eliminar.php?id=<?= $f['id'] ?>"
+                                            <a href="archivo-eliminar.php?id=<?= $f['id'] ?>"
                                                class="text-red-600 ml-2 text-xs"
                                                onclick="return confirm('¿Eliminar archivo?')">
                                                 Eliminar
@@ -159,7 +159,7 @@ require __DIR__ . '/includes/sidebar.php';
                             </div>
                         <?php endif; ?>
 
-                        <a href="/turnos-pro/pro/archivo-subir.php?record_id=<?= $e['id'] ?>"
+                        <a href="archivo-subir.php?record_id=<?= $e['id'] ?>"
                            class="inline-block mt-4 px-3 py-1 bg-slate-200 text-slate-700 rounded hover:bg-slate-300 text-xs">
                             Adjuntar archivo
                         </a>
