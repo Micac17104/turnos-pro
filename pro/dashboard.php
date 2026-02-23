@@ -40,6 +40,7 @@ $stats = [];
 $stmt = $pdo->prepare("
     SELECT COUNT(*) FROM appointments
     WHERE user_id = ?
+      AND date IS NOT NULL
       AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
 ");
 $stmt->execute([$user_id]);
@@ -70,6 +71,7 @@ $stmt = $pdo->prepare("
     SELECT COUNT(*) FROM appointments
     WHERE user_id = ?
       AND payment_status = 'pagado'
+      AND date IS NOT NULL
       AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
 ");
 $stmt->execute([$user_id]);
@@ -81,6 +83,7 @@ $stmt = $pdo->prepare("
     WHERE user_id = ?
       AND payment_status = 'pagado'
       AND amount IS NOT NULL
+      AND date IS NOT NULL
       AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
 ");
 $stmt->execute([$user_id]);
@@ -91,6 +94,7 @@ $stmt = $pdo->prepare("
     SELECT status, COUNT(*) AS total
     FROM appointments
     WHERE user_id = ?
+      AND date IS NOT NULL
       AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
     GROUP BY status
 ");
@@ -144,6 +148,7 @@ $stmt = $pdo->prepare("
     FROM appointments a
     LEFT JOIN clients c ON c.id = a.client_id
     WHERE a.user_id = ?
+      AND a.date IS NOT NULL
       AND a.date >= CURDATE()
     ORDER BY a.date ASC, a.time ASC
     LIMIT 5
@@ -158,6 +163,7 @@ $stmt = $pdo->prepare("
     LEFT JOIN clients c ON c.id = a.client_id
     WHERE a.user_id = ?
       AND a.payment_status = 'pagado'
+      AND a.date IS NOT NULL
     ORDER BY a.date DESC, a.time DESC
     LIMIT 5
 ");
@@ -196,7 +202,7 @@ require __DIR__ . '/includes/sidebar.php';
         <div class="bg-white p-6 rounded-xl shadow border">
             <p class="text-sm text-slate-500">Ingresos del mes</p>
             <p class="text-3xl font-bold text-green-600">
-                $<?= number_format($stats['ingresos_mes'], 2, ',', '.') ?>
+                $<?= number_format($stats['ingresos_mes'] ?? 0, 2, ',', '.') ?>
             </p>
         </div>
 
@@ -237,9 +243,12 @@ require __DIR__ . '/includes/sidebar.php';
         <?php foreach ($proximos as $t): ?>
             <div class="p-4 border rounded-lg mb-3 bg-slate-50">
                 <p class="font-medium">
-                    <?= $t['date'] ?> — <?= substr($t['time'], 0, 5) ?> hs
+                    <?= $t['date'] ?? 'Sin fecha' ?> — 
+                    <?= $t['time'] ? substr($t['time'], 0, 5) : '--:--' ?> hs
                 </p>
-                <p class="text-sm text-slate-600"><?= h($t['paciente']) ?></p>
+                <p class="text-sm text-slate-600">
+                    <?= h($t['paciente'] ?? 'Paciente desconocido') ?>
+                </p>
             </div>
         <?php endforeach; ?>
     </div>
@@ -257,11 +266,14 @@ require __DIR__ . '/includes/sidebar.php';
         <?php foreach ($pagos as $p): ?>
             <div class="p-4 border rounded-lg mb-3 bg-slate-50">
                 <p class="font-medium">
-                    <?= $p['date'] ?> — <?= substr($p['time'], 0, 5) ?> hs
+                    <?= $p['date'] ?? 'Sin fecha' ?> — 
+                    <?= $p['time'] ? substr($p['time'], 0, 5) : '--:--' ?> hs
                 </p>
-                <p class="text-sm text-slate-600"><?= h($p['paciente']) ?></p>
+                <p class="text-sm text-slate-600">
+                    <?= h($p['paciente'] ?? 'Paciente desconocido') ?>
+                </p>
                 <p class="text-sm text-green-600 font-semibold">
-                    $<?= number_format($p['amount'], 2, ',', '.') ?>
+                    $<?= number_format($p['amount'] ?? 0, 2, ',', '.') ?>
                 </p>
             </div>
         <?php endforeach; ?>
