@@ -49,6 +49,7 @@ $stats['turnos_mes'] = $stmt->fetchColumn() ?: 0;
 $stmt = $pdo->prepare("
     SELECT COUNT(*) FROM clients
     WHERE user_id = ?
+      AND created_at IS NOT NULL
       AND DATE_FORMAT(created_at, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
 ");
 $stmt->execute([$user_id]);
@@ -95,6 +96,7 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 $turnos_estado_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
 if (empty($turnos_estado_raw)) {
     $turnos_estado_raw = ['Sin datos' => 0];
 }
@@ -120,6 +122,7 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 $metodos_pago_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
 if (empty($metodos_pago_raw)) {
     $metodos_pago_raw = ['Sin datos' => 0];
 }
@@ -137,7 +140,7 @@ foreach ($metodos_pago_raw as $metodo => $total) {
 
 // --- PRÓXIMOS TURNOS ---
 $stmt = $pdo->prepare("
-    SELECT a.*, COALESCE(c.name, a.name) AS paciente
+    SELECT a.*, c.name AS paciente
     FROM appointments a
     LEFT JOIN clients c ON c.id = a.client_id
     WHERE a.user_id = ?
@@ -150,7 +153,7 @@ $proximos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // --- ÚLTIMOS PAGOS ---
 $stmt = $pdo->prepare("
-    SELECT a.*, COALESCE(c.name, a.name) AS paciente
+    SELECT a.*, c.name AS paciente
     FROM appointments a
     LEFT JOIN clients c ON c.id = a.client_id
     WHERE a.user_id = ?

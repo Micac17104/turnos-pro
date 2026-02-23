@@ -21,132 +21,113 @@ require __DIR__ . '/includes/helpers.php';
 $page_title = 'Estadísticas';
 $current    = 'estadisticas';
 
-$mes_actual = date('Y-m');
-
-// Turnos del mes
+// --- TURNOS POR MES ---
 $stmt = $pdo->prepare("
-    SELECT COUNT(*) FROM appointments
-    WHERE user_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?
-");
-$stmt->execute([$user_id, $mes_actual]);
-$turnos_mes = $stmt->fetchColumn() ?: 0;
-
-// Pacientes nuevos
-$stmt = $pdo->prepare("
-    SELECT COUNT(*) FROM clients
-    WHERE user_id = ? AND DATE_FORMAT(created_at, '%Y-%m') = ?
-");
-$stmt->execute([$user_id, $mes_actual]);
-$pacientes_nuevos = $stmt->fetchColumn() ?: 0;
-
-// Evoluciones
-$stmt = $pdo->prepare("
-    SELECT COUNT(*) FROM clinical_records
-    WHERE user_id = ? AND DATE_FORMAT(fecha, '%Y-%m') = ?
-");
-$stmt->execute([$user_id, $mes_actual]);
-$evoluciones_mes = $stmt->fetchColumn() ?: 0;
-
-// Turnos pagados
-$stmt = $pdo->prepare("
-    SELECT COUNT(*) FROM appointments
-    WHERE user_id = ? AND payment_status = 'pagado'
-      AND DATE_FORMAT(date, '%Y-%m') = ?
-");
-$stmt->execute([$user_id, $mes_actual]);
-$turnos_pagados = $stmt->fetchColumn() ?: 0;
-
-// Ingresos del mes
-$stmt = $pdo->prepare("
-    SELECT COALESCE(SUM(amount),0) FROM appointments
-    WHERE user_id = ? AND payment_status = 'pagado'
-      AND amount IS NOT NULL
-      AND DATE_FORMAT(date, '%Y-%m') = ?
-");
-$stmt->execute([$user_id, $mes_actual]);
-$ingresos_mes = $stmt->fetchColumn() ?: 0;
-
-// Turnos por estado
-$stmt = $pdo->prepare("
-    SELECT status, COUNT(*) AS total
+    SELECT DATE_FORMAT(date, '%Y-%m') AS mes, COUNT(*) AS total
     FROM appointments
-    WHERE user_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?
-    GROUP BY status
+    WHERE user_id = ?
+      AND date IS NOT NULL
+    GROUP BY mes
+    ORDER BY mes ASC
 ");
-$stmt->execute([$user_id, $mes_actual]);
-$turnos_estado_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+$stmt->execute([$user_id]);
+$turnos_mes_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Traducir estados
-$turnos_estado = [];
-foreach ($turnos_estado_raw as $estado => $total) {
-    $label = match ($estado) {
-        'pending'   => 'Pendiente',
-        'confirmed' => 'Confirmado',
-        'cancelled' => 'Cancelado',
-        default     => ucfirst($estado),
-    };
-    $turnos_estado[$label] = $total;
+if (empty($turnos_mes_raw)) {
+    $turnos_mes_raw = ['Sin datos' => 0];
 }
 
-// Turnos por día
+// --- INGRESOS POR MES ---
 $stmt = $pdo->prepare("
-    SELECT DATE(date) AS dia, COUNT(*) AS total
-    FROM appointments
-    WHERE user_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?
-    GROUP BY DATE(date)
-    ORDER BY dia ASC
-");
-$stmt->execute([$user_id, $mes_actual]);
-$turnos_dia_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Ingresos por día
-$stmt = $pdo->prepare("
-    SELECT DATE(date) AS dia, COALESCE(SUM(amount),0) AS total
-    FROM appointments
-    WHERE user_id = ? AND payment_status = 'pagado'
-      AND amount IS NOT NULL
-      AND DATE_FORMAT(date, '%Y-%m') = ?
-    GROUP BY DATE(date)
-    ORDER BY dia ASC
-");
-$stmt->execute([$user_id, $mes_actual]);
-$ingresos_dia_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Métodos de pago
-$stmt = $pdo->prepare("
-    SELECT payment_method, COUNT(*) AS total
+    SELECT DATE_FORMAT(date, '%Y-%m') AS mes, COALESCE(SUM(amount),0) AS total
     FROM appointments
     WHERE user_id = ?
       AND payment_status = 'pagado'
-      AND payment_method IS NOT NULL
-      AND DATE_FORMAT(date, '%Y-%m') = ?
-    GROUP BY payment_method
+      AND amount IS NOT NULL
+      AND date IS NOT NULL
+    GROUP BY mes
+    ORDER BY mes ASC
 ");
-$stmt->execute([$user_id, $mes_actual]);
-$metodos_pago_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+$stmt->execute([$user_id]);
+$ingresos_mes_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Traducir métodos
-$metodos_pago = [];
-foreach ($metodos_pago_raw as $metodo => $total) {
-    $label = match ($metodo) {
-        'efectivo'      => 'Efectivo',
-        'transferencia' => 'Transferencia',
-        'mercado_pago'  => 'Mercado Pago',
-        default         => ucfirst($metodo),
-    };
-    $metodos_pago[$label] = $total;
+if (empty($ingresos_mes_raw)) {
+    $ingresos_mes_raw = ['Sin datos' => 0];
 }
-
-// Normalizar arrays
-$turnos_dia_labels   = array_column($turnos_dia_raw, 'dia');
-$turnos_dia_values   = array_column($turnos_dia_raw, 'total');
-$ingresos_dia_labels = array_column($ingresos_dia_raw, 'dia');
-$ingresos_dia_values = array_column($ingresos_dia_raw, 'total');
 
 require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';
 ?>
 
-<!-- HTML Y JS SE MANTIENEN IGUAL -->
+<main class="flex-1 p-8">
+
+    <h1 class="text-2xl font-semibold text-slate-900 mb-6">Estadísticas</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- TURNOS POR MES -->
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="font-semibold mb-3 text-sm">Turnos por mes</h3>
+            <canvas id="chartTurnosMes"></canvas>
+        </div>
+
+        <!-- INGRESOS POR MES -->
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="font-semibold mb-3 text-sm">Ingresos por mes</h3>
+            <canvas id="chartIngresosMes"></canvas>
+        </div>
+
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// CONFIGURACIÓN GLOBAL
+Chart.defaults.font.size = 13;
+Chart.defaults.color = '#334155';
+
+// --- TURNOS POR MES ---
+new Chart(document.getElementById('chartTurnosMes'), {
+    type: 'line',
+    data: {
+        labels: <?= json_encode(array_keys($turnos_mes_raw)) ?>,
+        datasets: [{
+            label: 'Turnos',
+            data: <?= json_encode(array_values($turnos_mes_raw)) ?>,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59,130,246,0.2)',
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    },
+    options: {
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
+
+// --- INGRESOS POR MES ---
+new Chart(document.getElementById('chartIngresosMes'), {
+    type: 'bar',
+    data: {
+        labels: <?= json_encode(array_keys($ingresos_mes_raw)) ?>,
+        datasets: [{
+            label: 'Ingresos',
+            data: <?= json_encode(array_values($ingresos_mes_raw)) ?>,
+            backgroundColor: '#10b981',
+            borderColor: '#059669',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
+</script>
 
 <?php require __DIR__ . '/includes/footer.php'; ?>
