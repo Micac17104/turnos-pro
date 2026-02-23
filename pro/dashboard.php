@@ -58,6 +58,7 @@ $stats['pacientes_nuevos'] = $stmt->fetchColumn() ?: 0;
 $stmt = $pdo->prepare("
     SELECT COUNT(*) FROM clinical_records
     WHERE user_id = ?
+      AND fecha IS NOT NULL
       AND DATE_FORMAT(fecha, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
 ");
 $stmt->execute([$user_id]);
@@ -94,6 +95,9 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 $turnos_estado_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+if (empty($turnos_estado_raw)) {
+    $turnos_estado_raw = ['Sin datos' => 0];
+}
 
 $turnos_estado = [];
 foreach ($turnos_estado_raw as $estado => $total) {
@@ -116,6 +120,9 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 $metodos_pago_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+if (empty($metodos_pago_raw)) {
+    $metodos_pago_raw = ['Sin datos' => 0];
+}
 
 $metodos_pago = [];
 foreach ($metodos_pago_raw as $metodo => $total) {
