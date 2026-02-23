@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: ../centro/centro-dashboard.php");
             exit;
         } else {
-            header("Location: ../pro/agenda.php");
+            header("Location: ../dashboard.php");
             exit;
         }
     }
