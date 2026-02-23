@@ -7,7 +7,7 @@ if (!is_dir($path)) {
 }
 
 if (!is_writable($path)) {
-    chmod($path, 0777);
+    @chmod($path, 0777);
 }
 
 session_save_path($path);
@@ -37,8 +37,8 @@ if (!function_exists('h')) {
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Estilos propios -->
-    <!-- RUTA CORREGIDA: ahora es relativa y funciona en Railway -->
-    <link rel="stylesheet" href="assets/css/app.css">
+    <!-- RUTA ABSOLUTA: funciona SIEMPRE en Railway -->
+    <link rel="stylesheet" href="/pro/assets/css/app.css">
 </head>
 
 <body class="bg-slate-100 text-slate-900">
