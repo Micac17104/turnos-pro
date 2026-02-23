@@ -1,6 +1,8 @@
+
+
 <?php
-require __DIR__ . '/includes/header.php';
-require __DIR__ . '/includes/sidebar.php';
+echo "PHP FUNCIONA";
+exit;
 ?>
 
 <main class="flex-1 p-8">
