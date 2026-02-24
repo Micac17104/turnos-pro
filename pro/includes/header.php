@@ -1,18 +1,9 @@
 <?php
-// --- FIX DEFINITIVO PARA RAILWAY ---
-$path = __DIR__ . '/../../sessions';
+// /pro/includes/header.php
 
-if (!is_dir($path)) {
-    mkdir($path, 0777, true);
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
-
-if (!is_writable($path)) {
-    @chmod($path, 0777);
-}
-
-session_save_path($path);
-session_start();
-// -----------------------------------
 
 // Si no viene definido, asignar título por defecto
 if (!isset($page_title)) {
@@ -33,11 +24,10 @@ if (!function_exists('h')) {
     <title><?= h($page_title) ?> - TurnosPro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Tailwind CDN -->
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Estilos propios -->
-    <!-- RUTA ABSOLUTA: funciona SIEMPRE en Railway -->
     <link rel="stylesheet" href="/pro/assets/css/app.css">
 </head>
 
