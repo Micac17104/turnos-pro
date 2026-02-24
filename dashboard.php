@@ -1,9 +1,8 @@
 <?php
+// DEBUG (podés quitarlo cuando funcione)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-
-echo "<pre>DEBUG ACTIVADO</pre>";
 
 // --- SESIONES ---
 $path = __DIR__ . '/sessions';
@@ -118,13 +117,14 @@ foreach ($raw ?: ['Sin datos' => 0] as $estado => $total) {
     ] = (int) $total;
 }
 
-// --- GRÁFICO: MÉTODOS DE PAGO ---
+// --- GRÁFICO: MÉTODOS DE PAGO (CORREGIDO CON GROUP BY) ---
 $stmt = $pdo->prepare("
     SELECT payment_method, COUNT(*) AS total
     FROM appointments
     WHERE user_id = ?
       AND payment_status = 'pagado'
       AND payment_method IS NOT NULL
+    GROUP BY payment_method
 ");
 $stmt->execute([$user_id]);
 $raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
@@ -154,7 +154,6 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $proximos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// --- HTML DEL DASHBOARD ---
 ?>
 <!DOCTYPE html>
 <html lang="es">
