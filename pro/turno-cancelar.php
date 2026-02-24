@@ -1,7 +1,9 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
-session_start();
+// /pro/agenda.php
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';

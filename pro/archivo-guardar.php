@@ -1,13 +1,8 @@
 <?php
-// --- FIX SESSIONS (igual que en agenda.php) ---
-$path = __DIR__ . '/../sessions';
+// /pro/archivo-guardar.php
 
-if (!is_dir($path)) {
-    mkdir($path, 0777, true);
-}
-
-if (!is_writable($path)) {
-    @chmod($path, 0777);
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
 session_save_path($path);
