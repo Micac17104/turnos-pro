@@ -10,19 +10,27 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $title = trim($_POST['title'] ?? '');
 $description = trim($_POST['description'] ?? '');
 $date = trim($_POST['date'] ?? '');
+$time = trim($_POST['time'] ?? '');
 
-if ($title === '' || $date === '') {
+if ($title === '' || $date === '' || $time === '') {
     header("Location: /pro/agenda.php?error=campos");
     exit;
 }
 
 $stmt = $pdo->prepare("
-    INSERT INTO tasks (user_id, title, description, date)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO professional_tasks (user_id, title, description, date, time, completed)
+    VALUES (?, ?, ?, ?, ?, 0)
 ");
 
 try {
-    $stmt->execute([$user_id, $title, $description, $date]);
+    $stmt->execute([
+        $user_id,
+        $title,
+        $description,
+        $date,
+        $time
+    ]);
+
     header("Location: /pro/agenda.php?ok=1");
     exit;
 

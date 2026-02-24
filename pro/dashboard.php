@@ -209,41 +209,27 @@ include __DIR__ . '/includes/sidebar.php';
 
     <?php endif; ?>
 
-    <!-- ÚLTIMOS TURNOS -->
-<?php if (!empty($prefs['mostrar_ultimos_turnos'])): ?>
+    <!-- PRÓXIMOS TURNOS -->
+    <?php if ($prefs['mostrar_proximos_turnos']): ?>
+    <div class="bg-white p-6 rounded-xl shadow border mb-8">
+        <h2 class="text-xl font-semibold mb-4">Próximos turnos</h2>
 
-<div class="bg-white p-6 rounded-xl shadow border mb-8">
-    <h2 class="text-xl font-semibold mb-4">Últimos turnos</h2>
-
-    <?php
-    $stmt = $pdo->prepare("
-        SELECT a.*, c.name AS paciente
-        FROM appointments a
-        LEFT JOIN clients c ON c.id = a.client_id
-        WHERE a.user_id = ?
-        ORDER BY a.date DESC, a.time DESC
-        LIMIT 5
-    ");
-    $stmt->execute([$user_id]);
-    $ultimos_turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    ?>
-
-    <?php if (empty($ultimos_turnos)): ?>
-        <p class="text-slate-500">No hay turnos recientes.</p>
-    <?php else: ?>
-        <ul class="space-y-2">
-            <?php foreach ($ultimos_turnos as $t): ?>
-                <li class="p-3 bg-slate-100 rounded-lg">
-                    <strong><?= $t['date'] ?></strong> — <?= $t['time'] ?><br>
-                    <span class="text-slate-600"><?= $t['paciente'] ?></span>
-                </li>
-            <?php endforeach; ?>
-        </ul>
+        <?php if (empty($proximos)): ?>
+            <p class="text-slate-500">No hay turnos próximos.</p>
+        <?php else: ?>
+            <ul class="space-y-2">
+                <?php foreach ($proximos as $t): ?>
+                    <li class="p-3 bg-slate-100 rounded-lg">
+                        <strong><?= $t['date'] ?></strong> - <?= $t['time'] ?>  
+                        <br>
+                        <span class="text-slate-600"><?= $t['paciente'] ?></span>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
     <?php endif; ?>
-</div>
-
-<?php endif; ?>
-
+    
     <!-- ÚLTIMOS PAGOS -->
     <?php if ($prefs['mostrar_ultimos_pagos']): ?>
     <div class="bg-white p-6 rounded-xl shadow border mb-8">
