@@ -1,6 +1,4 @@
 <?php
-// /pro/dashboard.php
-
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';
@@ -8,7 +6,7 @@ require __DIR__ . '/includes/helpers.php';
 $page_title = "Dashboard";
 $current = "dashboard";
 
-// Cargar preferencias del usuario
+// Cargar preferencias
 $stmt = $pdo->prepare("SELECT dashboard_prefs FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $prefs_json = $stmt->fetchColumn();
@@ -101,12 +99,23 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $proximos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// INCLUDES DEL PANEL
+// --- ÚLTIMOS PAGOS ---
+$stmt = $pdo->prepare("
+    SELECT a.date, a.time, a.amount, c.name AS paciente
+    FROM appointments a
+    LEFT JOIN clients c ON c.id = a.client_id
+    WHERE a.user_id = ?
+      AND a.payment_status = 'pagado'
+    ORDER BY a.date DESC, a.time DESC
+    LIMIT 5
+");
+$stmt->execute([$user_id]);
+$pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 include __DIR__ . '/includes/header.php';
 include __DIR__ . '/includes/sidebar.php';
 ?>
 
-<!-- CONTENIDO PRINCIPAL -->
 <div class="flex-1 p-8">
 
     <div class="flex justify-between items-center mb-6">
@@ -150,91 +159,70 @@ include __DIR__ . '/includes/sidebar.php';
     </div>
     <?php endif; ?>
 
-    <?php if ($prefs['mostrar_tarjetas']): ?>
-    ... tarjetas ...
-<?php endif; ?>
+    <!-- GRÁFICOS -->
+    <?php if ($prefs['mostrar_graficos']): ?>
 
-<!-- GRÁFICOS -->
-<?php if ($prefs['mostrar_graficos']): ?>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="font-semibold mb-3 text-sm">Turnos por método de pago</h3>
+            <canvas id="chartTurnos"></canvas>
+        </div>
 
-    <!-- TURNOS POR MES -->
-    <div class="bg-white p-6 rounded-xl shadow border">
-        <h3 class="font-semibold mb-3 text-sm">Turnos por mes</h3>
-        <canvas id="chartTurnosMes"></canvas>
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="font-semibold mb-3 text-sm">Ingresos por método de pago</h3>
+            <canvas id="chartIngresos"></canvas>
+        </div>
+
     </div>
 
-    <!-- INGRESOS POR MES -->
-    <div class="bg-white p-6 rounded-xl shadow border">
-        <h3 class="font-semibold mb-3 text-sm">Ingresos por mes</h3>
-        <canvas id="chartIngresosMes"></canvas>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-</div>
+    <script>
+    Chart.defaults.font.size = 13;
+    Chart.defaults.color = '#334155';
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    new Chart(document.getElementById('chartTurnos'), {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode(array_keys($metodos_pago)) ?>,
+            datasets: [{
+                label: 'Turnos',
+                data: <?= json_encode(array_values($metodos_pago)) ?>,
+                backgroundColor: '#3b82f6'
+            }]
+        }
+    });
 
-<script>
-// CONFIGURACIÓN GLOBAL
-Chart.defaults.font.size = 13;
-Chart.defaults.color = '#334155';
+    new Chart(document.getElementById('chartIngresos'), {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode(array_keys($metodos_pago)) ?>,
+            datasets: [{
+                label: 'Ingresos',
+                data: <?= json_encode(array_values($metodos_pago)) ?>,
+                backgroundColor: '#10b981'
+            }]
+        }
+    });
+    </script>
 
-// --- TURNOS POR MES ---
-new Chart(document.getElementById('chartTurnosMes'), {
-    type: 'line',
-    data: {
-        labels: <?= json_encode(array_keys($metodos_pago)) ?>,
-        datasets: [{
-            label: 'Turnos',
-            data: <?= json_encode(array_values($metodos_pago)) ?>,
-            borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59,130,246,0.2)',
-            borderWidth: 2,
-            tension: 0.3
-        }]
-    },
-    options: {
-        plugins: { legend: { position: 'bottom' } }
-    }
-});
+    <?php endif; ?>
 
-// --- INGRESOS POR MES ---
-new Chart(document.getElementById('chartIngresosMes'), {
-    type: 'bar',
-    data: {
-        labels: <?= json_encode(array_keys($metodos_pago)) ?>,
-        datasets: [{
-            label: 'Ingresos',
-            data: <?= json_encode(array_values($metodos_pago)) ?>,
-            backgroundColor: '#10b981',
-            borderColor: '#059669',
-            borderWidth: 2
-        }]
-    },
-    options: {
-        plugins: { legend: { position: 'bottom' } }
-    }
-});
-</script>
-
-<?php endif; ?>
-
-    <!-- PRÓXIMOS TURNOS -->
-    <?php if ($prefs['mostrar_proximos_turnos']): ?>
+    <!-- ÚLTIMOS PAGOS -->
+    <?php if ($prefs['mostrar_ultimos_pagos']): ?>
     <div class="bg-white p-6 rounded-xl shadow border mb-8">
-        <h2 class="text-xl font-semibold mb-4">Próximos turnos</h2>
+        <h2 class="text-xl font-semibold mb-4">Últimos pagos</h2>
 
-        <?php if (empty($proximos)): ?>
-            <p class="text-slate-500">No hay turnos próximos.</p>
+        <?php if (empty($pagos)): ?>
+            <p class="text-slate-500">No hay pagos recientes.</p>
         <?php else: ?>
             <ul class="space-y-2">
-                <?php foreach ($proximos as $t): ?>
+                <?php foreach ($pagos as $p): ?>
                     <li class="p-3 bg-slate-100 rounded-lg">
-                        <strong><?= $t['date'] ?></strong> - <?= $t['time'] ?>  
-                        <br>
-                        <span class="text-slate-600"><?= $t['paciente'] ?></span>
+                        <strong>$<?= number_format($p['amount'], 2) ?></strong>
+                        — <?= $p['date'] ?> <?= $p['time'] ?><br>
+                        <span class="text-slate-600"><?= $p['paciente'] ?></span>
                     </li>
                 <?php endforeach; ?>
             </ul>

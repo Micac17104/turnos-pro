@@ -1,19 +1,10 @@
 <aside class="w-64 bg-white border-r border-slate-200 min-h-screen p-6">
 
-<aside class="w-64 bg-white border-r border-slate-200 min-h-screen p-6">
-
-    <div class="mb-6">
-        <h2 class="text-xl font-bold text-slate-900">Panel profesional</h2>
+    <div class="mb-4">
+        <h2 class="text-xl font-bold text-slate-900 leading-none">Panel profesional</h2>
     </div>
 
-    <nav class="space-y-2">
-        ...
-    </nav>
-
-</aside>
-
-    <nav class="space-y-2">
-
+    <nav class="space-y-1">
         <a href="/pro/dashboard.php"
            class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'dashboard' ? 'bg-slate-100 font-semibold' : '' ?>">
             Dashboard
@@ -58,7 +49,6 @@
            class="block px-4 py-2 rounded-lg hover:bg-red-100 text-red-600">
             Cerrar sesión
         </a>
-
     </nav>
 
 </aside>
