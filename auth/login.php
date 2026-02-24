@@ -1,16 +1,14 @@
 <?php
-// LOGIN ORIGINAL RECONSTRUIDO
-
-// Sesión normal (sin session_save_path)
+// Sesión normal
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require __DIR__ . '/../pro/includes/db.php';
 
-// Si ya está logueado → ir al panel profesional
+// Si ya está logueado → ir al panel
 if (isset($_SESSION['user_id'])) {
-    header("Location: /pro/includes/dashboard.php");
+    header("Location: /pro/dashboard.php");
     exit;
 }
 
@@ -25,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
-        header("Location: /pro/includes/dashboard.php");
+        header("Location: /pro/dashboard.php");
         exit;
     }
 
@@ -80,6 +78,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
 
         </form>
+
+        <div class="mt-6 text-center text-sm text-slate-600">
+            <a href="/auth/forgot.php" class="text-slate-900 hover:underline">
+                ¿Olvidaste tu contraseña?
+            </a>
+        </div>
+
+        <div class="mt-2 text-center text-sm text-slate-600">
+            ¿No tenés cuenta?
+            <a href="/auth/register.php" class="text-slate-900 font-medium hover:underline">
+                Crear cuenta
+            </a>
+        </div>
 
     </div>
 

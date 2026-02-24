@@ -1,27 +1,46 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Crear cuenta</title>
+    <meta charset="UTF-8">
+    <title>Crear cuenta - TurnosPro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
-body { background:#f1f5f9; font-family:Arial; display:flex; justify-content:center; align-items:center; height:100vh; }
-.box { background:white; padding:40px; border-radius:20px; width:350px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.08); }
-.btn { display:block; padding:14px; margin-top:15px; border-radius:12px; text-decoration:none; font-weight:600; }
-.btn-prof { background:#0ea5e9; color:white; }
-.btn-centro { background:#22c55e; color:white; }
-</style>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="/pro/assets/css/app.css">
 </head>
-<body>
 
-<div class="box">
-    <h2>Crear cuenta</h2>
-    <p>Elegí el tipo de cuenta</p>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen">
 
-    <a href="register-profesional.php" class="btn btn-prof">Profesional individual</a>
-    <a href="register-centro.php" class="btn btn-centro">Centro médico</a>
-</div>
+    <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md border border-slate-200 text-center">
+
+        <h2 class="text-2xl font-bold text-slate-900 mb-2">
+            Crear cuenta
+        </h2>
+
+        <p class="text-slate-600 text-sm mb-6">
+            Elegí el tipo de cuenta
+        </p>
+
+        <a href="register-profesional.php"
+           class="block w-full bg-slate-900 text-white py-2 rounded-lg hover:bg-slate-800 transition mb-3">
+            Profesional individual
+        </a>
+
+        <a href="register-centro.php"
+           class="block w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition">
+            Centro médico
+        </a>
+
+        <p class="mt-6 text-sm">
+            <a href="login.php" class="text-slate-900 hover:underline">
+                Volver al login
+            </a>
+        </p>
+
+    </div>
 
 </body>
 </html>

@@ -1,5 +1,5 @@
 <?php
-require '../config.php';
+require __DIR__ . '/../pro/includes/db.php'; // conexión REAL del sistema
 
 $email = trim($_POST['email'] ?? '');
 
@@ -17,6 +17,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$email, $email]);
 $exists = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Si no existe, igual decimos "enviado" por seguridad
 if (!$exists) {
     header("Location: forgot-password.php?sent=1");
     exit;
@@ -33,8 +34,8 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$email, $token, $expires]);
 
-// Link de recuperación
-$reset_link = "https://TU-DOMINIO.com/turnos-pro/auth/reset-password.php?token=$token";
+// Link de recuperación (AJUSTADO A TU ESTRUCTURA REAL)
+$reset_link = "https://TU-DOMINIO.com/auth/reset-password.php?token=$token";
 
 // Enviar email
 $subject = "Restablecer contraseña - TurnosPro";

@@ -1,5 +1,5 @@
 <?php
-require '../config.php';
+require __DIR__ . '/../pro/includes/db.php'; // conexión REAL
 
 $errors = [];
 
@@ -47,43 +47,78 @@ if ($_POST) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Crear centro médico</title>
+    <meta charset="UTF-8">
+    <title>Crear centro médico - TurnosPro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
-body { background:#f1f5f9; font-family:Arial; display:flex; justify-content:center; align-items:center; height:100vh; }
-.box { background:white; padding:40px; border-radius:20px; width:350px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.08); }
-input { width:100%; padding:12px; margin:8px 0; border-radius:10px; border:1px solid #ddd; }
-button { width:100%; padding:14px; background:#22c55e; color:white; border:none; border-radius:12px; font-weight:600; }
-.error { color:#b00020; margin-bottom:10px; }
-</style>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="/pro/assets/css/app.css">
 </head>
-<body>
 
-<div class="box">
-    <h2>Crear centro médico</h2>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen">
 
-    <?php if (!empty($errors)): ?>
-        <div class="error">
-            <?php foreach ($errors as $e) echo "<p>$e</p>"; ?>
-        </div>
-    <?php endif; ?>
+    <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md border border-slate-200">
 
-    <form method="post">
-        <input name="name" placeholder="Nombre del centro" required>
-        <input name="email" placeholder="Email" required>
-        <input name="password" type="password" placeholder="Contraseña" required>
-        <input name="password2" type="password" placeholder="Repetir contraseña" required>
-        <button>Crear centro</button>
-    </form>
+        <h2 class="text-2xl font-bold text-slate-900 mb-4 text-center">
+            Crear centro médico
+        </h2>
 
-    <p style="margin-top:10px;">¿Ya tenés cuenta? <a href="login.php">Ingresar</a></p>
-</div>
+        <?php if (!empty($errors)): ?>
+            <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-sm">
+                <?php foreach ($errors as $e): ?>
+                    <p><?= $e ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <form method="post" class="space-y-4">
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del centro</label>
+                <input name="name"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                <input name="email" type="email"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
+                <input name="password" type="password"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Repetir contraseña</label>
+                <input name="password2" type="password"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       required>
+            </div>
+
+            <button class="w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition">
+                Crear centro
+            </button>
+
+        </form>
+
+        <p class="mt-4 text-center text-sm">
+            ¿Ya tenés cuenta?
+            <a href="login.php" class="text-slate-900 hover:underline">Ingresar</a>
+        </p>
+
+    </div>
 
 </body>
 </html>

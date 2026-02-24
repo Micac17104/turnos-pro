@@ -1,18 +1,8 @@
 <?php
-// --- FIX SESSIONS (igual que en agenda.php) ---
-$path = __DIR__ . '/../sessions';
-
-if (!is_dir($path)) {
-    mkdir($path, 0777, true);
+// Sesión normal (sin session_save_path)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
-
-if (!is_writable($path)) {
-    @chmod($path, 0777);
-}
-
-session_save_path($path);
-session_start();
-// ----------------------------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
@@ -28,5 +18,4 @@ $prefs = [
 $stmt = $pdo->prepare("UPDATE users SET dashboard_prefs = ? WHERE id = ?");
 $stmt->execute([json_encode($prefs), $user_id]);
 
-// Ruta corregida (sin /turnos-pro/pro/)
 redirect("dashboard.php?prefs_ok=1");
