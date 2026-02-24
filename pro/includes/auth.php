@@ -16,7 +16,7 @@ session_start();
 
 // VALIDAR SESIÓN DEL PROFESIONAL
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /pro/auth/login.php");
+    header("Location: /auth/login.php");
     exit;
 }
 
