@@ -32,4 +32,6 @@ if (!function_exists('h')) {
 </head>
 
 <body class="bg-slate-100 text-slate-900">
+
+<!-- CONTENEDOR PRINCIPAL DEL PANEL -->
 <div class="min-h-screen flex">
