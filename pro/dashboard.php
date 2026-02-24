@@ -5,21 +5,21 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // --- SESIONES ---
-$path = __DIR__ . '/sessions';
+$path = __DIR__ . '/../sessions'; // dashboard está en /pro → subir 1 nivel
 if (!is_dir($path)) mkdir($path, 0777, true);
 session_save_path($path);
 session_start();
 
-// --- INCLUDES CORRECTOS ---
-require __DIR__ . '/pro/includes/auth.php';
-require __DIR__ . '/pro/includes/db.php';
-require __DIR__ . '/pro/includes/helpers.php';
+// --- INCLUDES ---
+require __DIR__ . '/includes/auth.php';
+require __DIR__ . '/includes/db.php';
+require __DIR__ . '/includes/helpers.php';
 
 // --- CONFIG ---
 $page_title = "Dashboard";
 $current    = "dashboard";
 
-// --- PREFERENCIAS DEL USUARIO ---
+// --- PREFERENCIAS ---
 $stmt = $pdo->prepare("SELECT dashboard_prefs FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $prefs_json = $stmt->fetchColumn();
@@ -93,7 +93,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $stats['ingresos_mes'] = (float) $stmt->fetchColumn();
 
-// --- GRÁFICO: ESTADO DE TURNOS ---
+// --- ESTADO DE TURNOS ---
 $stmt = $pdo->prepare("
     SELECT status, COUNT(*) AS total
     FROM appointments
@@ -117,7 +117,7 @@ foreach ($raw ?: ['Sin datos' => 0] as $estado => $total) {
     ] = (int) $total;
 }
 
-// --- GRÁFICO: MÉTODOS DE PAGO (CORREGIDO CON GROUP BY) ---
+// --- MÉTODOS DE PAGO (CORREGIDO) ---
 $stmt = $pdo->prepare("
     SELECT payment_method, COUNT(*) AS total
     FROM appointments
@@ -155,33 +155,21 @@ $stmt->execute([$user_id]);
 $proximos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard</title>
-    <style>
-        body { font-family: sans-serif; margin: 20px; }
-        .cards { display: flex; gap: 20px; }
-        .card { padding: 20px; background: #f5f5f5; border-radius: 10px; width: 200px; }
-        .section { margin-top: 40px; }
-    </style>
-</head>
-<body>
 
-<h1>Dashboard</h1>
+<?php include __DIR__ . '/layout/header.php'; ?>
+<?php include __DIR__ . '/layout/sidebar.php'; ?>
 
-<?php if ($prefs['mostrar_tarjetas']): ?>
-<div class="cards">
-    <div class="card"><strong>Turnos del mes:</strong> <?= $stats['turnos_mes'] ?></div>
-    <div class="card"><strong>Pacientes nuevos:</strong> <?= $stats['pacientes_nuevos'] ?></div>
-    <div class="card"><strong>Evoluciones:</strong> <?= $stats['evoluciones_mes'] ?></div>
-    <div class="card"><strong>Pagos:</strong> <?= $stats['pagos_mes'] ?></div>
-    <div class="card"><strong>Ingresos:</strong> $<?= number_format($stats['ingresos_mes'], 2) ?></div>
-</div>
-<?php endif; ?>
+<div class="content">
+    <h1>Dashboard</h1>
 
-<div class="section">
+    <div class="cards">
+        <div class="card"><strong>Turnos del mes:</strong> <?= $stats['turnos_mes'] ?></div>
+        <div class="card"><strong>Pacientes nuevos:</strong> <?= $stats['pacientes_nuevos'] ?></div>
+        <div class="card"><strong>Evoluciones:</strong> <?= $stats['evoluciones_mes'] ?></div>
+        <div class="card"><strong>Pagos:</strong> <?= $stats['pagos_mes'] ?></div>
+        <div class="card"><strong>Ingresos:</strong> $<?= number_format($stats['ingresos_mes'], 2) ?></div>
+    </div>
+
     <h2>Próximos turnos</h2>
     <?php if (empty($proximos)): ?>
         <p>No hay turnos próximos.</p>
@@ -194,5 +182,4 @@ $proximos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php endif; ?>
 </div>
 
-</body>
-</html>
+<?php include __DIR__ . '/layout/footer.php'; ?>
