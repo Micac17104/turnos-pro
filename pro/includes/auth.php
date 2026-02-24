@@ -1,6 +1,6 @@
 <?php
 // --- FIX DEFINITIVO PARA RAILWAY ---
-$path = __DIR__ . '/../sessions';
+$path = __DIR__ . '/../../sessions';
 
 if (!is_dir($path)) {
     mkdir($path, 0777, true);
