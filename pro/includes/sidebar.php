@@ -1,5 +1,17 @@
 <aside class="w-64 bg-white border-r border-slate-200 min-h-screen p-6">
 
+<aside class="w-64 bg-white border-r border-slate-200 min-h-screen p-6">
+
+    <div class="mb-6">
+        <h2 class="text-xl font-bold text-slate-900">Panel profesional</h2>
+    </div>
+
+    <nav class="space-y-2">
+        ...
+    </nav>
+
+</aside>
+
     <nav class="space-y-2">
 
         <a href="/pro/dashboard.php"

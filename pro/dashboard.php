@@ -150,6 +150,77 @@ include __DIR__ . '/includes/sidebar.php';
     </div>
     <?php endif; ?>
 
+    <?php if ($prefs['mostrar_tarjetas']): ?>
+    ... tarjetas ...
+<?php endif; ?>
+
+<!-- GRÁFICOS -->
+<?php if ($prefs['mostrar_graficos']): ?>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+    <!-- TURNOS POR MES -->
+    <div class="bg-white p-6 rounded-xl shadow border">
+        <h3 class="font-semibold mb-3 text-sm">Turnos por mes</h3>
+        <canvas id="chartTurnosMes"></canvas>
+    </div>
+
+    <!-- INGRESOS POR MES -->
+    <div class="bg-white p-6 rounded-xl shadow border">
+        <h3 class="font-semibold mb-3 text-sm">Ingresos por mes</h3>
+        <canvas id="chartIngresosMes"></canvas>
+    </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+// CONFIGURACIÓN GLOBAL
+Chart.defaults.font.size = 13;
+Chart.defaults.color = '#334155';
+
+// --- TURNOS POR MES ---
+new Chart(document.getElementById('chartTurnosMes'), {
+    type: 'line',
+    data: {
+        labels: <?= json_encode(array_keys($metodos_pago)) ?>,
+        datasets: [{
+            label: 'Turnos',
+            data: <?= json_encode(array_values($metodos_pago)) ?>,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59,130,246,0.2)',
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    },
+    options: {
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+
+// --- INGRESOS POR MES ---
+new Chart(document.getElementById('chartIngresosMes'), {
+    type: 'bar',
+    data: {
+        labels: <?= json_encode(array_keys($metodos_pago)) ?>,
+        datasets: [{
+            label: 'Ingresos',
+            data: <?= json_encode(array_values($metodos_pago)) ?>,
+            backgroundColor: '#10b981',
+            borderColor: '#059669',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+</script>
+
+<?php endif; ?>
+
     <!-- PRÓXIMOS TURNOS -->
     <?php if ($prefs['mostrar_proximos_turnos']): ?>
     <div class="bg-white p-6 rounded-xl shadow border mb-8">

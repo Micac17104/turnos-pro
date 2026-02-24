@@ -1,7 +1,10 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+session_unset();
 session_destroy();
-header("Location: login.php");
+
+header("Location: /auth/login.php");
 exit;
