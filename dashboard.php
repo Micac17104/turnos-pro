@@ -1,10 +1,8 @@
 <?php
-$path = __DIR__ . '/../sessions';
-if (!is_dir($path)) mkdir($path, 0777, true);
-session_save_path($path);
-session_start();
-
-require __DIR__ . '/includes/auth.php';
-
-echo "<h1 style='background:#d1ffd1;padding:20px'>TEST A OK (auth.php existe)</h1>";
+echo "<pre>";
+echo "Dashboard path: " . __DIR__ . "\n";
+echo "Auth path: " . __DIR__ . "/includes/auth.php\n";
+echo "File exists? ";
+echo file_exists(__DIR__ . "/includes/auth.php") ? "YES" : "NO";
+echo "</pre>";
 exit;
