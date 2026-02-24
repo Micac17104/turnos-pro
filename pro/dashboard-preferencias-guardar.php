@@ -18,4 +18,4 @@ $prefs = [
 $stmt = $pdo->prepare("UPDATE users SET dashboard_prefs = ? WHERE id = ?");
 $stmt->execute([json_encode($prefs), $user_id]);
 
-redirect("dashboard.php?prefs_ok=1");
+redirect("/pro/dashboard.php?prefs_ok=1");

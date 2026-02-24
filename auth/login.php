@@ -79,18 +79,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         </form>
 
-        <div class="mt-6 text-center text-sm text-slate-600">
-            <a href="/auth/forgot.php" class="text-slate-900 hover:underline">
-                ¿Olvidaste tu contraseña?
-            </a>
-        </div>
+        <!-- SOLO CAMBIO LOS LINKS DEL FINAL -->
 
-        <div class="mt-2 text-center text-sm text-slate-600">
-            ¿No tenés cuenta?
-            <a href="/auth/register.php" class="text-slate-900 font-medium hover:underline">
-                Crear cuenta
-            </a>
-        </div>
+<p class="mt-6 text-center text-sm text-slate-600">
+    <a href="/auth/forgot-password.php" class="text-slate-900 hover:underline">
+        ¿Olvidaste tu contraseña?
+    </a>
+</p>
+
+<p class="mt-2 text-center text-sm text-slate-600">
+    ¿No tenés cuenta?
+    <a href="/auth/register-type.php" class="text-slate-900 font-medium hover:underline">
+        Crear cuenta
+    </a>
+</p>
 
     </div>
 
