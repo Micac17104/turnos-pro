@@ -1,18 +1,10 @@
 <?php
-// --- FIX DEFINITIVO PARA RAILWAY ---
-$path = __DIR__ . '/../sessions';
+// /pro/agenda.php
 
-if (!is_dir($path)) {
-    mkdir($path, 0777, true);
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-if (!is_writable($path)) {
-    chmod($path, 0777);
-}
-
-session_save_path($path);
-session_start();
-// -----------------------------------
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
