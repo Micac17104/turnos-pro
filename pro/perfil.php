@@ -29,7 +29,9 @@ $defaults = [
     'public_description' => '',
     'specialties' => '',
     'slug' => '',
-    'profile_image' => ''
+    'profile_image' => '',
+    'accepts_insurance' => 0,
+    'insurance_list' => ''
 ];
 
 $user = array_merge($defaults, $user ?: []);
@@ -123,15 +125,44 @@ require __DIR__ . '/includes/sidebar.php';
                            class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm">
                 </div>
 
+                <!-- ACEPTA OBRA SOCIAL -->
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="accepts_insurance"
+                           class="w-4 h-4"
+                           <?= $user['accepts_insurance'] ? 'checked' : '' ?>>
+                    <label class="text-sm text-slate-700">Acepto obra social</label>
+                </div>
+
+                <!-- LISTA DE OBRAS SOCIALES -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Obras sociales con las que trabajo
+                    </label>
+                    <textarea name="insurance_list" rows="3"
+                              class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                              placeholder="Ej: OSDE, Swiss Medical, Galeno, Medicus"><?= h($user['insurance_list']) ?></textarea>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Separá las obras sociales por coma.
+                    </p>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">URL pública (slug)</label>
                     <input type="text" name="slug"
                            value="<?= h($user['slug']) ?>"
                            class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
                            placeholder="ej: dr-gustavo-perez">
+
                     <p class="text-xs text-slate-500 mt-1">
-                        Tu página pública será: <strong>/p/<?= h($user['slug']) ?></strong>
+                        Tu página pública será:
+                        <strong>https://turnos-pro-production.up.railway.app/<?= h($user['slug']) ?></strong>
                     </p>
+
+                    <button type="button"
+                            onclick="navigator.clipboard.writeText('https://turnos-pro-production.up.railway.app/<?= h($user['slug']) ?>')"
+                            class="mt-2 px-3 py-1 bg-slate-900 text-white text-xs rounded">
+                        Copiar URL
+                    </button>
                 </div>
 
                 <div>

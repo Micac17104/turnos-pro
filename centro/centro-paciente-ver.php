@@ -1,0 +1,117 @@
+<?php
+require __DIR__ . '/includes/auth.php';
+require __DIR__ . '/../config.php';
+
+$client_id = $_GET['id'] ?? null;
+
+if (!$client_id) {
+    header("Location: centro-pacientes.php");
+    exit;
+}
+
+// Obtener datos del paciente
+$stmt = $pdo->prepare("
+    SELECT id, name, email, phone
+    FROM clients
+    WHERE id = ?
+");
+$stmt->execute([$client_id]);
+$paciente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$paciente) {
+    die("Paciente no encontrado.");
+}
+
+// Obtener historial de turnos
+$stmt = $pdo->prepare("
+    SELECT a.date, a.time, a.status,
+           u.name AS profesional
+    FROM appointments a
+    JOIN users u ON a.user_id = u.id
+    WHERE a.client_id = ?
+    ORDER BY a.date DESC, a.time DESC
+");
+$stmt->execute([$client_id]);
+$turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Paciente: <?= htmlspecialchars($paciente['name']) ?></title>
+<style>
+body{margin:0;font-family:Arial;background:#f1f5f9;}
+.top{background:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 4px rgba(15,23,42,0.06);}
+.main{padding:24px;max-width:900px;margin:0 auto;}
+.card{background:white;border-radius:16px;padding:20px;margin-bottom:20px;box-shadow:0 10px 30px rgba(15,23,42,0.06);}
+table{width:100%;border-collapse:collapse;font-size:14px;}
+th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
+.badge{padding:4px 10px;border-radius:999px;font-size:12px;}
+.badge-pending{background:#fbbf24;color:#92400e;}
+.badge-confirmed{background:#22c55e;color:white;}
+.badge-cancelled{background:#fecaca;color:#b91c1c;}
+.btn{display:inline-block;padding:10px 16px;background:#0ea5e9;color:white;border-radius:10px;text-decoration:none;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="top">
+    <div><strong>TurnosPro – Centro</strong></div>
+    <div>
+        <?= htmlspecialchars($_SESSION['user_name'] ?? 'Centro') ?>
+        &nbsp;|&nbsp;
+        <a href="../auth/logout.php" style="color:#0ea5e9;text-decoration:none;">Salir</a>
+    </div>
+</div>
+
+<div class="main">
+
+    <div class="card">
+        <h2><?= htmlspecialchars($paciente['name']) ?></h2>
+        <p><strong>Email:</strong> <?= htmlspecialchars($paciente['email'] ?: '-') ?></p>
+        <p><strong>Teléfono:</strong> <?= htmlspecialchars($paciente['phone'] ?: '-') ?></p>
+
+        <br>
+
+        <!-- BOTÓN DE NOTAS INTERNAS -->
+        <a class="btn" href="centro-paciente-notas.php?id=<?= $paciente['id'] ?>">
+            📝 Notas internas
+        </a>
+    </div>
+
+    <div class="card">
+        <h2>Historial de turnos</h2>
+
+        <table>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Profesional</th>
+                <th>Estado</th>
+            </tr>
+
+            <?php foreach ($turnos as $t): ?>
+            <tr>
+                <td><?= htmlspecialchars($t['date']) ?></td>
+                <td><?= htmlspecialchars(substr($t['time'], 0, 5)) ?></td>
+                <td><?= htmlspecialchars($t['profesional']) ?></td>
+                <td>
+                    <?php
+                    $s = $t['status'];
+                    $class = $s==='confirmed'?'badge-confirmed':($s==='cancelled'?'badge-cancelled':'badge-pending');
+                    ?>
+                    <span class="badge <?= $class ?>"><?= htmlspecialchars($s) ?></span>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+
+            <?php if (empty($turnos)): ?>
+            <tr><td colspan="4">Este paciente aún no tiene turnos.</td></tr>
+            <?php endif; ?>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

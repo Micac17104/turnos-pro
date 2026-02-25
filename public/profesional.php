@@ -156,7 +156,7 @@ h2 { margin-bottom:10px; font-size:24px; font-weight:700; color:#0f172a; }
 
     <!-- MODO RÁPIDO / LOGIN -->
     <?php if (!$modo): ?>
-        <a href="paciente-turnos.php?user_id=<?= $user_id ?>&modo=rapido" class="btn-primary">
+        <a href="paciente-turno.php?user_id=<?= $user_id ?>&modo=rapido" class="btn-primary">
             Sacar turno sin registrarme
         </a>
 

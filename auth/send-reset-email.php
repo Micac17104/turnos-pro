@@ -1,7 +1,7 @@
 <?php
-require __DIR__ . '/../pro/includes/db.php'; // conexión REAL del sistema
+require __DIR__ . '/../pro/includes/db.php';
 
-$email = trim($_POST['email'] ?? '');
+$email = trim(strtolower($_POST['email'] ?? ''));
 
 if ($email === '') {
     header("Location: forgot-password.php?error=1");
@@ -23,6 +23,10 @@ if (!$exists) {
     exit;
 }
 
+// Borrar tokens viejos
+$stmt = $pdo->prepare("DELETE FROM password_resets WHERE email = ?");
+$stmt->execute([$email]);
+
 // Crear token
 $token = bin2hex(random_bytes(32));
 $expires = date("Y-m-d H:i:s", strtotime("+1 hour"));
@@ -34,8 +38,8 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$email, $token, $expires]);
 
-// Link de recuperación (AJUSTADO A TU ESTRUCTURA REAL)
-$reset_link = "https://TU-DOMINIO.com/auth/reset-password.php?token=$token";
+// Link real de Railway
+$reset_link = "https://turnos-pro-production.up.railway.app/reset.php?token=$token";
 
 // Enviar email
 $subject = "Restablecer contraseña - TurnosPro";

@@ -1,35 +1,63 @@
 <?php
-require __DIR__ . '/../pro/includes/db.php'; // conexión REAL
+require __DIR__ . '/../pro/includes/db.php';
 
 $errors = [];
 
 if ($_POST) {
 
-    if ($_POST['password'] !== $_POST['password2']) {
+    // Normalizar email
+    $email = trim(strtolower($_POST['email'] ?? ''));
+    $name  = trim($_POST['name'] ?? '');
+    $profession = trim($_POST['profession'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $city  = trim($_POST['city'] ?? '');
+    $password  = $_POST['password'] ?? '';
+    $password2 = $_POST['password2'] ?? '';
+    $accepts_insurance = isset($_POST['accepts_insurance']) ? 1 : 0;
+
+    // Validaciones
+    if ($password !== $password2) {
         $errors[] = "Las contraseñas no coinciden.";
     }
 
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Email inválido.";
+    }
+
+    if ($name === '' || $profession === '' || $phone === '' || $city === '') {
+        $errors[] = "Completá todos los campos obligatorios.";
+    }
+
+    // Validar email único
+    if (empty($errors)) {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        if ($stmt->fetch()) {
+            $errors[] = "Ese email ya está registrado.";
+        }
+    }
+
+    // Crear cuenta
     if (empty($errors)) {
 
         $stmt = $pdo->prepare("
-            INSERT INTO users (name, email, password, profession, account_type, parent_center_id)
-            VALUES (?, ?, ?, ?, 'professional', NULL)
+            INSERT INTO users 
+            (name, email, password, profession, phone, city, accepts_insurance, account_type) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'professional')
         ");
 
-        try {
-            $stmt->execute([
-                $_POST['name'],
-                $_POST['email'],
-                password_hash($_POST['password'], PASSWORD_BCRYPT),
-                $_POST['profession']
-            ]);
+        $stmt->execute([
+            $name,
+            $email,
+            password_hash($password, PASSWORD_BCRYPT),
+            $profession,
+            $phone,
+            $city,
+            $accepts_insurance
+        ]);
 
-            header("Location: login.php?registered=1");
-            exit;
-
-        } catch (PDOException $e) {
-            $errors[] = "Ese email ya está registrado.";
-        }
+        header("Location: login.php?registered=1");
+        exit;
     }
 }
 ?>
@@ -40,10 +68,7 @@ if ($_POST) {
     <title>Crear cuenta profesional - TurnosPro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Estilos propios -->
     <link rel="stylesheet" href="/pro/assets/css/app.css">
 </head>
 
@@ -68,14 +93,28 @@ if ($_POST) {
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Nombre y apellido</label>
                 <input name="name"
-                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
                 <input name="email" type="email"
-                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                       required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
+                <input name="phone"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                       required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Ciudad</label>
+                <input name="city"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
             </div>
 
@@ -83,21 +122,26 @@ if ($_POST) {
                 <label class="block text-sm font-medium text-slate-700 mb-1">Profesión</label>
                 <input name="profession"
                        placeholder="Psicólogo, nutricionista, etc."
-                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input type="checkbox" name="accepts_insurance" class="w-4 h-4">
+                <label class="text-sm text-slate-700">Acepto obra social</label>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
                 <input name="password" type="password"
-                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Repetir contraseña</label>
                 <input name="password2" type="password"
-                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
             </div>
 

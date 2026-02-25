@@ -1,49 +1,70 @@
 <?php
-require __DIR__ . '/../pro/includes/db.php'; // conexión REAL
+require __DIR__ . '/../pro/includes/db.php';
 
 $errors = [];
 
 if ($_POST) {
 
-    if ($_POST['password'] !== $_POST['password2']) {
+    // Normalizar email
+    $email = trim(strtolower($_POST['email'] ?? ''));
+    $name  = trim($_POST['name'] ?? '');
+    $password  = $_POST['password'] ?? '';
+    $password2 = $_POST['password2'] ?? '';
+
+    // Validaciones
+    if ($password !== $password2) {
         $errors[] = "Las contraseñas no coinciden.";
     }
 
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Email inválido.";
+    }
+
+    if ($name === '') {
+        $errors[] = "El nombre del centro es obligatorio.";
+    }
+
+    // Validar email único
+    if (empty($errors)) {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        if ($stmt->fetch()) {
+            $errors[] = "Ese email ya está registrado.";
+        }
+    }
+
+    // Crear centro
     if (empty($errors)) {
 
-        // Crear centro
+        // Crear usuario tipo centro
         $stmt = $pdo->prepare("
             INSERT INTO users (name, email, password, account_type)
             VALUES (?, ?, ?, 'center')
         ");
 
-        try {
-            $stmt->execute([
-                $_POST['name'],
-                $_POST['email'],
-                password_hash($_POST['password'], PASSWORD_BCRYPT)
-            ]);
+        $stmt->execute([
+            $name,
+            $email,
+            password_hash($password, PASSWORD_BCRYPT)
+        ]);
 
-            $center_id = $pdo->lastInsertId();
+        $center_id = $pdo->lastInsertId();
 
-            // Crear administrador del centro
-            $stmt2 = $pdo->prepare("
-                INSERT INTO center_staff (center_id, name, email, password, role)
-                VALUES (?, ?, ?, ?, 'admin')
-            ");
-            $stmt2->execute([
-                $center_id,
-                $_POST['name'],
-                $_POST['email'],
-                password_hash($_POST['password'], PASSWORD_BCRYPT)
-            ]);
+        // Crear administrador del centro
+        $stmt2 = $pdo->prepare("
+            INSERT INTO center_staff (center_id, name, email, password, role)
+            VALUES (?, ?, ?, ?, 'admin')
+        ");
 
-            header("Location: login.php?registered=1");
-            exit;
+        $stmt2->execute([
+            $center_id,
+            $name,
+            $email,
+            password_hash($password, PASSWORD_BCRYPT)
+        ]);
 
-        } catch (PDOException $e) {
-            $errors[] = "Ese email ya está registrado.";
-        }
+        header("Location: login.php?registered=1");
+        exit;
     }
 }
 ?>
@@ -54,10 +75,7 @@ if ($_POST) {
     <title>Crear centro médico - TurnosPro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Estilos propios -->
     <link rel="stylesheet" href="/pro/assets/css/app.css">
 </head>
 
@@ -82,28 +100,28 @@ if ($_POST) {
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del centro</label>
                 <input name="name"
-                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
                 <input name="email" type="email"
-                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
                 <input name="password" type="password"
-                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Repetir contraseña</label>
                 <input name="password2" type="password"
-                       class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
             </div>
 
