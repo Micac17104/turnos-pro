@@ -77,6 +77,8 @@ select,input{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
 </style>
 </head>
 <body>
+<?php include __DIR__ . '/includes/sidebar.php'; ?>
+<div style="margin-left:260px; padding:24px;">
 
 <div class="top">
     <div><strong>TurnosPro – Centro</strong></div>
@@ -150,5 +152,6 @@ select,input{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
 
 </div>
 
+</div>
 </body>
 </html>

@@ -58,6 +58,8 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 </style>
 </head>
 <body>
+<?php include __DIR__ . '/includes/sidebar.php'; ?>
+<div style="margin-left:260px; padding:24px;">
 
 <div class="top">
     <div><strong>TurnosPro – Centro</strong></div>
@@ -133,5 +135,6 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 
 </div>
 
+</div>
 </body>
 </html>

@@ -37,7 +37,15 @@ if ($_POST) {
     $description = trim($_POST['description'] ?? '');
     $specialties = trim($_POST['specialties'] ?? '');
     $accepts_insurance = isset($_POST['accepts_insurance']) ? 1 : 0;
+
+    // Lista de obras sociales seleccionadas
     $insurance_list = $_POST['insurance_list'] ?? [];
+
+    // Si eligió "otra", agregamos lo que escribió
+    if (isset($_POST['insurance_other']) && $_POST['insurance_other'] !== '') {
+        $insurance_list[] = trim($_POST['insurance_other']);
+    }
+
     $slug = trim($_POST['slug'] ?? '');
 
     if ($name === '' || $profession === '') {
@@ -82,9 +90,6 @@ if ($_POST) {
         ]);
 
         $success = "Datos actualizados correctamente.";
-        
-        // Refrescar datos
-        $stmt->execute();
     }
 }
 
@@ -117,6 +122,8 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
 </style>
 </head>
 <body>
+<?php include __DIR__ . '/includes/sidebar.php'; ?>
+<div style="margin-left:260px; padding:24px;">
 
 <div class="box">
     <h2>Editar profesional</h2>
@@ -148,21 +155,37 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
         <textarea name="specialties" placeholder="Especialidades (separadas por coma)"><?= htmlspecialchars($prof['specialties']) ?></textarea>
 
         <label>
-            <input type="checkbox" name="accepts_insurance" <?= $prof['accepts_insurance'] ? 'checked' : '' ?>>
+            <input type="checkbox" name="accepts_insurance" id="accepts_insurance" <?= $prof['accepts_insurance'] ? 'checked' : '' ?> onclick="toggleInsurance()">
             Acepta obra social
         </label>
 
-        <label>Obras sociales (Ctrl + click para varias):</label>
-        <select name="insurance_list[]" multiple size="5">
+        <div id="insurance_block" style="display: <?= $prof['accepts_insurance'] ? 'block' : 'none' ?>; margin-top:10px;">
+
+            <label>Obras sociales (Ctrl + click para varias):</label>
+            <select name="insurance_list[]" multiple size="5" id="insurance_select">
+                <?php
+                $all_insurances = ["OSDE", "Swiss Medical", "Galeno", "Medifé", "IOMA", "otra"];
+                foreach ($all_insurances as $i):
+                ?>
+                    <option value="<?= $i ?>" <?= in_array($i, $insurance_list) ? 'selected' : '' ?>>
+                        <?= $i ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
             <?php
-            $all_insurances = ["OSDE", "Swiss Medical", "Galeno", "Medifé", "IOMA"];
-            foreach ($all_insurances as $i):
+            $other_value = "";
+            foreach ($insurance_list as $i) {
+                if (!in_array($i, ["OSDE", "Swiss Medical", "Galeno", "Medifé", "IOMA"])) {
+                    $other_value = $i;
+                }
+            }
             ?>
-                <option value="<?= $i ?>" <?= in_array($i, $insurance_list) ? 'selected' : '' ?>>
-                    <?= $i ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+
+            <input name="insurance_other" id="insurance_other" placeholder="Escribí otra obra social"
+                   value="<?= htmlspecialchars($other_value) ?>"
+                   style="display: <?= $other_value ? 'block' : 'none' ?>;">
+        </div>
 
         <input name="slug" value="<?= htmlspecialchars($prof['slug']) ?>" placeholder="Slug público (ej: dr-juan-perez)" required>
 
@@ -172,5 +195,23 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
     <p style="margin-top:10px;"><a href="centro-profesional-ver.php?id=<?= $prof['id'] ?>">Volver</a></p>
 </div>
 
+<script>
+function toggleInsurance() {
+    const block = document.getElementById('insurance_block');
+    block.style.display = document.getElementById('accepts_insurance').checked ? 'block' : 'none';
+}
+
+document.getElementById("insurance_select").addEventListener("change", function() {
+    const otherInput = document.getElementById("insurance_other");
+    if ([...this.options].some(opt => opt.selected && opt.value === "otra")) {
+        otherInput.style.display = "block";
+    } else {
+        otherInput.style.display = "none";
+        otherInput.value = "";
+    }
+});
+</script>
+
+</div>
 </body>
 </html>

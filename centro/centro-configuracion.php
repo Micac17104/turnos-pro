@@ -111,6 +111,8 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
 </style>
 </head>
 <body>
+<?php include __DIR__ . '/includes/sidebar.php'; ?>
+<div style="margin-left:260px; padding:24px;">
 
 <div class="top">
     <div><strong>TurnosPro – Centro</strong></div>
@@ -170,5 +172,6 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
 
 </div>
 
+ </div>
 </body>
 </html>

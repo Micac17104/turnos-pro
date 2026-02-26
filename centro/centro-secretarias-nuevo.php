@@ -61,6 +61,8 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
 </style>
 </head>
 <body>
+<?php include __DIR__ . '/includes/sidebar.php'; ?>
+<div style="margin-left:260px; padding:24px;">
 
 <div class="box">
     <h2>Agregar secretaria</h2>
@@ -82,5 +84,6 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
     <p style="margin-top:10px;"><a href="centro-secretarias.php">Volver</a></p>
 </div>
 
+</div>
 </body>
 </html>

@@ -17,7 +17,15 @@ if ($_POST) {
     $description = trim($_POST['description'] ?? '');
     $specialties = trim($_POST['specialties'] ?? '');
     $accepts_insurance = isset($_POST['accepts_insurance']) ? 1 : 0;
+
+    // Lista de obras sociales seleccionadas
     $insurance_list = $_POST['insurance_list'] ?? [];
+
+    // Si eligió "otra", agregamos lo que escribió
+    if (isset($_POST['insurance_other']) && $_POST['insurance_other'] !== '') {
+        $insurance_list[] = trim($_POST['insurance_other']);
+    }
+
     $password = $_POST['password'] ?? '';
     $password2 = $_POST['password2'] ?? '';
 
@@ -101,6 +109,8 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
 </style>
 </head>
 <body>
+<?php include __DIR__ . '/includes/sidebar.php'; ?>
+<div style="margin-left:260px; padding:24px;">
 
 <div class="box">
     <h2>Agregar profesional</h2>
@@ -128,17 +138,23 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
         <textarea name="specialties" placeholder="Especialidades (separadas por coma)"></textarea>
 
         <label>
-            <input type="checkbox" name="accepts_insurance"> Acepta obra social
+            <input type="checkbox" name="accepts_insurance" id="accepts_insurance" onclick="toggleInsurance()"> Acepta obra social
         </label>
 
-        <label>Obras sociales (Ctrl + click para varias):</label>
-        <select name="insurance_list[]" multiple size="5">
-            <option value="OSDE">OSDE</option>
-            <option value="Swiss Medical">Swiss Medical</option>
-            <option value="Galeno">Galeno</option>
-            <option value="Medifé">Medifé</option>
-            <option value="IOMA">IOMA</option>
-        </select>
+        <div id="insurance_block" style="display:none; margin-top:10px;">
+
+            <label>Obras sociales (Ctrl + click para varias):</label>
+            <select name="insurance_list[]" multiple size="5">
+                <option value="OSDE">OSDE</option>
+                <option value="Swiss Medical">Swiss Medical</option>
+                <option value="Galeno">Galeno</option>
+                <option value="Medifé">Medifé</option>
+                <option value="IOMA">IOMA</option>
+                <option value="otra">Otra (escribir abajo)</option>
+            </select>
+
+            <input name="insurance_other" id="insurance_other" placeholder="Escribí otra obra social" style="display:none;">
+        </div>
 
         <input name="password" type="password" placeholder="Contraseña" required>
         <input name="password2" type="password" placeholder="Repetir contraseña" required>
@@ -149,5 +165,23 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
     <p style="margin-top:10px;"><a href="centro-profesionales.php">Volver</a></p>
 </div>
 
+<script>
+function toggleInsurance() {
+    const block = document.getElementById('insurance_block');
+    block.style.display = document.getElementById('accepts_insurance').checked ? 'block' : 'none';
+}
+
+document.querySelector("select[name='insurance_list[]']").addEventListener("change", function() {
+    const otherInput = document.getElementById("insurance_other");
+    if ([...this.options].some(opt => opt.selected && opt.value === "otra")) {
+        otherInput.style.display = "block";
+    } else {
+        otherInput.style.display = "none";
+        otherInput.value = "";
+    }
+});
+</script>
+
+</div>
 </body>
 </html>
