@@ -6,7 +6,7 @@ require __DIR__ . '/../config.php';
 $base = $_GET['date'] ?? date('Y-m-d');
 $base_time = strtotime($base);
 
-// Calcular lunes de la semana
+// Calcular lunes y domingo de la semana
 $lunes = date('Y-m-d', strtotime('monday this week', $base_time));
 $domingo = date('Y-m-d', strtotime('sunday this week', $base_time));
 
@@ -24,7 +24,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$center_id]);
 $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Obtener turnos de la semana
+// Obtener turnos de la semana (CORREGIDO)
 $query = "
     SELECT a.id, a.date, a.time, a.status,
            u.name AS profesional,
@@ -34,11 +34,13 @@ $query = "
     JOIN users u ON a.user_id = u.id
     JOIN clients c ON a.client_id = c.id
     WHERE a.date BETWEEN ? AND ?
-    AND u.parent_center_id = ?
+    AND a.center_id = ?
+    AND c.center_id = ?
 ";
 
-$params = [$lunes, $domingo, $center_id];
+$params = [$lunes, $domingo, $center_id, $center_id];
 
+// Filtro por profesional
 if ($prof_filter !== '') {
     $query .= " AND u.id = ? ";
     $params[] = $prof_filter;
@@ -83,6 +85,7 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
 </style>
 </head>
 <body>
+
 <?php include __DIR__ . '/includes/sidebar.php'; ?>
 <div style="margin-left:260px; padding:24px;">
 
@@ -100,7 +103,6 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
     <div class="card">
         <h2>Agenda semanal</h2>
 
-        <!-- Navegación -->
         <?php
         $prev = date('Y-m-d', strtotime('-7 days', strtotime($lunes)));
         $next = date('Y-m-d', strtotime('+7 days', strtotime($lunes)));
@@ -111,7 +113,6 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
 
         <br><br>
 
-        <!-- Filtros -->
         <form method="GET" style="margin-bottom:15px;">
             <input type="hidden" name="date" value="<?= $lunes ?>">
 
@@ -127,7 +128,6 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
             <button class="btn">Filtrar</button>
         </form>
 
-        <!-- Tabla semanal -->
         <table>
             <tr>
                 <th>Hora</th>
@@ -137,40 +137,37 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
                 <?php endfor; ?>
             </tr>
 
-            <?php
-            // Horarios de 08:00 a 21:00
-            for ($h = 8; $h <= 21; $h++):
-                $hora = sprintf("%02d:00:00", $h);
-            ?>
-            <tr>
-                <td style="text-align:center;font-weight:bold;"><?= substr($hora, 0, 5) ?></td>
+            <?php for ($h = 8; $h <= 21; $h++): ?>
+                <?php $hora = sprintf("%02d:00:00", $h); ?>
+                <tr>
+                    <td style="text-align:center;font-weight:bold;"><?= substr($hora, 0, 5) ?></td>
 
-                <?php for ($d = 0; $d < 7; $d++): ?>
-                    <?php
-                    $dia = date('Y-m-d', strtotime("+$d days", strtotime($lunes)));
-                    $slots = $agenda[$dia][$hora] ?? [];
-                    ?>
-                    <td>
-                        <?php foreach ($slots as $t): ?>
+                    <?php for ($d = 0; $d < 7; $d++): ?>
+                        <?php
+                        $dia = date('Y-m-d', strtotime("+$d days", strtotime($lunes)));
+                        $slots = $agenda[$dia][$hora] ?? [];
+                        ?>
+                        <td>
+                            <?php foreach ($slots as $t): ?>
 
-                            <?php
-                            if (!isset($color_map[$t['profesional_id']])) {
-                                $color_map[$t['profesional_id']] = $colores[$i % count($colores)];
-                                $i++;
-                            }
-                            $color = $color_map[$t['profesional_id']];
-                            ?>
+                                <?php
+                                if (!isset($color_map[$t['profesional_id']])) {
+                                    $color_map[$t['profesional_id']] = $colores[$i % count($colores)];
+                                    $i++;
+                                }
+                                $color = $color_map[$t['profesional_id']];
+                                ?>
 
-                            <div class="slot" style="background: <?= $color ?>;">
-                                <?= htmlspecialchars($t['paciente']) ?><br>
-                                <small><?= htmlspecialchars($t['profesional']) ?></small>
-                            </div>
+                                <div class="slot" style="background: <?= $color ?>;">
+                                    <?= htmlspecialchars($t['paciente']) ?><br>
+                                    <small><?= htmlspecialchars($t['profesional']) ?></small>
+                                </div>
 
-                        <?php endforeach; ?>
-                    </td>
-                <?php endfor; ?>
+                            <?php endforeach; ?>
+                        </td>
+                    <?php endfor; ?>
 
-            </tr>
+                </tr>
             <?php endfor; ?>
         </table>
 

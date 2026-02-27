@@ -4,22 +4,24 @@ require __DIR__ . '/../config.php';
 
 $search = trim($_GET['search'] ?? '');
 
-// Buscar pacientes
+// Buscar pacientes SOLO del centro
 if ($search !== '') {
     $stmt = $pdo->prepare("
         SELECT id, name, email, phone
         FROM clients
-        WHERE name LIKE ? OR email LIKE ?
+        WHERE center_id = ?
+        AND (name LIKE ? OR email LIKE ?)
         ORDER BY name
     ");
-    $stmt->execute(["%$search%", "%$search%"]);
+    $stmt->execute([$center_id, "%$search%", "%$search%"]);
 } else {
     $stmt = $pdo->prepare("
         SELECT id, name, email, phone
         FROM clients
+        WHERE center_id = ?
         ORDER BY name
     ");
-    $stmt->execute();
+    $stmt->execute([$center_id]);
 }
 
 $pacientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -41,6 +43,7 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 </style>
 </head>
 <body>
+
 <?php include __DIR__ . '/includes/sidebar.php'; ?>
 <div style="margin-left:260px; padding:24px;">
 

@@ -29,11 +29,13 @@ $query = "
     JOIN users u ON a.user_id = u.id
     JOIN clients c ON a.client_id = c.id
     WHERE a.date = ?
-    AND u.parent_center_id = ?
+    AND a.center_id = ?
+    AND c.center_id = ?
 ";
 
-$params = [$fecha, $center_id];
+$params = [$fecha, $center_id, $center_id];
 
+// Filtro por profesional
 if ($prof_filter !== '') {
     $query .= " AND u.id = ? ";
     $params[] = $prof_filter;
@@ -68,6 +70,7 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
 </style>
 </head>
 <body>
+
 <?php include __DIR__ . '/includes/sidebar.php'; ?>
 <div style="margin-left:260px; padding:24px;">
 
@@ -114,7 +117,6 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
         <?php foreach ($turnos as $t): ?>
 
             <?php
-            // Asignar color por profesional
             if (!isset($color_map[$t['profesional_id']])) {
                 $color_map[$t['profesional_id']] = $colores[$i % count($colores)];
                 $i++;

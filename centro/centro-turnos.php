@@ -26,10 +26,9 @@ $query = "
     FROM appointments a
     JOIN users u ON a.user_id = u.id
     JOIN clients c ON a.client_id = c.id
-    WHERE u.parent_center_id = ?
+    WHERE a.center_id = ?
 ";
 
-// Parámetros
 $params = [$center_id];
 
 // Filtro por profesional
@@ -77,6 +76,7 @@ select,input{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
 </style>
 </head>
 <body>
+
 <?php include __DIR__ . '/includes/sidebar.php'; ?>
 <div style="margin-left:260px; padding:24px;">
 

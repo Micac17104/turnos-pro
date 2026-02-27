@@ -16,13 +16,14 @@ $stmt = $pdo->prepare("
 $stmt->execute([$center_id]);
 $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Obtener pacientes (clientes)
+// Obtener pacientes del centro
 $stmt = $pdo->prepare("
     SELECT id, name 
     FROM clients
+    WHERE center_id = ?
     ORDER BY name
 ");
-$stmt->execute();
+$stmt->execute([$center_id]);
 $pacientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Procesar formulario
@@ -38,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Todos los campos son obligatorios.";
     }
 
-    // Validar que el profesional pertenece al centro
+    // Validar profesional del centro
     $stmt = $pdo->prepare("
         SELECT id FROM users 
         WHERE id=? AND parent_center_id=? AND account_type='professional'
@@ -48,14 +49,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Profesional inválido.";
     }
 
+    // Validar paciente del centro
+    $stmt = $pdo->prepare("
+        SELECT id FROM clients
+        WHERE id=? AND center_id=?
+    ");
+    $stmt->execute([$client_id, $center_id]);
+    if (!$stmt->fetch()) {
+        $errors[] = "Paciente inválido.";
+    }
+
     if (empty($errors)) {
 
         $stmt = $pdo->prepare("
-            INSERT INTO appointments (user_id, client_id, date, time, status)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO appointments (user_id, client_id, date, time, status, center_id)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
 
-        $stmt->execute([$prof_id, $client_id, $date, $time, $status]);
+        $stmt->execute([$prof_id, $client_id, $date, $time, $status, $center_id]);
 
         $success = "Turno creado correctamente.";
     }
@@ -78,6 +89,7 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
 </style>
 </head>
 <body>
+
 <?php include __DIR__ . '/includes/sidebar.php'; ?>
 <div style="margin-left:260px; padding:24px;">
 

@@ -9,29 +9,30 @@ if (!$client_id) {
     exit;
 }
 
-// Obtener datos del paciente
+// Obtener datos del paciente SOLO si pertenece al centro
 $stmt = $pdo->prepare("
     SELECT id, name, email, phone
     FROM clients
-    WHERE id = ?
+    WHERE id = ? AND center_id = ?
 ");
-$stmt->execute([$client_id]);
+$stmt->execute([$client_id, $center_id]);
 $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$paciente) {
-    die("Paciente no encontrado.");
+    die("Paciente no encontrado o no pertenece a este centro.");
 }
 
-// Obtener historial de turnos
+// Obtener historial de turnos SOLO del centro
 $stmt = $pdo->prepare("
     SELECT a.date, a.time, a.status,
            u.name AS profesional
     FROM appointments a
     JOIN users u ON a.user_id = u.id
     WHERE a.client_id = ?
+    AND a.center_id = ?
     ORDER BY a.date DESC, a.time DESC
 ");
-$stmt->execute([$client_id]);
+$stmt->execute([$client_id, $center_id]);
 $turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -54,6 +55,7 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 </style>
 </head>
 <body>
+
 <?php include __DIR__ . '/includes/sidebar.php'; ?>
 <div style="margin-left:260px; padding:24px;">
 
@@ -75,7 +77,6 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 
         <br>
 
-        <!-- BOTÓN DE NOTAS INTERNAS -->
         <a class="btn" href="centro-paciente-notas.php?id=<?= $paciente['id'] ?>">
             📝 Notas internas
         </a>
@@ -115,6 +116,6 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 
 </div>
 
- </div>
+</div>
 </body>
 </html>

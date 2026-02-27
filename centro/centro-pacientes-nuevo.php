@@ -22,11 +22,11 @@ if ($_POST) {
     if (empty($errors)) {
 
         $stmt = $pdo->prepare("
-            INSERT INTO clients (name, email, phone)
-            VALUES (?, ?, ?)
+            INSERT INTO clients (name, email, phone, center_id)
+            VALUES (?, ?, ?, ?)
         ");
 
-        $stmt->execute([$name, $email, $phone]);
+        $stmt->execute([$name, $email, $phone, $center_id]);
 
         header("Location: centro-pacientes.php?ok=1");
         exit;
