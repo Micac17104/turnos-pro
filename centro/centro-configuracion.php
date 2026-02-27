@@ -2,9 +2,9 @@
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
 
-// Cargamos datos del centro desde users
+// Cargar datos del centro
 $stmt = $pdo->prepare("
-    SELECT name, email, phone, city, address, description, slug
+    SELECT name, email, phone, city, address, description, slug, profile_image
     FROM users
     WHERE id = ? AND account_type = 'center'
 ");
@@ -37,14 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Email inválido.";
     }
 
-    // Validar email único (excepto el propio)
+    // Email único
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
     $stmt->execute([$email, $center_id]);
     if ($stmt->fetch()) {
         $errors[] = "Ese email ya está en uso por otra cuenta.";
     }
 
-    // Validar slug único (excepto el propio)
+    // Slug único
     if ($slug === '') {
         $errors[] = "El slug público es obligatorio.";
     } else {
@@ -52,6 +52,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$slug, $center_id]);
         if ($stmt->fetch()) {
             $errors[] = "Ese slug ya está en uso. Elegí otro.";
+        }
+    }
+
+    // SUBIR FOTO DEL CENTRO
+    if (!empty($_FILES['profile_image']['name'])) {
+
+        $ext = strtolower(pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION));
+        $allowed = ['jpg','jpeg','png','webp'];
+
+        if (!in_array($ext, $allowed)) {
+            $errors[] = "Formato de imagen no permitido. Solo JPG, PNG o WEBP.";
+        } else {
+            $filename = "center_" . $center_id . "_" . time() . "." . $ext;
+            $destino = __DIR__ . '/../uploads/' . $filename;
+
+            if (move_uploaded_file($_FILES['profile_image']['tmp_name'], $destino)) {
+
+                // Guardar en DB
+                $stmt = $pdo->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
+                $stmt->execute([$filename, $center_id]);
+
+                // Actualizar variable local
+                $center['profile_image'] = $filename;
+            }
         }
     }
 
@@ -85,7 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'city' => $city,
             'address' => $address,
             'description' => $description,
-            'slug' => $slug
+            'slug' => $slug,
+            'profile_image' => $center['profile_image'] ?? null
         ];
     }
 }
@@ -105,12 +130,12 @@ button{padding:12px 20px;background:#0ea5e9;color:white;border:none;border-radiu
 button:hover{opacity:0.9;}
 .error{color:#b00020;margin-bottom:10px;}
 .success{color:#22c55e;margin-bottom:10px;}
-a{color:#0ea5e9;text-decoration:none;font-size:14px;}
 .label{font-size:13px;font-weight:bold;color:#475569;margin-bottom:2px;display:block;}
 .small{font-size:12px;color:#64748b;}
 </style>
 </head>
 <body>
+
 <?php include __DIR__ . '/includes/sidebar.php'; ?>
 <div style="margin-left:260px; padding:24px;">
 
@@ -138,7 +163,7 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
             <div class="success"><?= $success ?></div>
         <?php endif; ?>
 
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
 
             <label class="label">Nombre del centro</label>
             <input name="name" value="<?= htmlspecialchars($center['name']) ?>" required>
@@ -161,17 +186,28 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
             <label class="label">Slug público del centro</label>
             <input name="slug" value="<?= htmlspecialchars($center['slug'] ?? '') ?>" required>
             <div class="small">
-                Esto define la URL pública del centro. Ejemplo:  
-                <code>tusitio.com/centro/<?= htmlspecialchars($center['slug'] ?: 'mi-centro') ?></code>
+                URL pública: <code>tusitio.com/centro/<?= htmlspecialchars($center['slug'] ?: 'mi-centro') ?></code>
             </div>
 
             <br>
+
+            <!-- FOTO DEL CENTRO -->
+            <label class="label">Foto del centro</label>
+            <input type="file" name="profile_image" accept="image/*">
+
+            <?php if (!empty($center['profile_image'])): ?>
+                <img src="../uploads/<?= htmlspecialchars($center['profile_image']) ?>"
+                     style="width:120px;height:120px;border-radius:16px;object-fit:cover;margin-top:10px;border:2px solid #e2e8f0;">
+            <?php endif; ?>
+
+            <br><br>
+
             <button>Guardar cambios</button>
         </form>
     </div>
 
 </div>
 
- </div>
+</div>
 </body>
 </html>
