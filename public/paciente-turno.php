@@ -12,13 +12,16 @@ if (!$user_id) {
 }
 
 // Datos del profesional
-$stmt = $pdo->prepare("SELECT name, profession FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT id, name, profession, parent_center_id FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $pro = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$pro) {
     die("Profesional no encontrado.");
 }
+
+// Guardamos el center_id si pertenece a un centro
+$center_id = $pro['parent_center_id'] ?? null;
 
 // Horarios configurados
 $stmt = $pdo->prepare("
@@ -156,7 +159,7 @@ h2 { margin-bottom:10px; font-size:24px; font-weight:700; color:#0f172a; }
 
     <!-- MODO RÁPIDO / LOGIN -->
     <?php if (!$modo): ?>
-        <a href="paciente-turnos.php?user_id=<?= $user_id ?>&modo=rapido" class="btn-primary">
+        <a href="paciente-turno.php?user_id=<?= $user_id ?>&modo=rapido" class="btn-primary">
             Sacar turno sin registrarme
         </a>
 
@@ -210,7 +213,7 @@ h2 { margin-bottom:10px; font-size:24px; font-weight:700; color:#0f172a; }
                         <div class="turno-ocupado"><?= $t['hora'] ?></div>
                     <?php else: ?>
                         <a class="turno-btn"
-                           href="datos-paciente.php?user_id=<?= $user_id ?>&fecha=<?= $t['fecha'] ?>&hora=<?= $t['hora'] ?>">
+                           href="datos-paciente.php?user_id=<?= $user_id ?>&fecha=<?= $t['fecha'] ?>&hora=<?= $t['hora'] ?>&center_id=<?= $center_id ?>">
                            <?= $t['hora'] ?>
                         </a>
                     <?php endif; ?>

@@ -4,7 +4,7 @@ require __DIR__ . '/../config.php';
 
 // Obtener profesionales del centro
 $stmt = $pdo->prepare("
-    SELECT id, name, email, profession, accepts_insurance
+    SELECT id, name, email, profession, accepts_insurance, slug
     FROM users
     WHERE account_type='professional'
     AND parent_center_id=?
@@ -30,6 +30,7 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 .badge{padding:4px 10px;border-radius:999px;font-size:12px;}
 .badge-yes{background:#22c55e;color:white;}
 .badge-no{background:#fecaca;color:#b91c1c;}
+.action-link{margin-right:8px;color:#0ea5e9;text-decoration:none;}
 </style>
 </head>
 <body>
@@ -74,8 +75,30 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                     <?php endif; ?>
                 </td>
                 <td>
-                    <a href="centro-profesional-ver.php?id=<?= $p['id'] ?>">Ver</a> |
-                    <a href="centro-profesionales-editar.php?id=<?= $p['id'] ?>">Editar</a>
+
+                    <!-- Ver datos básicos -->
+                    <a class="action-link" href="centro-profesional-ver.php?id=<?= $p['id'] ?>">Ver</a>
+
+                    <!-- Editar datos básicos -->
+                    <a class="action-link" href="centro-profesionales-editar.php?id=<?= $p['id'] ?>">Editar</a>
+
+                    <!-- Editar perfil público -->
+                    <a class="action-link" href="centro-profesional-publico.php?id=<?= $p['id'] ?>">
+                        Perfil público
+                    </a>
+
+                    <!-- Entrar al panel del profesional (modo admin) -->
+                    <a class="action-link" href="../pro/login-as.php?id=<?= $p['id'] ?>">
+                        Entrar como profesional
+                    </a>
+
+                    <!-- Ver landing pública -->
+                    <?php if (!empty($p['slug'])): ?>
+                        <a class="action-link" href="/<?= htmlspecialchars($p['slug']) ?>" target="_blank">
+                            Ver landing
+                        </a>
+                    <?php endif; ?>
+
                 </td>
             </tr>
             <?php endforeach; ?>

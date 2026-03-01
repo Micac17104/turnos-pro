@@ -5,12 +5,13 @@ session_start();
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
 
-$pro_id = $_POST['pro']  ?? null;
-$date   = $_POST['date'] ?? null;
-$time   = $_POST['time'] ?? null;
-$name   = trim($_POST['name']  ?? '');
-$email  = trim($_POST['email'] ?? '');
-$phone  = trim($_POST['phone'] ?? '');
+$pro_id    = $_POST['user_id'] ?? null;
+$date      = $_POST['fecha'] ?? null;
+$time      = $_POST['hora'] ?? null;
+$name      = trim($_POST['nombre'] ?? '');
+$email     = trim($_POST['email'] ?? '');
+$phone     = trim($_POST['telefono'] ?? '');
+$center_id = $_POST['center_id'] ?? null; // ← AGREGADO
 
 if (!$pro_id || !$date || !$time || !$name || !$email) {
     die("Datos incompletos.");
@@ -20,6 +21,7 @@ if (!$pro_id || !$date || !$time || !$name || !$email) {
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$pro_id]);
 $pro = $stmt->fetch(PDO::FETCH_ASSOC);
+
 if (!$pro) {
     die("Profesional no encontrado.");
 }
@@ -39,10 +41,10 @@ if ($paciente_id) {
 
 if (!$paciente) {
     $stmt = $pdo->prepare("
-        INSERT INTO clients (user_id, name, email, phone)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO clients (user_id, name, email, phone, center_id)
+        VALUES (?, ?, ?, ?, ?)
     ");
-    $stmt->execute([$pro_id, $name, $email, $phone]);
+    $stmt->execute([$pro_id, $name, $email, $phone, $center_id]);
     $paciente_id = $pdo->lastInsertId();
 } else {
     $paciente_id = $paciente['id'];
@@ -54,16 +56,18 @@ $stmt = $pdo->prepare("
     WHERE user_id = ? AND date = ? AND time = ? AND status IN ('confirmed','pending')
 ");
 $stmt->execute([$pro_id, $date, $time]);
+
 if ($stmt->fetch()) {
     die("El turno ya fue tomado. Volvé atrás y elegí otro horario.");
 }
 
 // Crear turno
 $stmt = $pdo->prepare("
-    INSERT INTO appointments (user_id, client_id, date, time, status, reminder_sent)
-    VALUES (?, ?, ?, ?, 'confirmed', 0)
+    INSERT INTO appointments (user_id, center_id, client_id, date, time, status, reminder_sent)
+    VALUES (?, ?, ?, ?, ?, 'confirmed', 0)
 ");
-$stmt->execute([$pro_id, $paciente_id, $date, $time]);
+$stmt->execute([$pro_id, $center_id, $paciente_id, $date, $time]);
+
 $turno_id = $pdo->lastInsertId();
 
 // Notificaciones

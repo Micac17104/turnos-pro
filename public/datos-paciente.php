@@ -13,6 +13,7 @@ if (isset($_SESSION['paciente_id'])) {
 $user_id = $_GET['user_id'] ?? null;
 $fecha = $_GET['fecha'] ?? null;
 $hora = $_GET['hora'] ?? null;
+$center_id = $_GET['center_id'] ?? null; // ← AGREGADO
 
 if (!$user_id || !$fecha || !$hora) {
     die("Datos incompletos.");
@@ -71,12 +72,15 @@ if (!$pro) {
     <p>Turno con <strong><?= htmlspecialchars($pro['name']) ?></strong></p>
     <p><?= date("d/m/Y", strtotime($fecha)) ?> — <?= $hora ?> hs</p>
 
-    <!-- RUTA CORRECTA PARA RAILWAY -->
     <form method="post" action="confirmar-turno.php">
+
+        <!-- Datos ocultos -->
         <input type="hidden" name="user_id" value="<?= $user_id ?>">
         <input type="hidden" name="fecha" value="<?= $fecha ?>">
         <input type="hidden" name="hora" value="<?= $hora ?>">
+        <input type="hidden" name="center_id" value="<?= htmlspecialchars($center_id) ?>"> <!-- ← AGREGADO -->
 
+        <!-- Datos del paciente -->
         <input type="text" name="nombre" placeholder="Tu nombre" required>
         <input type="text" name="telefono" placeholder="Teléfono" required>
         <input type="email" name="email" placeholder="Email" required>
