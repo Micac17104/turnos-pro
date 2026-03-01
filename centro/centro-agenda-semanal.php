@@ -24,7 +24,14 @@ $stmt = $pdo->prepare("
 $stmt->execute([$center_id]);
 $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Obtener turnos de la semana (CORREGIDO)
+// Verificar si la tabla clients tiene center_id
+$has_center_id = false;
+$check = $pdo->query("SHOW COLUMNS FROM clients LIKE 'center_id'");
+if ($check->fetch()) {
+    $has_center_id = true;
+}
+
+// Base query
 $query = "
     SELECT a.id, a.date, a.time, a.status,
            u.name AS profesional,
@@ -35,10 +42,15 @@ $query = "
     JOIN clients c ON a.client_id = c.id
     WHERE a.date BETWEEN ? AND ?
     AND a.center_id = ?
-    AND c.center_id = ?
 ";
 
-$params = [$lunes, $domingo, $center_id, $center_id];
+$params = [$lunes, $domingo, $center_id];
+
+// Si existe center_id en clients, filtramos
+if ($has_center_id) {
+    $query .= " AND c.center_id = ? ";
+    $params[] = $center_id;
+}
 
 // Filtro por profesional
 if ($prof_filter !== '') {
