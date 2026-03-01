@@ -157,7 +157,19 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
                 <th>Hora</th>
                 <?php for ($d = 0; $d < 7; $d++): ?>
                     <?php $dia = date('Y-m-d', strtotime("+$d days", strtotime($lunes))); ?>
-                    <th><?= date('D d/m', strtotime($dia)) ?></th>
+                    <th><?php
+$dias = [
+    'Mon' => 'Lun',
+    'Tue' => 'Mar',
+    'Wed' => 'Mié',
+    'Thu' => 'Jue',
+    'Fri' => 'Vie',
+    'Sat' => 'Sáb',
+    'Sun' => 'Dom'
+];
+$diaSemana = $dias[date('D', strtotime($dia))];
+?>
+<?= $diaSemana . " " . date('d/m', strtotime($dia)) ?></th>
                 <?php endfor; ?>
             </tr>
 

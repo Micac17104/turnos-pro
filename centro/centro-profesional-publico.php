@@ -25,7 +25,7 @@ $errors = [];
 $success = "";
 
 /* ============================================================
-   PROCESAR FORMULARIO DE PERFIL
+   GUARDAR PERFIL
    ============================================================ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
 
@@ -112,11 +112,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
 }
 
 /* ============================================================
-   HORARIOS DEL PROFESIONAL
+   HORARIOS (TABLA REAL: schedules)
    ============================================================ */
 
 // Obtener horarios actuales
-$stmt = $pdo->prepare("SELECT * FROM professional_schedule WHERE user_id = ? ORDER BY day_of_week, start_time");
+$stmt = $pdo->prepare("SELECT * FROM schedules WHERE user_id = ? ORDER BY day_of_week, start_time");
 $stmt->execute([$pro_id]);
 $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -124,20 +124,20 @@ $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_schedule'])) {
 
     // Borrar horarios anteriores
-    $pdo->prepare("DELETE FROM professional_schedule WHERE user_id = ?")->execute([$pro_id]);
+    $pdo->prepare("DELETE FROM schedules WHERE user_id = ?")->execute([$pro_id]);
 
     if (!empty($_POST['day'])) {
         foreach ($_POST['day'] as $i => $day) {
             $start = $_POST['start'][$i];
             $end   = $_POST['end'][$i];
-            $interval = $_POST['interval'][$i] ?? 30;
+            $slot  = $_POST['interval'][$i] ?? 30;
 
             if ($day !== '' && $start !== '' && $end !== '') {
                 $stmt = $pdo->prepare("
-                    INSERT INTO professional_schedule (user_id, day_of_week, start_time, end_time, interval_minutes)
+                    INSERT INTO schedules (user_id, day_of_week, start_time, end_time, slot_duration)
                     VALUES (?, ?, ?, ?, ?)
                 ");
-                $stmt->execute([$pro_id, $day, $start, $end, $interval]);
+                $stmt->execute([$pro_id, $day, $start, $end, $slot]);
             }
         }
     }
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_schedule'])) {
     $success = "Horarios actualizados correctamente.";
 
     // Recargar horarios
-    $stmt = $pdo->prepare("SELECT * FROM professional_schedule WHERE user_id = ? ORDER BY day_of_week, start_time");
+    $stmt = $pdo->prepare("SELECT * FROM schedules WHERE user_id = ? ORDER BY day_of_week, start_time");
     $stmt->execute([$pro_id]);
     $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -271,7 +271,7 @@ button:hover{opacity:0.9;}
                         <input type="time" name="start[]" value="<?= $h['start_time'] ?>">
                         <input type="time" name="end[]" value="<?= $h['end_time'] ?>">
 
-                        <input type="number" name="interval[]" value="<?= $h['interval_minutes'] ?>" min="5" max="120" style="width:80px;">
+                        <input type="number" name="interval[]" value="<?= $h['slot_duration'] ?>" min="5" max="120" style="width:80px;">
                         <span>min</span>
 
                         <button type="button" onclick="this.parentNode.remove()">Eliminar</button>
