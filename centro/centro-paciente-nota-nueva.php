@@ -9,6 +9,15 @@ if (!$client_id) {
     exit;
 }
 
+// Verificar que el paciente pertenece al centro
+$stmt = $pdo->prepare("SELECT id FROM clients WHERE id = ? AND center_id = ?");
+$stmt->execute([$client_id, $center_id]);
+$valid = $stmt->fetch();
+
+if (!$valid) {
+    die("Paciente no encontrado o no pertenece a este centro.");
+}
+
 $errors = [];
 $success = "";
 
@@ -18,6 +27,12 @@ if ($_POST) {
 
     if ($note === '') {
         $errors[] = "La nota no puede estar vacía.";
+    }
+
+    // Validar usuario autor
+    $user_id = $_SESSION['user_id'] ?? null;
+    if (!$user_id) {
+        $errors[] = "Error interno: usuario no identificado.";
     }
 
     if (empty($errors)) {
@@ -30,7 +45,7 @@ if ($_POST) {
         $stmt->execute([
             $client_id,
             $center_id,
-            $_SESSION['user_id'],
+            $user_id,
             $note
         ]);
 
@@ -75,7 +90,6 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
     <p style="margin-top:10px;"><a href="centro-paciente-notas.php?id=<?= $client_id ?>">Volver</a></p>
 </div>
 
-
-    </div>
+</div>
 </body>
 </html>

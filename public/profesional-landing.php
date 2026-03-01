@@ -1,4 +1,7 @@
 <?php
+session_save_path(__DIR__ . '/../sessions');
+session_start();
+
 require __DIR__ . '/../config.php';
 
 $slug = $_GET['slug'] ?? null;
@@ -7,9 +10,10 @@ if (!$slug) {
     die("Profesional no encontrado.");
 }
 
-// Obtener datos del profesional
+// Traer datos del profesional
 $stmt = $pdo->prepare("
-    SELECT *
+    SELECT id, name, profession, public_description, specialties,
+           accepts_insurance, insurance_list, profile_image_blob
     FROM users
     WHERE slug = ? AND account_type = 'professional'
 ");
@@ -20,103 +24,110 @@ if (!$pro) {
     die("Profesional no encontrado.");
 }
 
-$user_id = $pro['id'];
+$pro_id = $pro['id'];
 
-// Obtener horarios configurados
+// Traer horarios del profesional
 $stmt = $pdo->prepare("
-    SELECT *
+    SELECT day_of_week, start_time, end_time, slot_duration
     FROM schedules
     WHERE user_id = ?
     ORDER BY day_of_week, start_time
 ");
-$stmt->execute([$user_id]);
+$stmt->execute([$pro_id]);
 $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Obtener centro (si pertenece a uno)
-$center = null;
-if ($pro['parent_center_id']) {
-    $stmt = $pdo->prepare("SELECT name, slug FROM users WHERE id = ?");
-    $stmt->execute([$pro['parent_center_id']]);
-    $center = $stmt->fetch(PDO::FETCH_ASSOC);
-}
+$dias = [
+    1 => "Lunes",
+    2 => "Martes",
+    3 => "Miércoles",
+    4 => "Jueves",
+    5 => "Viernes",
+    6 => "Sábado",
+    7 => "Domingo"
+];
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title><?= htmlspecialchars($pro['name']) ?> – Profesional</title>
+<title><?= htmlspecialchars($pro['name']) ?> - Profesional</title>
 
 <style>
-body { margin:0; font-family:Arial; background:#f8fafc; color:#0f172a; }
-.container { max-width:900px; margin:40px auto; padding:20px; }
-.card { background:white; padding:30px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.06); margin-bottom:30px; }
-h1 { margin:0; font-size:32px; }
-h2 { margin-top:0; font-size:22px; }
-.profile-img { width:140px; height:140px; border-radius:100%; object-fit:cover; border:4px solid #e2e8f0; }
-.btn { display:inline-block; padding:12px 20px; background:#0ea5e9; color:white; border-radius:12px; text-decoration:none; font-weight:600; }
-.btn:hover { opacity:0.9; }
-.badge { display:inline-block; padding:6px 12px; background:#e2e8f0; border-radius:8px; margin-right:6px; font-size:13px; }
-</style>
+body { background:#f1f5f9; font-family:Arial; margin:0; padding:0; }
+.container { max-width:900px; margin:40px auto; background:white; padding:30px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.08); }
 
+.header { display:flex; gap:20px; align-items:center; margin-bottom:30px; }
+.header img { width:140px; height:140px; border-radius:20px; object-fit:cover; border:3px solid #e2e8f0; }
+
+h1 { margin:0; font-size:28px; color:#0f172a; }
+.prof { color:#475569; margin-top:4px; }
+
+.section-title { font-size:20px; font-weight:700; margin-top:30px; margin-bottom:10px; color:#0f172a; }
+
+.btn-primary {
+    background: linear-gradient(135deg, #22c55e, #0ea5e9);
+    padding: 14px 22px;
+    border-radius: 12px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    display:inline-block;
+    margin-top:20px;
+}
+</style>
 </head>
 <body>
 
 <div class="container">
 
-    <div class="card" style="text-align:center;">
-        <?php if ($pro['profile_image']): ?>
-            <img src="/uploads/<?= htmlspecialchars($pro['profile_image']) ?>" class="profile-img">
+    <div class="header">
+        <?php if (!empty($pro['profile_image_blob'])): ?>
+            <img src="data:image/jpeg;base64,<?= base64_encode($pro['profile_image_blob']) ?>">
         <?php else: ?>
-            <img src="/default-avatar.png" class="profile-img">
+            <img src="https://via.placeholder.com/140x140?text=Sin+Foto">
         <?php endif; ?>
 
-        <h1><?= htmlspecialchars($pro['name']) ?></h1>
-        <p style="font-size:18px; color:#475569;"><?= htmlspecialchars($pro['profession']) ?></p>
+        <div>
+            <h1><?= htmlspecialchars($pro['name']) ?></h1>
+            <div class="prof"><?= htmlspecialchars($pro['profession']) ?></div>
+        </div>
+    </div>
 
-        <?php if ($center): ?>
-            <p style="margin-top:10px;">
-                Atiende en:
-                <a href="/centro/<?= htmlspecialchars($center['slug']) ?>" style="color:#0ea5e9;">
-                    <?= htmlspecialchars($center['name']) ?>
-                </a>
-            </p>
+    <?php if (!empty($pro['public_description'])): ?>
+        <div>
+            <div class="section-title">Sobre mí</div>
+            <p><?= nl2br(htmlspecialchars($pro['public_description'])) ?></p>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($pro['specialties'])): ?>
+        <div>
+            <div class="section-title">Especialidades</div>
+            <p><?= nl2br(htmlspecialchars($pro['specialties'])) ?></p>
+        </div>
+    <?php endif; ?>
+
+    <div>
+        <div class="section-title">Horarios de atención</div>
+
+        <?php if (empty($horarios)): ?>
+            <p>Este profesional aún no cargó horarios.</p>
+        <?php else: ?>
+            <ul>
+                <?php foreach ($horarios as $h): ?>
+                    <li>
+                        <strong><?= $dias[$h['day_of_week']] ?>:</strong>
+                        <?= substr($h['start_time'],0,5) ?> a <?= substr($h['end_time'],0,5) ?>
+                        (cada <?= $h['slot_duration'] ?> min)
+                    </li>
+                <?php endforeach; ?>
+            </ul>
         <?php endif; ?>
-
-        <a class="btn" href="/public/paciente-turno.php?user_id=<?= $user_id ?>&modo=rapido">
-            Sacar turno
-        </a>
     </div>
 
-    <div class="card">
-        <h2>Sobre mí</h2>
-        <p><?= nl2br(htmlspecialchars($pro['public_description'] ?: 'Este profesional aún no agregó una descripción.')) ?></p>
-    </div>
-
-    <?php if ($pro['specialties']): ?>
-    <div class="card">
-        <h2>Especialidades</h2>
-        <?php foreach (explode(',', $pro['specialties']) as $esp): ?>
-            <span class="badge"><?= htmlspecialchars(trim($esp)) ?></span>
-        <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
-
-    <?php if ($pro['accepts_insurance']): ?>
-    <div class="card">
-        <h2>Obras sociales</h2>
-        <?php foreach (explode(',', $pro['insurance_list']) as $os): ?>
-            <span class="badge"><?= htmlspecialchars(trim($os)) ?></span>
-        <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
-
-    <div class="card">
-        <h2>Ubicación</h2>
-        <p>
-            <?= htmlspecialchars($pro['address']) ?><br>
-            <?= htmlspecialchars($pro['city']) ?>, <?= htmlspecialchars($pro['province']) ?>
-        </p>
-    </div>
+    <a href="paciente-turno.php?user_id=<?= $pro_id ?>" class="btn-primary">
+        Sacar turno
+    </a>
 
 </div>
 

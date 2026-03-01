@@ -57,24 +57,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
         }
     }
 
-    // Subir imagen
-    if (!empty($_FILES['profile_image']['name'])) {
+    // Guardar imagen en la base de datos (BLOB)
+    if (!empty($_FILES['profile_image']['tmp_name'])) {
 
-        $ext = strtolower(pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION));
-        $allowed = ['jpg','jpeg','png','webp'];
+        $imgData = file_get_contents($_FILES['profile_image']['tmp_name']);
 
-        if (!in_array($ext, $allowed)) {
-            $errors[] = "Formato de imagen no permitido.";
-        } else {
-            $filename = "pro_" . $pro_id . "_" . time() . "." . $ext;
-            $destino = __DIR__ . '/../uploads/' . $filename;
+        $stmt = $pdo->prepare("UPDATE users SET profile_image_blob = ? WHERE id = ?");
+        $stmt->execute([$imgData, $pro_id]);
 
-            if (move_uploaded_file($_FILES['profile_image']['tmp_name'], $destino)) {
-                $stmt = $pdo->prepare("UPDATE users SET profile_image = ? WHERE id = ?");
-                $stmt->execute([$filename, $pro_id]);
-                $pro['profile_image'] = $filename;
-            }
-        }
+        $pro['profile_image_blob'] = $imgData;
     }
 
     if (empty($errors)) {
@@ -112,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
 }
 
 /* ============================================================
-   HORARIOS (TABLA REAL: schedules)
+   HORARIOS (TABLA schedules)
    ============================================================ */
 
 // Obtener horarios actuales
@@ -233,8 +224,8 @@ button:hover{opacity:0.9;}
             <label class="label">Foto del profesional</label>
             <input type="file" name="profile_image" accept="image/*">
 
-            <?php if (!empty($pro['profile_image'])): ?>
-                <img src="../uploads/<?= htmlspecialchars($pro['profile_image']) ?>"
+            <?php if (!empty($pro['profile_image_blob'])): ?>
+                <img src="data:image/jpeg;base64,<?= base64_encode($pro['profile_image_blob']) ?>"
                      style="width:120px;height:120px;border-radius:16px;object-fit:cover;margin-top:10px;border:2px solid #e2e8f0;">
             <?php endif; ?>
 
