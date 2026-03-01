@@ -3,7 +3,13 @@
 // 1) Detectar la URL solicitada
 $request = trim($_SERVER['REQUEST_URI'], '/');
 
-// 2) Si la URL está vacía → mostrar tu home actual
+// 2) Evitar error fatal cuando Railway pide /favicon.ico
+if ($request === 'favicon.ico') {
+    http_response_code(204); // Sin contenido
+    exit;
+}
+
+// 3) Si la URL está vacía → mostrar tu home actual
 if ($request === '') {
     ?>
     <!DOCTYPE html>
@@ -88,11 +94,18 @@ if ($request === '') {
     exit;
 }
 
-// 3) Si la URL parece un slug (solo letras, números y guiones)
+// 4) Si la URL parece un slug (solo letras, números y guiones)
 if (preg_match('/^[a-z0-9-]+$/', $request)) {
     header("Location: /public/profesional-landing.php?slug=" . $request);
     exit;
 }
 
-// 4) Si no es slug ni home → cargar archivo normal
-require __DIR__ . '/' . $request;
+// 5) Si no es slug ni home → cargar archivo normal
+$path = __DIR__ . '/' . $request;
+
+if (file_exists($path)) {
+    require $path;
+} else {
+    http_response_code(404);
+    echo "Página no encontrada.";
+}
