@@ -11,7 +11,7 @@ $time      = $_POST['hora'] ?? null;
 $name      = trim($_POST['nombre'] ?? '');
 $email     = trim($_POST['email'] ?? '');
 $phone     = trim($_POST['telefono'] ?? '');
-$center_id = $_POST['center_id'] ?? null; // ← AGREGADO
+$center_id = $_POST['center_id'] ?? null;
 
 if (!$pro_id || !$date || !$time || !$name || !$email) {
     die("Datos incompletos.");
@@ -34,17 +34,18 @@ if ($paciente_id) {
     $stmt->execute([$paciente_id]);
     $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 } else {
-    $stmt = $pdo->prepare("SELECT * FROM clients WHERE email = ? AND user_id = ?");
-    $stmt->execute([$email, $pro_id]);
+    // CORREGIDO: buscar por email + center_id
+    $stmt = $pdo->prepare("SELECT * FROM clients WHERE email = ? AND center_id = ?");
+    $stmt->execute([$email, $center_id]);
     $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 if (!$paciente) {
     $stmt = $pdo->prepare("
-        INSERT INTO clients (user_id, name, email, phone, center_id)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO clients (name, email, phone, center_id)
+        VALUES (?, ?, ?, ?)
     ");
-    $stmt->execute([$pro_id, $name, $email, $phone, $center_id]);
+    $stmt->execute([$name, $email, $phone, $center_id]);
     $paciente_id = $pdo->lastInsertId();
 } else {
     $paciente_id = $paciente['id'];

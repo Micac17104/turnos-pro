@@ -9,6 +9,13 @@ if (!$client_id) {
     exit;
 }
 
+// Verificar si appointments.center_id existe
+$appointments_has_center = false;
+$check = $pdo->query("SHOW COLUMNS FROM appointments LIKE 'center_id'");
+if ($check->fetch()) {
+    $appointments_has_center = true;
+}
+
 // Obtener datos del paciente SOLO si pertenece al centro
 $stmt = $pdo->prepare("
     SELECT id, name, email, phone
@@ -22,17 +29,27 @@ if (!$paciente) {
     die("Paciente no encontrado o no pertenece a este centro.");
 }
 
-// Obtener historial de turnos SOLO del centro
-$stmt = $pdo->prepare("
+// Base query historial
+$query = "
     SELECT a.date, a.time, a.status,
            u.name AS profesional
     FROM appointments a
     JOIN users u ON a.user_id = u.id
     WHERE a.client_id = ?
-    AND a.center_id = ?
-    ORDER BY a.date DESC, a.time DESC
-");
-$stmt->execute([$client_id, $center_id]);
+";
+
+$params = [$client_id];
+
+// Filtrar por centro SOLO si la columna existe
+if ($appointments_has_center) {
+    $query .= " AND a.center_id = ? ";
+    $params[] = $center_id;
+}
+
+$query .= " ORDER BY a.date DESC, a.time DESC";
+
+$stmt = $pdo->prepare($query);
+$stmt->execute($params);
 $turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
