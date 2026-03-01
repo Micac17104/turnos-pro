@@ -19,11 +19,18 @@ $stmt = $pdo->prepare("
 $stmt->execute([$center_id]);
 $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Verificar si la tabla clients tiene center_id
-$has_center_id = false;
-$check = $pdo->query("SHOW COLUMNS FROM clients LIKE 'center_id'");
-if ($check->fetch()) {
-    $has_center_id = true;
+// Verificar si appointments.center_id existe
+$appointments_has_center = false;
+$checkA = $pdo->query("SHOW COLUMNS FROM appointments LIKE 'center_id'");
+if ($checkA->fetch()) {
+    $appointments_has_center = true;
+}
+
+// Verificar si clients.center_id existe
+$clients_has_center = false;
+$checkC = $pdo->query("SHOW COLUMNS FROM clients LIKE 'center_id'");
+if ($checkC->fetch()) {
+    $clients_has_center = true;
 }
 
 // Base query
@@ -36,13 +43,18 @@ $query = "
     JOIN users u ON a.user_id = u.id
     JOIN clients c ON a.client_id = c.id
     WHERE a.date = ?
-    AND a.center_id = ?
 ";
 
-$params = [$fecha, $center_id];
+$params = [$fecha];
 
-// Si existe center_id en clients, filtramos
-if ($has_center_id) {
+// Filtrar por centro SOLO si la columna existe
+if ($appointments_has_center) {
+    $query .= " AND a.center_id = ? ";
+    $params[] = $center_id;
+}
+
+// Filtrar pacientes por centro SOLO si la columna existe
+if ($clients_has_center) {
     $query .= " AND c.center_id = ? ";
     $params[] = $center_id;
 }

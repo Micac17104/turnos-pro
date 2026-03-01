@@ -24,8 +24,10 @@ if (!$pro) {
 $errors = [];
 $success = "";
 
-// Procesar formulario
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+/* ============================================================
+   PROCESAR FORMULARIO DE PERFIL
+   ============================================================ */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
 
     $name = trim($_POST['name'] ?? '');
     $profession = trim($_POST['profession'] ?? '');
@@ -92,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pro_id, $center_id
         ]);
 
-        $success = "Perfil público actualizado correctamente.";
+        $success = "Perfil actualizado correctamente.";
 
         // Refrescar datos
         $pro = array_merge($pro, [
@@ -108,6 +110,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
     }
 }
+
+/* ============================================================
+   HORARIOS DEL PROFESIONAL
+   ============================================================ */
+
+// Obtener horarios actuales
+$stmt = $pdo->prepare("SELECT * FROM professional_schedule WHERE user_id = ? ORDER BY day_of_week, start_time");
+$stmt->execute([$pro_id]);
+$horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Guardar horarios
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_schedule'])) {
+
+    // Borrar horarios anteriores
+    $pdo->prepare("DELETE FROM professional_schedule WHERE user_id = ?")->execute([$pro_id]);
+
+    if (!empty($_POST['day'])) {
+        foreach ($_POST['day'] as $i => $day) {
+            $start = $_POST['start'][$i];
+            $end   = $_POST['end'][$i];
+            $interval = $_POST['interval'][$i] ?? 30;
+
+            if ($day !== '' && $start !== '' && $end !== '') {
+                $stmt = $pdo->prepare("
+                    INSERT INTO professional_schedule (user_id, day_of_week, start_time, end_time, interval_minutes)
+                    VALUES (?, ?, ?, ?, ?)
+                ");
+                $stmt->execute([$pro_id, $day, $start, $end, $interval]);
+            }
+        }
+    }
+
+    $success = "Horarios actualizados correctamente.";
+
+    // Recargar horarios
+    $stmt = $pdo->prepare("SELECT * FROM professional_schedule WHERE user_id = ? ORDER BY day_of_week, start_time");
+    $stmt->execute([$pro_id]);
+    $horarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -119,7 +161,7 @@ body{margin:0;font-family:Arial;background:#f1f5f9;}
 .top{background:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 4px rgba(15,23,42,0.06);}
 .main{padding:24px;max-width:800px;margin:0 auto;}
 .card{background:white;border-radius:16px;padding:20px;margin-bottom:20px;box-shadow:0 10px 30px rgba(15,23,42,0.06);}
-input, textarea{width:100%;padding:10px;margin:6px 0 14px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;}
+input, textarea, select{width:100%;padding:10px;margin:6px 0 14px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;}
 button{padding:12px 20px;background:#0ea5e9;color:white;border:none;border-radius:12px;font-weight:600;cursor:pointer;}
 button:hover{opacity:0.9;}
 .error{color:#b00020;margin-bottom:10px;}
@@ -156,7 +198,10 @@ button:hover{opacity:0.9;}
             <div class="success"><?= $success ?></div>
         <?php endif; ?>
 
+        <!-- FORMULARIO PERFIL -->
         <form method="post" enctype="multipart/form-data">
+
+            <input type="hidden" name="save_profile" value="1">
 
             <label class="label">Nombre</label>
             <input name="name" value="<?= htmlspecialchars($pro['name']) ?>" required>
@@ -195,8 +240,80 @@ button:hover{opacity:0.9;}
 
             <br><br>
 
-            <button>Guardar cambios</button>
+            <button>Guardar perfil</button>
         </form>
+
+    </div>
+
+
+    <!-- HORARIOS -->
+    <div class="card">
+        <h2>Horarios de atención</h2>
+
+        <form method="post">
+
+            <input type="hidden" name="save_schedule" value="1">
+
+            <div id="horarios-container">
+                <?php foreach ($horarios as $h): ?>
+                    <div class="horario-item" style="display:flex; gap:10px; margin-bottom:10px;">
+
+                        <select name="day[]">
+                            <option value="1" <?= $h['day_of_week']==1?'selected':'' ?>>Lunes</option>
+                            <option value="2" <?= $h['day_of_week']==2?'selected':'' ?>>Martes</option>
+                            <option value="3" <?= $h['day_of_week']==3?'selected':'' ?>>Miércoles</option>
+                            <option value="4" <?= $h['day_of_week']==4?'selected':'' ?>>Jueves</option>
+                            <option value="5" <?= $h['day_of_week']==5?'selected':'' ?>>Viernes</option>
+                            <option value="6" <?= $h['day_of_week']==6?'selected':'' ?>>Sábado</option>
+                            <option value="7" <?= $h['day_of_week']==7?'selected':'' ?>>Domingo</option>
+                        </select>
+
+                        <input type="time" name="start[]" value="<?= $h['start_time'] ?>">
+                        <input type="time" name="end[]" value="<?= $h['end_time'] ?>">
+
+                        <input type="number" name="interval[]" value="<?= $h['interval_minutes'] ?>" min="5" max="120" style="width:80px;">
+                        <span>min</span>
+
+                        <button type="button" onclick="this.parentNode.remove()">Eliminar</button>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <button type="button" onclick="addHorario()">+ Agregar horario</button>
+
+            <script>
+            function addHorario() {
+                const div = document.createElement('div');
+                div.className = 'horario-item';
+                div.style = "display:flex; gap:10px; margin-bottom:10px;";
+                div.innerHTML = `
+                    <select name="day[]">
+                        <option value="1">Lunes</option>
+                        <option value="2">Martes</option>
+                        <option value="3">Miércoles</option>
+                        <option value="4">Jueves</option>
+                        <option value="5">Viernes</option>
+                        <option value="6">Sábado</option>
+                        <option value="7">Domingo</option>
+                    </select>
+
+                    <input type="time" name="start[]">
+                    <input type="time" name="end[]">
+
+                    <input type="number" name="interval[]" value="30" min="5" max="120" style="width:80px;">
+                    <span>min</span>
+
+                    <button type="button" onclick="this.parentNode.remove()">Eliminar</button>
+                `;
+                document.getElementById('horarios-container').appendChild(div);
+            }
+            </script>
+
+            <br><br>
+
+            <button>Guardar horarios</button>
+        </form>
+
     </div>
 
 </div>
