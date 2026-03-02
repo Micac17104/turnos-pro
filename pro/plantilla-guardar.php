@@ -26,7 +26,7 @@ $fields = [];
 foreach ($lines as $label) {
     $fields[] = [
         'label' => $label,
-        'type'  => 'textarea' // simple por ahora
+        'type'  => 'textarea'
     ];
 }
 
@@ -41,4 +41,5 @@ $stmt->execute([
     json_encode($fields, JSON_UNESCAPED_UNICODE)
 ]);
 
-redirect("paciente-historia.php?id=" . ($_GET['id'] ?? ''));
+// Redirección correcta
+redirect("pacientes.php");
