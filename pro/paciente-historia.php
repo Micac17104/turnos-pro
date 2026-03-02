@@ -1,5 +1,5 @@
 <?php
-// /pro/agenda.php
+// /pro/paciente-historia.php (antes decía agenda.php en el comentario)
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -36,7 +36,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$patient_id]);
 $extra = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-// Evoluciones + archivos
+// Evoluciones + archivos (clásico)
 $stmt = $pdo->prepare("
     SELECT cr.id AS record_id, cr.fecha, cr.motivo, cr.evolucion, cr.indicaciones, cr.diagnostico,
            cf.id AS file_id, cf.file_name, cf.file_path
@@ -72,6 +72,46 @@ foreach ($rows as $r) {
     }
 }
 
+// Plantillas del profesional
+$stmt = $pdo->prepare("
+    SELECT id, title
+    FROM clinical_templates
+    WHERE user_id = ? AND center_id IS NULL
+    ORDER BY created_at DESC
+");
+$stmt->execute([$user_id]);
+$plantillas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Registros de plantillas para este paciente
+$stmt = $pdo->prepare("
+    SELECT r.id, r.created_at, r.data, t.title
+    FROM clinical_template_records r
+    JOIN clinical_templates t ON t.id = r.template_id
+    WHERE r.client_id = ? AND r.user_id = ?
+    ORDER BY r.created_at DESC
+");
+$stmt->execute([$patient_id, $user_id]);
+$tpl_rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Archivos de registros de plantillas
+$tpl_files = [];
+if (!empty($tpl_rows)) {
+    $ids = array_column($tpl_rows, 'id');
+    $in  = implode(',', array_fill(0, count($ids), '?'));
+
+    $stmt = $pdo->prepare("
+        SELECT id, record_id, file_name, file_path
+        FROM clinical_template_files
+        WHERE record_id IN ($in)
+    ");
+    $stmt->execute($ids);
+    $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($files as $f) {
+        $tpl_files[$f['record_id']][] = $f;
+    }
+}
+
 require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';
 ?>
@@ -94,7 +134,7 @@ require __DIR__ . '/includes/sidebar.php';
         </a>
     </div>
 
-    <!-- DATOS CLÍNICOS -->
+    <!-- DATOS CLÍNICOS FIJOS -->
     <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-slate-900">Datos clínicos</h2>
@@ -115,7 +155,83 @@ require __DIR__ . '/includes/sidebar.php';
         </div>
     </section>
 
-    <!-- EVOLUCIONES -->
+    <!-- HISTORIA CLÍNICA PERSONALIZADA -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-slate-900">Historia clínica personalizada</h2>
+
+            <div class="flex gap-2">
+                <a href="plantilla-nueva.php"
+                   class="px-3 py-1 rounded-lg bg-slate-200 text-slate-700 text-sm hover:bg-slate-300">
+                    Nueva plantilla
+                </a>
+
+                <?php if (!empty($plantillas)): ?>
+                    <div class="relative">
+                        <details class="group">
+                            <summary class="px-3 py-1 rounded-lg bg-emerald-600 text-white text-sm cursor-pointer hover:bg-emerald-700">
+                                Registrar con plantilla
+                            </summary>
+                            <div class="absolute mt-2 bg-white border border-slate-200 rounded-lg shadow-lg z-10 min-w-[220px]">
+                                <?php foreach ($plantillas as $p): ?>
+                                    <a href="plantilla-usar.php?patient_id=<?= $patient_id ?>&template_id=<?= $p['id'] ?>"
+                                       class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                        <?= h($p['title']) ?>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        </details>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <?php if (empty($tpl_rows)): ?>
+            <p class="text-sm text-slate-500">Todavía no registraste historias clínicas personalizadas para este paciente.</p>
+        <?php else: ?>
+            <div class="space-y-6">
+                <?php foreach ($tpl_rows as $r): ?>
+                    <?php $data = json_decode($r['data'], true) ?: []; ?>
+                    <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <h3 class="text-sm font-semibold text-slate-900 mb-2">
+                            <?= date("d/m/Y H:i", strtotime($r['created_at'])) ?> — <?= h($r['title']) ?>
+                        </h3>
+
+                        <div class="space-y-1 text-sm text-slate-700">
+                            <?php foreach ($data as $item): ?>
+                                <p>
+                                    <strong><?= h($item['label']) ?>:</strong>
+                                    <?= nl2br(h($item['value'])) ?>
+                                </p>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <?php if (!empty($tpl_files[$r['id']])): ?>
+                            <div class="mt-4">
+                                <strong>Archivos adjuntos:</strong>
+                                <ul class="list-disc ml-6 mt-2 text-blue-700 text-sm">
+                                    <?php foreach ($tpl_files[$r['id']] as $f): ?>
+                                        <li>
+                                            <a href="../../uploads/<?= h($f['file_path']) ?>" target="_blank">
+                                                <?= h($f['file_name']) ?>
+                                            </a>
+                                            <a href="plantilla-archivo-eliminar.php?id=<?= $f['id'] ?>"
+                                               class="text-red-600 ml-2 text-xs"
+                                               onclick="return confirm('¿Eliminar archivo?')">
+                                                Eliminar
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </section>
+
+    <!-- EVOLUCIONES CLÁSICAS -->
     <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-slate-900">Evoluciones</h2>
@@ -162,10 +278,14 @@ require __DIR__ . '/includes/sidebar.php';
                             </div>
                         <?php endif; ?>
 
-                        <a href="archivo-subir.php?record_id=<?= $e['id'] ?>"
-                           class="inline-block mt-4 px-3 py-1 bg-slate-200 text-slate-700 rounded hover:bg-slate-300 text-xs">
-                            Adjuntar archivo
-                        </a>
+                        <form action="archivo-subir.php" method="post" enctype="multipart/form-data" class="mt-4 flex items-center gap-2 text-xs">
+                            <input type="hidden" name="record_id" value="<?= $e['id'] ?>">
+                            <input type="file" name="archivo" class="text-xs">
+                            <button type="submit"
+                                    class="px-3 py-1 bg-slate-200 text-slate-700 rounded hover:bg-slate-300">
+                                Adjuntar archivo
+                            </button>
+                        </form>
                     </div>
                 <?php endforeach; ?>
             </div>
