@@ -61,12 +61,6 @@ body{margin:0;font-family:Arial;background:#f1f5f9;}
         </div>
 
         <div class="card">
-            <h3>Secretarias</h3>
-            <p>Agregar y gestionar cuentas de secretarias.</p>
-            <a href="centro-secretarias.php" class="btn">Ir a secretarias</a>
-        </div>
-
-        <div class="card">
             <h3>Configuración</h3>
             <p>Editar datos del centro y preferencias.</p>
             <a href="centro-configuracion.php" class="btn">Ir a configuración</a>
