@@ -7,7 +7,6 @@
     <a href="centro-agenda.php">Agenda diaria</a>
     <a href="centro-agenda-semanal.php">Agenda semanal</a>
     <a href="centro-pacientes.php">Pacientes</a>
-    <a href="centro-secretarias.php">Secretarias</a>
     <a href="centro-configuracion.php">Configuración</a>
     <a href="../auth/logout.php" class="logout">Salir</a>
 </div>
