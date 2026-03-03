@@ -9,12 +9,31 @@ $pro_id = $_POST['user_id'] ?? null;
 $date   = $_POST['fecha'] ?? null;
 $time   = $_POST['hora'] ?? null;
 
-$name  = trim($_POST['nombre'] ?? '');
-$email = trim($_POST['email'] ?? '');
-$phone = trim($_POST['telefono'] ?? '');
+$paciente_id = $_SESSION['paciente_id'] ?? null;
 
-if (!$pro_id || !$date || !$time || !$name || !$email) {
-    die("Datos incompletos.");
+// Si el paciente NO está logueado → usa los datos del formulario
+if (!$paciente_id) {
+    $name  = trim($_POST['nombre'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $phone = trim($_POST['telefono'] ?? '');
+
+    if (!$pro_id || !$date || !$time || !$name || !$email) {
+        die("Datos incompletos.");
+    }
+
+} else {
+    // Paciente logueado → obtener datos desde la base
+    $stmt = $pdo->prepare("SELECT name, email, phone FROM clients WHERE id = ?");
+    $stmt->execute([$paciente_id]);
+    $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$paciente) {
+        die("Paciente no encontrado.");
+    }
+
+    $name  = $paciente['name'];
+    $email = $paciente['email'];
+    $phone = $paciente['phone'];
 }
 
 // Obtener profesional
@@ -26,42 +45,28 @@ if (!$pro) {
     die("Profesional no encontrado.");
 }
 
-// Detectar si el profesional pertenece a un centro
 $center_id = $pro['parent_center_id'] ?: null;
 
-// Buscar paciente logueado
-$paciente_id = $_SESSION['paciente_id'] ?? null;
-
-if ($paciente_id) {
-    // Paciente logueado → buscar en clients
-    $stmt = $pdo->prepare("SELECT * FROM clients WHERE id = ?");
-    $stmt->execute([$paciente_id]);
-    $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
-
-} else {
-    // Paciente NO logueado → buscar por email (sin center_id)
+// Si el paciente no estaba logueado, buscarlo por email
+if (!$paciente_id) {
     $stmt = $pdo->prepare("SELECT * FROM clients WHERE email = ?");
     $stmt->execute([$email]);
     $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$paciente) {
+        $stmt = $pdo->prepare("
+            INSERT INTO clients (name, email, phone, center_id)
+            VALUES (?, ?, ?, NULL)
+        ");
+        $stmt->execute([$name, $email, $phone]);
+        $paciente_id = $pdo->lastInsertId();
+        $_SESSION['paciente_id'] = $paciente_id;
+    } else {
+        $paciente_id = $paciente['id'];
+    }
 }
 
-// Crear paciente si no existe
-if (!$paciente) {
-    $stmt = $pdo->prepare("
-        INSERT INTO clients (name, email, phone, center_id)
-        VALUES (?, ?, ?, NULL)
-    ");
-    $stmt->execute([$name, $email, $phone]);
-    $paciente_id = $pdo->lastInsertId();
-
-    // Guardar sesión si no estaba logueado
-    $_SESSION['paciente_id'] = $paciente_id;
-
-} else {
-    $paciente_id = $paciente['id'];
-}
-
-// Verificar que el turno siga libre
+// Verificar turno libre
 $stmt = $pdo->prepare("
     SELECT id FROM appointments
     WHERE user_id = ? AND date = ? AND time = ? AND status IN ('confirmed','pending')
@@ -88,7 +93,6 @@ $config = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
 $telefono_normalizado = preg_replace('/\D/', '', $phone);
 
-// Mensaje al paciente
 if (!empty($config['confirm_message'])) {
     $mensaje_final = str_replace(
         ['{nombre}', '{fecha}', '{hora}', '{profesional}'],
@@ -99,12 +103,10 @@ if (!empty($config['confirm_message'])) {
     $mensaje_final = "Hola $name, tu turno con {$pro['name']} fue confirmado para el $date a las $time.";
 }
 
-// Email al paciente
 if (!empty($config['email_enabled'])) {
     @mail($email, "Confirmación de turno", $mensaje_final);
 }
 
-// Notificar profesional
 if (!empty($config['notify_professional_email']) && !empty($config['professional_message'])) {
     $msg_pro = str_replace(
         ['{paciente}', '{fecha}', '{hora}'],
@@ -114,7 +116,6 @@ if (!empty($config['notify_professional_email']) && !empty($config['professional
     @mail($pro['email'], "Nuevo turno reservado", $msg_pro);
 }
 
-// Guardar datos para pantalla de gracias
 $_SESSION['last_booking'] = [
     'pro_name' => $pro['name'],
     'date'     => $date,
@@ -124,6 +125,5 @@ $_SESSION['last_booking'] = [
     'mensaje_final' => $mensaje_final
 ];
 
-// Redirigir
 header("Location: gracias.php");
 exit;
