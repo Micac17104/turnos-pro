@@ -46,7 +46,8 @@ $subject = "Restablecer contraseña - TurnosPro";
 $message = "Hola, hacé clic en este enlace para restablecer tu contraseña:\n\n$reset_link\n\nEste enlace vence en 1 hora.";
 $headers = "From: no-reply@turnospro.com";
 
-mail($email, $subject, $message, $headers);
+require __DIR__ . '/mailer.php';
+enviarEmail($email, $subject, $message);
 
 // Redirigir
 header("Location: forgot-password.php?sent=1");
