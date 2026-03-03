@@ -4,6 +4,13 @@ session_start();
 
 require __DIR__ . '/../config.php';
 
+// 🔥 BLOQUEAR ESTE FLUJO PARA PACIENTES REGISTRADOS
+// Si el paciente está logueado → NO debe usar este archivo viejo
+if (isset($_SESSION['paciente_id'])) {
+    header("Location: paciente-sacar-turno.php");
+    exit;
+}
+
 $user_id = $_GET['user_id'] ?? null;
 $modo = $_GET['modo'] ?? null;
 
