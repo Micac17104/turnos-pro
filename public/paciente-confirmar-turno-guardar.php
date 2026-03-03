@@ -68,6 +68,12 @@ if (!$paciente_id) {
     $stmt->execute([$paciente_id]);
     $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Si el paciente no tiene center_id y el profesional sí pertenece a un centro → asignarlo
+if (empty($paciente['center_id']) && !empty($center_id)) {
+    $stmt = $pdo->prepare("UPDATE clients SET center_id = ? WHERE id = ?");
+    $stmt->execute([$center_id, $paciente_id]);
+}
+
     if (!$paciente) {
         die("Paciente no encontrado.");
     }
