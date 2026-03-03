@@ -63,17 +63,20 @@ if (!$paciente_id) {
 // PACIENTE LOGUEADO
 // -----------------------------
 } else {
+$stmt = $pdo->prepare("SELECT name, email, phone, center_id FROM clients WHERE id = ?");
+$stmt->execute([$paciente_id]);
+$paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->prepare("SELECT name, email, phone FROM clients WHERE id = ?");
-    $stmt->execute([$paciente_id]);
-    $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$paciente) {
+    die("Paciente no encontrado.");
+}
 
-    // Si el paciente no tiene center_id y el profesional sí pertenece a un centro → asignarlo
+// Si el paciente no tiene center_id y el profesional pertenece a un centro → asignarlo
 if (empty($paciente['center_id']) && !empty($center_id)) {
     $stmt = $pdo->prepare("UPDATE clients SET center_id = ? WHERE id = ?");
     $stmt->execute([$center_id, $paciente_id]);
+    $paciente['center_id'] = $center_id; // actualizar en memoria
 }
-
     if (!$paciente) {
         die("Paciente no encontrado.");
     }
