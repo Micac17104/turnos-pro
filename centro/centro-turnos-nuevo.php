@@ -59,6 +59,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Paciente inválido.";
     }
 
+    // Validar turno libre
+    $stmt = $pdo->prepare("
+        SELECT id FROM appointments
+        WHERE user_id = ? AND date = ? AND time = ? AND status IN ('confirmed','pending')
+    ");
+    $stmt->execute([$prof_id, $date, $time]);
+
+    if ($stmt->fetch()) {
+        $errors[] = "Ese horario ya está ocupado para ese profesional.";
+    }
+
     if (empty($errors)) {
 
         $stmt = $pdo->prepare("

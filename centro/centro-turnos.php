@@ -118,7 +118,16 @@ select,input{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
 <div class="main">
 
     <div class="card">
-        <h2>Turnos del centro</h2>
+
+        <!-- Título + Botón Nuevo Turno -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h2>Turnos del centro</h2>
+
+            <a href="centro-turno-nuevo.php" 
+               style="background:#0ea5e9; color:white; padding:8px 14px; border-radius:999px; text-decoration:none;">
+                + Nuevo turno
+            </a>
+        </div>
 
         <!-- Filtros -->
         <form method="GET" style="margin-bottom:15px;">
