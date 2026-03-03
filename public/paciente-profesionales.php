@@ -7,6 +7,9 @@ require __DIR__ . '/../config.php';
 
 $paciente_id = $_SESSION['paciente_id'];
 
+// Detectar si viene center_id desde paciente-centros.php
+$center_id = $_GET['center_id'] ?? null;
+
 // Obtener ciudad del paciente
 $stmt = $pdo->prepare("SELECT city FROM clients WHERE id = ?");
 $stmt->execute([$paciente_id]);
@@ -35,24 +38,47 @@ if (!$city) {
     $city = $cities[0] ?? "";
 }
 
-// Obtener profesionales filtrados
-$stmt = $pdo->prepare("
-    SELECT id, name, profession, city 
-    FROM users
-    WHERE account_type = 'professional'
-      AND city = ?
-");
-$stmt->execute([$city]);
-$profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// ---------------------------------------------
+// SI VIENE center_id → MOSTRAR SOLO PROFESIONALES DEL CENTRO
+// ---------------------------------------------
+if ($center_id) {
+
+    $stmt = $pdo->prepare("
+        SELECT id, name, profession, city 
+        FROM users
+        WHERE account_type = 'professional'
+          AND parent_center_id = ?
+    ");
+    $stmt->execute([$center_id]);
+    $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} else {
+
+    // ---------------------------------------------
+    // SIN center_id → FILTRAR POR CIUDAD
+    // ---------------------------------------------
+    $stmt = $pdo->prepare("
+        SELECT id, name, profession, city 
+        FROM users
+        WHERE account_type = 'professional'
+          AND LOWER(city) = LOWER(?)
+    ");
+    $stmt->execute([$city]);
+    $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 ?>
 
-<h1 class="text-2xl font-bold text-slate-900 mb-6">Profesionales disponibles</h1>
+<h1 class="text-2xl font-bold text-slate-900 mb-6">
+    <?= $center_id ? "Profesionales del centro" : "Profesionales disponibles" ?>
+</h1>
 
+<?php if (!$center_id): ?>
 <form method="GET" class="mb-6 flex items-center gap-3">
     <label class="text-sm text-slate-600">Ciudad</label>
     <select name="city" class="border rounded-lg p-2">
         <?php foreach ($cities as $c): ?>
-            <option value="<?= $c ?>" <?= $c === $city ? 'selected' : '' ?>>
+            <option value="<?= $c ?>" <?= strtolower($c) === strtolower($city) ? 'selected' : '' ?>>
                 <?= $c ?>
             </option>
         <?php endforeach; ?>
@@ -62,13 +88,16 @@ $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Filtrar
     </button>
 </form>
+<?php endif; ?>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
 <?php if (empty($profesionales)): ?>
 
     <div class="bg-white p-6 rounded-xl shadow border col-span-2 text-center">
-        <p class="text-slate-500">No hay profesionales en esta ciudad.</p>
+        <p class="text-slate-500">
+            <?= $center_id ? "Este centro no tiene profesionales cargados." : "No hay profesionales en esta ciudad." ?>
+        </p>
     </div>
 
 <?php else: ?>
@@ -79,7 +108,6 @@ $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <p class="text-slate-600"><?= htmlspecialchars($pro['profession']) ?></p>
             <p class="text-sm text-slate-500 mt-1"><?= htmlspecialchars($pro['city']) ?></p>
 
-            <!-- RUTA CORRECTA PARA RAILWAY -->
             <a href="reservar.php?user_id=<?= $pro['id'] ?>"
                class="mt-4 inline-block px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
                 Ver disponibilidad

@@ -171,10 +171,21 @@ select,input{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
                 <td><?= htmlspecialchars($t['paciente']) ?></td>
                 <td>
                     <?php
-                    $s = $t['status'];
-                    $class = $s==='confirmed'?'badge-confirmed':($s==='cancelled'?'badge-cancelled':'badge-pending');
-                    ?>
-                    <span class="badge <?= $class ?>"><?= htmlspecialchars($s) ?></span>
+$s = $t['status'];
+
+$class = $s==='confirmed'
+    ? 'badge-confirmed'
+    : ($s==='cancelled' ? 'badge-cancelled' : 'badge-pending');
+
+// Traducción
+$label = [
+    'confirmed' => 'Confirmado',
+    'pending'   => 'Pendiente',
+    'cancelled' => 'Cancelado'
+][$s] ?? $s;
+?>
+
+<span class="badge <?= $class ?>"><?= $label ?></span>
                 </td>
             </tr>
             <?php endforeach; ?>
