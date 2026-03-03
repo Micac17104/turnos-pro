@@ -123,7 +123,7 @@ select,input{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h2>Turnos del centro</h2>
 
-            <a href="centro-turno-nuevo.php" 
+            <a href="centro-turnos-nuevo.php" 
                style="background:#0ea5e9; color:white; padding:8px 14px; border-radius:999px; text-decoration:none;">
                 + Nuevo turno
             </a>
