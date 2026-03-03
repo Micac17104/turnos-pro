@@ -72,7 +72,7 @@ if (!$pro) {
     <p>Turno con <strong><?= htmlspecialchars($pro['name']) ?></strong></p>
     <p><?= date("d/m/Y", strtotime($fecha)) ?> — <?= $hora ?> hs</p>
 
-    <form method="post" action="confirmar-turno.php">
+    <form method="post" action="paciente-confirmar-turno-guardar.php">
 
         <!-- Datos ocultos -->
         <input type="hidden" name="user_id" value="<?= $user_id ?>">
