@@ -1,12 +1,39 @@
 <?php
 file_put_contents(__DIR__ . "/cron-log.txt", "Ejecutado: " . date("Y-m-d H:i:s") . "\n", FILE_APPEND);
-require __DIR__ . '/../config.php';
+
+// ===============================
+// CONEXIÓN A LA BASE (Railway)
+// ===============================
+$host = getenv('MYSQLHOST');
+$user = getenv('MYSQLUSER');
+$pass = getenv('MYSQLPASSWORD');
+$db   = getenv('MYSQLDATABASE');
+$port = getenv('MYSQLPORT');
+
+try {
+    $pdo = new PDO(
+        "mysql:host=$host;port=$port;dbname=$db;charset=utf8",
+        $user,
+        $pass,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        ]
+    );
+} catch (Exception $e) {
+    file_put_contents(__DIR__ . "/cron-log.txt", "ERROR DB: " . $e->getMessage() . "\n", FILE_APPEND);
+    echo "Error de conexión: " . $e->getMessage();
+    exit;
+}
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
+
 echo "Cron ejecutado a las " . date("Y-m-d H:i:s") . "\n";
 
+// ===============================
 // 1) Recordatorio 24 horas antes
+// ===============================
 $stmt = $pdo->prepare("
     SELECT a.*, c.email, c.name AS paciente
     FROM appointments a
@@ -16,7 +43,7 @@ $stmt = $pdo->prepare("
       AND a.status = 'confirmed'
 ");
 $stmt->execute();
-$turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$turnos = $stmt->fetchAll();
 
 foreach ($turnos as $t) {
     $to = $t['email'];
@@ -29,7 +56,9 @@ foreach ($turnos as $t) {
     $update->execute([$t['id']]);
 }
 
+// ===============================
 // 2) Recordatorio 2 horas antes
+// ===============================
 $stmt = $pdo->prepare("
     SELECT a.*, c.email, c.name AS paciente
     FROM appointments a
@@ -40,7 +69,7 @@ $stmt = $pdo->prepare("
       AND a.status = 'confirmed'
 ");
 $stmt->execute();
-$turnos2 = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$turnos2 = $stmt->fetchAll();
 
 foreach ($turnos2 as $t) {
     $to = $t['email'];
