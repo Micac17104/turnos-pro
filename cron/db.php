@@ -1,9 +1,9 @@
 <?php
-$host = "mysql.railway.internal";
-$dbname = "railway";
-$user = "root";
-$pass = "yjdBrLZlWrojESOUCJNSIySVjkcqAlXf"; // tu contraseña
-$port = 3306;
+$host = getenv("MYSQLHOST");
+$dbname = getenv("MYSQLDATABASE");
+$user = getenv("MYSQLUSER");
+$pass = getenv("MYSQLPASSWORD");
+$port = getenv("MYSQLPORT");
 
 try {
     $pdo = new PDO(
@@ -13,5 +13,6 @@ try {
     );
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
+    file_put_contents(__DIR__ . "/cron-log.txt", "ERROR DB: " . $e->getMessage() . "\n", FILE_APPEND);
     die("Error de conexión: " . $e->getMessage());
 }
