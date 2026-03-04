@@ -1,4 +1,5 @@
 <?php
+file_put_contents(__DIR__ . "/cron-log.txt", "Ejecutado: " . date("Y-m-d H:i:s") . "\n", FILE_APPEND);
 require __DIR__ . '/../config.php';
 
 ini_set('display_errors', 1);
