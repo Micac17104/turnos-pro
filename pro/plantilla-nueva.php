@@ -49,11 +49,6 @@ require __DIR__ . '/includes/sidebar.php';
                 Cancelar
             </a>
 
-            <a href="plantilla-eliminar.php?id=<?= $p['id'] ?>"
-   onclick="return confirm('¿Eliminar esta plantilla?')"
-   class="text-red-600 hover:underline">
-   Eliminar
-</a>
 
             <button type="submit"
                     class="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800">

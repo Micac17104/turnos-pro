@@ -166,6 +166,13 @@ require __DIR__ . '/includes/sidebar.php';
                     Nueva plantilla
                 </a>
 
+                
+            <a href="plantilla-eliminar.php?id=<?= $p['id'] ?>"
+   onclick="return confirm('¿Eliminar esta plantilla?')"
+   class="text-red-600 hover:underline">
+   Eliminar
+</a>
+
                 <?php if (!empty($plantillas)): ?>
                     <div class="relative">
                         <details class="group">

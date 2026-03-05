@@ -87,10 +87,6 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                         Perfil público
                     </a>
 
-                    <!-- Entrar al panel del profesional (modo admin) -->
-                    <a class="action-link" href="../pro/login-as.php?id=<?= $p['id'] ?>">
-                        Entrar como profesional
-                    </a>
 
                     <!-- Ver landing pública -->
                     <?php if (!empty($p['slug'])): ?>

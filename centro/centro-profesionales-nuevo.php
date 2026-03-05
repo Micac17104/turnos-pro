@@ -156,8 +156,6 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
             <input name="insurance_other" id="insurance_other" placeholder="Escribí otra obra social" style="display:none;">
         </div>
 
-        <input name="password" type="password" placeholder="Contraseña" required>
-        <input name="password2" type="password" placeholder="Repetir contraseña" required>
 
         <button>Crear profesional</button>
     </form>
