@@ -32,4 +32,4 @@ $stmt = $pdo->prepare("
 $stmt->execute([$payment_status, $payment_method, $turno_id]);
 
 // Redirección corregida (ruta relativa)
-redirect('agenda.php?pay=1');
+redirect("pagos.php");

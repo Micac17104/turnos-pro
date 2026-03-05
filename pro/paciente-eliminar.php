@@ -24,4 +24,4 @@ if (!$stmt->fetch()) {
 $stmt = $pdo->prepare("DELETE FROM clients WHERE id = ? AND user_id = ?");
 $stmt->execute([$id, $user_id]);
 
-redirect('pacientes.php?deleted=1');
+redirect("pacientes.php");
