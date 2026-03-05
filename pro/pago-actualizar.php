@@ -9,7 +9,7 @@ require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';
 
-$turno_id       = require_param($_POST, 'turno_id');
+$turno_id = require_param($_POST, 'id');
 $payment_status = trim($_POST['payment_status'] ?? '');
 $payment_method = trim($_POST['payment_method'] ?? '');
 
