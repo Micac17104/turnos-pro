@@ -1,5 +1,5 @@
 <?php
-// /pro/paciente-historia.php (antes decía agenda.php en el comentario)
+// /pro/paciente-historia.php
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -71,7 +71,6 @@ foreach ($rows as $r) {
         ];
     }
 }
-
 // Plantillas del profesional
 $stmt = $pdo->prepare("
     SELECT id, title
@@ -154,8 +153,7 @@ require __DIR__ . '/includes/sidebar.php';
             <p><strong>Nro afiliado:</strong> <?= h($extra['nro_afiliado'] ?? 'No registrado') ?></p>
         </div>
     </section>
-
-    <!-- HISTORIA CLÍNICA PERSONALIZADA -->
+        <!-- HISTORIA CLÍNICA PERSONALIZADA -->
     <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-slate-900">Historia clínica personalizada</h2>
@@ -165,13 +163,6 @@ require __DIR__ . '/includes/sidebar.php';
                    class="px-3 py-1 rounded-lg bg-slate-200 text-slate-700 text-sm hover:bg-slate-300">
                     Nueva plantilla
                 </a>
-
-                
-            <a href="plantilla-eliminar.php?id=<?= $p['id'] ?>"
-   onclick="return confirm('¿Eliminar esta plantilla?')"
-   class="text-red-600 hover:underline">
-   Eliminar
-</a>
 
                 <?php if (!empty($plantillas)): ?>
                     <div class="relative">
@@ -200,9 +191,18 @@ require __DIR__ . '/includes/sidebar.php';
                 <?php foreach ($tpl_rows as $r): ?>
                     <?php $data = json_decode($r['data'], true) ?: []; ?>
                     <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
-                        <h3 class="text-sm font-semibold text-slate-900 mb-2">
-                            <?= date("d/m/Y H:i", strtotime($r['created_at'])) ?> — <?= h($r['title']) ?>
-                        </h3>
+
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-sm font-semibold text-slate-900">
+                                <?= date("d/m/Y H:i", strtotime($r['created_at'])) ?> — <?= h($r['title']) ?>
+                            </h3>
+
+                            <a href="plantilla-registro-eliminar.php?id=<?= $r['id'] ?>"
+                               class="text-red-600 text-xs"
+                               onclick="return confirm('¿Eliminar este registro?')">
+                                Eliminar registro
+                            </a>
+                        </div>
 
                         <div class="space-y-1 text-sm text-slate-700">
                             <?php foreach ($data as $item): ?>
@@ -232,13 +232,13 @@ require __DIR__ . '/includes/sidebar.php';
                                 </ul>
                             </div>
                         <?php endif; ?>
+
                     </div>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
     </section>
-
-    <!-- EVOLUCIONES CLÁSICAS -->
+        <!-- EVOLUCIONES CLÁSICAS -->
     <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-slate-900">Evoluciones</h2>
