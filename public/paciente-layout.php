@@ -1,7 +1,8 @@
 <?php
-// Siempre usar la carpeta de sesiones correcta
-session_save_path(__DIR__ . '/../sessions');
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_save_path(__DIR__ . '/../sessions');
+    session_start();
+}
 
 // Verificar login del paciente
 if (!isset($_SESSION['paciente_id'])) {
