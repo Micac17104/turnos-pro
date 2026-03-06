@@ -98,7 +98,10 @@ require __DIR__ . '/includes/sidebar.php';
                             Editar
                         </a>
 
-                        <a href="eliminar-paciente.php?id=<?= $paciente['id'] ?>" class="btn btn-danger">Eliminar</a>
+                       <a href="eliminar-paciente.php?id=<?= $c['id'] ?>" 
+   class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-500">
+   Eliminar
+</a>
   
 
                     </div>
