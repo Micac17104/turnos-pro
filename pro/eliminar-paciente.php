@@ -19,13 +19,8 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 $paciente_id = intval($_GET['id']);
 
 // Eliminar el paciente SOLO si pertenece al profesional logueado
-$stmt = $conn->prepare("DELETE FROM pacientes WHERE id = ? AND pro_id = ?");
-$stmt->bind_param("ii", $paciente_id, $pro_id);
+$stmt = $pdo->prepare("DELETE FROM clients WHERE id = ? AND user_id = ?");
+$stmt->execute([$paciente_id, $pro_id]);
 
-if ($stmt->execute()) {
-    header("Location: pacientes.php?success=deleted");
-    exit();
-} else {
-    header("Location: pacientes.php?error=delete_failed");
-    exit();
-}
+header("Location: pacientes.php?success=deleted");
+exit();
