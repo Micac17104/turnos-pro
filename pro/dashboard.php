@@ -18,64 +18,67 @@ $prefs = $prefs_json ? json_decode($prefs_json, true) : [
     "mostrar_ultimos_pagos" => true
 ];
 
-// --- ESTADÍSTICAS ---
-$stats = [
-    "turnos_mes" => 0,
-    "pacientes_nuevos" => 0,
-    "evoluciones_mes" => 0,
-    "pagos_mes" => 0,
-    "ingresos_mes" => 0
-];
+/**
+ * Genera los últimos 6 meses en formato YYYY-MM
+ */
+function ultimos_6_meses() {
+    $meses = [];
+    for ($i = 5; $i >= 0; $i--) {
+        $meses[] = date('Y-m', strtotime("-$i months"));
+    }
+    return $meses;
+}
 
-// Turnos del mes
+/**
+ * Convierte YYYY-MM a "Ene 2026"
+ */
+function formatear_mes($ym) {
+    $timestamp = strtotime($ym . "-01");
+    return ucfirst(strftime("%b %Y", $timestamp));
+}
+
+$meses = ultimos_6_meses();
+
+// --- TURNOS POR MES ---
 $stmt = $pdo->prepare("
-    SELECT COUNT(*) FROM appointments
+    SELECT DATE_FORMAT(date, '%Y-%m') AS mes, COUNT(*) AS total
+    FROM appointments
     WHERE user_id = ?
-    AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+      AND date IS NOT NULL
+    GROUP BY mes
 ");
 $stmt->execute([$user_id]);
-$stats['turnos_mes'] = (int)$stmt->fetchColumn();
+$turnos_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Pacientes nuevos
+// Rellenar con 0
+$turnos_mes = [];
+foreach ($meses as $m) {
+    $turnos_mes[$m] = isset($turnos_raw[$m]) ? (int)$turnos_raw[$m] : 0;
+}
+
+// --- INGRESOS POR MES ---
 $stmt = $pdo->prepare("
-    SELECT COUNT(*) FROM clients
+    SELECT DATE_FORMAT(date, '%Y-%m') AS mes, COALESCE(SUM(amount),0) AS total
+    FROM appointments
     WHERE user_id = ?
-    AND DATE_FORMAT(created_at, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+      AND payment_status = 'pagado'
+      AND amount IS NOT NULL
+      AND date IS NOT NULL
+    GROUP BY mes
 ");
 $stmt->execute([$user_id]);
-$stats['pacientes_nuevos'] = (int)$stmt->fetchColumn();
+$ingresos_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Evoluciones
-$stmt = $pdo->prepare("
-    SELECT COUNT(*) FROM clinical_records
-    WHERE user_id = ?
-    AND DATE_FORMAT(fecha, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
-");
-$stmt->execute([$user_id]);
-$stats['evoluciones_mes'] = (int)$stmt->fetchColumn();
+// Rellenar con 0
+$ingresos_mes = [];
+foreach ($meses as $m) {
+    $ingresos_mes[$m] = isset($ingresos_raw[$m]) ? (float)$ingresos_raw[$m] : 0;
+}
 
-// Pagos del mes
-$stmt = $pdo->prepare("
-    SELECT COUNT(*) FROM appointments
-    WHERE user_id = ?
-    AND payment_status = 'pagado'
-    AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
-");
-$stmt->execute([$user_id]);
-$stats['pagos_mes'] = (int)$stmt->fetchColumn();
+// Etiquetas formateadas
+$labels = array_map('formatear_mes', $meses);
 
-// Ingresos del mes
-$stmt = $pdo->prepare("
-    SELECT COALESCE(SUM(amount),0) FROM appointments
-    WHERE user_id = ?
-    AND payment_status = 'pagado'
-    AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
-");
-$stmt->execute([$user_id]);
-$stats['ingresos_mes'] = (float)$stmt->fetchColumn();
-
-
-// --- GRÁFICO 1: TURNOS POR MÉTODO DE PAGO (CANTIDAD) ---
+// --- TURNOS POR MÉTODO DE PAGO ---
 $stmt = $pdo->prepare("
     SELECT payment_method, COUNT(*) AS total
     FROM appointments
@@ -87,8 +90,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $turnos_metodo = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-
-// --- GRÁFICO 2: INGRESOS POR MÉTODO DE PAGO (DINERO) ---
+// --- INGRESOS POR MÉTODO DE PAGO ---
 $stmt = $pdo->prepare("
     SELECT payment_method, SUM(amount) AS total
     FROM appointments
@@ -100,7 +102,6 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 $ingresos_metodo = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-
 
 // --- PRÓXIMOS TURNOS ---
 $stmt = $pdo->prepare("
@@ -115,7 +116,6 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $proximos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
 // --- ÚLTIMOS PAGOS ---
 $stmt = $pdo->prepare("
     SELECT a.date, a.time, a.amount, c.name AS paciente
@@ -128,7 +128,6 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 
 include __DIR__ . '/includes/header.php';
 include __DIR__ . '/includes/sidebar.php';
@@ -151,27 +150,58 @@ include __DIR__ . '/includes/sidebar.php';
 
         <div class="bg-white p-5 rounded-xl shadow border">
             <div class="text-sm text-slate-500">Turnos del mes</div>
-            <div class="text-2xl font-bold"><?= $stats['turnos_mes'] ?></div>
+            <div class="text-2xl font-bold"><?= $turnos_mes[$meses[5]] ?></div>
         </div>
 
         <div class="bg-white p-5 rounded-xl shadow border">
             <div class="text-sm text-slate-500">Pacientes nuevos</div>
-            <div class="text-2xl font-bold"><?= $stats['pacientes_nuevos'] ?></div>
+            <div class="text-2xl font-bold">
+                <?php
+                $stmt = $pdo->prepare("
+                    SELECT COUNT(*) FROM clients
+                    WHERE user_id = ?
+                    AND DATE_FORMAT(created_at, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+                ");
+                $stmt->execute([$user_id]);
+                echo $stmt->fetchColumn();
+                ?>
+            </div>
         </div>
 
         <div class="bg-white p-5 rounded-xl shadow border">
             <div class="text-sm text-slate-500">Evoluciones</div>
-            <div class="text-2xl font-bold"><?= $stats['evoluciones_mes'] ?></div>
+            <div class="text-2xl font-bold">
+                <?php
+                $stmt = $pdo->prepare("
+                    SELECT COUNT(*) FROM clinical_records
+                    WHERE user_id = ?
+                    AND DATE_FORMAT(fecha, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+                ");
+                $stmt->execute([$user_id]);
+                echo $stmt->fetchColumn();
+                ?>
+            </div>
         </div>
 
         <div class="bg-white p-5 rounded-xl shadow border">
             <div class="text-sm text-slate-500">Pagos</div>
-            <div class="text-2xl font-bold"><?= $stats['pagos_mes'] ?></div>
+            <div class="text-2xl font-bold">
+                <?php
+                $stmt = $pdo->prepare("
+                    SELECT COUNT(*) FROM appointments
+                    WHERE user_id = ?
+                    AND payment_status = 'pagado'
+                    AND DATE_FORMAT(date, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+                ");
+                $stmt->execute([$user_id]);
+                echo $stmt->fetchColumn();
+                ?>
+            </div>
         </div>
 
         <div class="bg-white p-5 rounded-xl shadow border">
             <div class="text-sm text-slate-500">Ingresos</div>
-            <div class="text-2xl font-bold">$<?= number_format($stats['ingresos_mes'], 2) ?></div>
+            <div class="text-2xl font-bold">$<?= number_format($ingresos_mes[$meses[5]], 2) ?></div>
         </div>
 
     </div>
@@ -182,26 +212,71 @@ include __DIR__ . '/includes/sidebar.php';
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
+        <!-- TURNOS POR MES -->
         <div class="bg-white p-6 rounded-xl shadow border">
-            <h3 class="font-semibold mb-3 text-sm">Turnos por método de pago</h3>
-            <canvas id="chartTurnos"></canvas>
+            <h3 class="font-semibold mb-3 text-sm">Turnos por mes</h3>
+            <canvas id="chartTurnosMes"></canvas>
         </div>
 
+        <!-- INGRESOS POR MES -->
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="font-semibold mb-3 text-sm">Ingresos por mes</h3>
+            <canvas id="chartIngresosMes"></canvas>
+        </div>
+
+        <!-- TURNOS POR MÉTODO -->
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="font-semibold mb-3 text-sm">Turnos por método de pago</h3>
+            <canvas id="chartTurnosMetodo"></canvas>
+        </div>
+
+        <!-- INGRESOS POR MÉTODO -->
         <div class="bg-white p-6 rounded-xl shadow border">
             <h3 class="font-semibold mb-3 text-sm">Ingresos por método de pago</h3>
-            <canvas id="chartIngresos"></canvas>
+            <canvas id="chartIngresosMetodo"></canvas>
         </div>
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
     Chart.defaults.font.size = 13;
     Chart.defaults.color = '#334155';
 
-    // GRÁFICO AZUL (TURNOS)
-    new Chart(document.getElementById('chartTurnos'), {
+    // TURNOS POR MES
+    new Chart(document.getElementById('chartTurnosMes'), {
+        type: 'line',
+        data: {
+            labels: <?= json_encode($labels) ?>,
+            datasets: [{
+                label: 'Turnos',
+                data: <?= json_encode(array_values($turnos_mes)) ?>,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59,130,246,0.2)',
+                borderWidth: 2,
+                tension: 0.3
+            }]
+        }
+    });
+
+    // INGRESOS POR MES
+    new Chart(document.getElementById('chartIngresosMes'), {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode($labels) ?>,
+            datasets: [{
+                label: 'Ingresos',
+                data: <?= json_encode(array_values($ingresos_mes)) ?>,
+                backgroundColor: '#10b981',
+                borderColor: '#059669',
+                borderWidth: 2
+            }]
+        }
+    });
+
+    // TURNOS POR MÉTODO
+    new Chart(document.getElementById('chartTurnosMetodo'), {
         type: 'bar',
         data: {
             labels: <?= json_encode(array_keys($turnos_metodo)) ?>,
@@ -215,8 +290,8 @@ include __DIR__ . '/includes/sidebar.php';
         }
     });
 
-    // GRÁFICO VERDE (INGRESOS)
-    new Chart(document.getElementById('chartIngresos'), {
+    // INGRESOS POR MÉTODO
+    new Chart(document.getElementById('chartIngresosMetodo'), {
         type: 'bar',
         data: {
             labels: <?= json_encode(array_keys($ingresos_metodo)) ?>,
