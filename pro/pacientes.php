@@ -98,7 +98,7 @@ require __DIR__ . '/includes/sidebar.php';
                             Editar
                         </a>
 
-                        <a href="paciente-eliminar.php?id=<?= $c['id'] ?>"
+                        <a href="pacientes-eliminar.php?id=<?= $c['id'] ?>"
    onclick="return confirm('¿Seguro que querés eliminar este paciente?')"
    class="text-red-600 hover:underline">
    Eliminar
