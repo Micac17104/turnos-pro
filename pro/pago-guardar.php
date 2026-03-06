@@ -1,5 +1,4 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
 session_start();
 
 require __DIR__ . '/includes/auth.php';
@@ -11,7 +10,7 @@ $user_id = $_SESSION['user_id'];
 $turno_id       = require_param($_POST, 'turno_id');
 $payment_status = trim($_POST['payment_status'] ?? '');
 $payment_method = trim($_POST['payment_method'] ?? '');
-$amount         = floatval($_POST['amount'] ?? 0); // ← AHORA SIEMPRE LLEGA UN NÚMERO
+$amount         = floatval($_POST['amount'] ?? 0);
 
 // Validar turno
 $stmt = $pdo->prepare("
@@ -31,4 +30,4 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$payment_status, $payment_method, $amount, $turno_id, $user_id]);
 
-redirect('pagos.php?ok=1'); // ← AHORA VUELVE A PAGOS
+redirect('pagos.php?ok=1');
