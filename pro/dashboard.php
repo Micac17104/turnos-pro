@@ -74,17 +74,33 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $stats['ingresos_mes'] = (float)$stmt->fetchColumn();
 
-// --- MÉTODOS DE PAGO ---
+
+// --- GRÁFICO 1: TURNOS POR MÉTODO DE PAGO (CANTIDAD) ---
 $stmt = $pdo->prepare("
     SELECT payment_method, COUNT(*) AS total
     FROM appointments
     WHERE user_id = ?
-    AND payment_status = 'pagado'
-    AND payment_method IS NOT NULL
+      AND payment_status = 'pagado'
+      AND payment_method IS NOT NULL
     GROUP BY payment_method
 ");
 $stmt->execute([$user_id]);
-$metodos_pago = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+$turnos_metodo = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
+
+// --- GRÁFICO 2: INGRESOS POR MÉTODO DE PAGO (DINERO) ---
+$stmt = $pdo->prepare("
+    SELECT payment_method, SUM(amount) AS total
+    FROM appointments
+    WHERE user_id = ?
+      AND payment_status = 'pagado'
+      AND amount IS NOT NULL
+      AND payment_method IS NOT NULL
+    GROUP BY payment_method
+");
+$stmt->execute([$user_id]);
+$ingresos_metodo = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
 
 // --- PRÓXIMOS TURNOS ---
 $stmt = $pdo->prepare("
@@ -99,6 +115,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $proximos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+
 // --- ÚLTIMOS PAGOS ---
 $stmt = $pdo->prepare("
     SELECT a.date, a.time, a.amount, c.name AS paciente
@@ -111,6 +128,7 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 include __DIR__ . '/includes/header.php';
 include __DIR__ . '/includes/sidebar.php';
@@ -182,26 +200,32 @@ include __DIR__ . '/includes/sidebar.php';
     Chart.defaults.font.size = 13;
     Chart.defaults.color = '#334155';
 
+    // GRÁFICO AZUL (TURNOS)
     new Chart(document.getElementById('chartTurnos'), {
         type: 'bar',
         data: {
-            labels: <?= json_encode(array_keys($metodos_pago)) ?>,
+            labels: <?= json_encode(array_keys($turnos_metodo)) ?>,
             datasets: [{
                 label: 'Turnos',
-                data: <?= json_encode(array_values($metodos_pago)) ?>,
-                backgroundColor: '#3b82f6'
+                data: <?= json_encode(array_values($turnos_metodo)) ?>,
+                backgroundColor: '#3b82f6',
+                borderColor: '#1d4ed8',
+                borderWidth: 2
             }]
         }
     });
 
+    // GRÁFICO VERDE (INGRESOS)
     new Chart(document.getElementById('chartIngresos'), {
         type: 'bar',
         data: {
-            labels: <?= json_encode(array_keys($metodos_pago)) ?>,
+            labels: <?= json_encode(array_keys($ingresos_metodo)) ?>,
             datasets: [{
                 label: 'Ingresos',
-                data: <?= json_encode(array_values($metodos_pago)) ?>,
-                backgroundColor: '#10b981'
+                data: <?= json_encode(array_values($ingresos_metodo)) ?>,
+                backgroundColor: '#10b981',
+                borderColor: '#059669',
+                borderWidth: 2
             }]
         }
     });
@@ -220,8 +244,7 @@ include __DIR__ . '/includes/sidebar.php';
             <ul class="space-y-2">
                 <?php foreach ($proximos as $t): ?>
                     <li class="p-3 bg-slate-100 rounded-lg">
-                        <strong><?= $t['date'] ?></strong> - <?= $t['time'] ?>  
-                        <br>
+                        <strong><?= $t['date'] ?></strong> - <?= $t['time'] ?><br>
                         <span class="text-slate-600"><?= $t['paciente'] ?></span>
                     </li>
                 <?php endforeach; ?>
@@ -229,7 +252,7 @@ include __DIR__ . '/includes/sidebar.php';
         <?php endif; ?>
     </div>
     <?php endif; ?>
-    
+
     <!-- ÚLTIMOS PAGOS -->
     <?php if ($prefs['mostrar_ultimos_pagos']): ?>
     <div class="bg-white p-6 rounded-xl shadow border mb-8">
