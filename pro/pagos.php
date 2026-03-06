@@ -1,5 +1,5 @@
 <?php
-// /pro/agenda.php
+// /pro/pagos.php
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -12,7 +12,9 @@ require __DIR__ . '/includes/helpers.php';
 $page_title = 'Pagos';
 $current = 'pagos';
 
-// Obtener pagos
+$user_id = $_SESSION['user_id']; // ← NECESARIO
+
+// Obtener pagos desde appointments
 $stmt = $pdo->prepare("
     SELECT a.*, COALESCE(c.name, a.name) AS paciente
     FROM appointments a
@@ -50,7 +52,7 @@ require __DIR__ . '/includes/sidebar.php';
                 <?php foreach ($pagos as $p): ?>
                     <tr class="border-b">
                         <td class="py-3">
-                            <?= $p['date'] ?> <?= substr($p['time'], 0, 5) ?>
+                            <?= h($p['date']) ?> <?= substr($p['time'], 0, 5) ?>
                         </td>
 
                         <td><?= h($p['paciente']) ?></td>
