@@ -292,11 +292,18 @@ require __DIR__ . '/includes/sidebar.php';
                 + Nuevo turno
             </button>
 
+            <button
+    onclick="window.location.href='turnos-manana.php'"
+    class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm shadow hover:bg-emerald-700">
+    Turnos de mañana
+</button>
+
             <button type="button"
                     onclick="document.getElementById('modalTarea').classList.remove('hidden')"
                     class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm shadow hover:bg-slate-800">
                 + Nueva tarea
             </button>
+
         </div>
     </div>
 
