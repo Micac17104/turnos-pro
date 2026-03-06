@@ -1,9 +1,10 @@
 <?php
-// /pro/agenda.php
+// /pro/pago-editar.php
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';
@@ -37,7 +38,8 @@ require __DIR__ . '/includes/sidebar.php';
     <form method="POST" action="pago-guardar.php"
           class="bg-white p-6 rounded-xl shadow border max-w-lg">
 
-        <input type="hidden" name="id" value="<?= $id ?>">
+        <!-- CAMBIO IMPORTANTE -->
+        <input type="hidden" name="turno_id" value="<?= $id ?>">
 
         <p class="text-sm text-slate-600 mb-4">
             Paciente: <strong><?= h($pago['paciente']) ?></strong><br>
