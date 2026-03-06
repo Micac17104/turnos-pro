@@ -30,11 +30,28 @@ function ultimos_6_meses() {
 }
 
 /**
- * Convierte YYYY-MM a "Ene 2026"
+ * Convierte YYYY-MM a "Ene 2026" sin usar strftime()
  */
 function formatear_mes($ym) {
-    $timestamp = strtotime($ym . "-01");
-    return ucfirst(strftime("%b %Y", $timestamp));
+    $meses = [
+        "01" => "Ene",
+        "02" => "Feb",
+        "03" => "Mar",
+        "04" => "Abr",
+        "05" => "May",
+        "06" => "Jun",
+        "07" => "Jul",
+        "08" => "Ago",
+        "09" => "Sep",
+        "10" => "Oct",
+        "11" => "Nov",
+        "12" => "Dic"
+    ];
+
+    $anio = substr($ym, 0, 4);
+    $mes  = substr($ym, 5, 2);
+
+    return $meses[$mes] . " " . $anio;
 }
 
 $meses = ultimos_6_meses();
