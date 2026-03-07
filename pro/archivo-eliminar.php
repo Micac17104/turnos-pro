@@ -5,8 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-session_save_path($path);
-session_start();
 // ----------------------------------------------------
 
 require __DIR__ . '/includes/auth.php';
@@ -29,6 +27,7 @@ if (!$file || $file['user_id'] != $user_id) {
     die("No tienes permiso para eliminar este archivo.");
 }
 
+// Ruta real del archivo
 $ruta = __DIR__ . '/../../uploads/' . $file['file_path'];
 
 if (file_exists($ruta)) {
@@ -39,5 +38,5 @@ if (file_exists($ruta)) {
 $stmt = $pdo->prepare("DELETE FROM clinical_files WHERE id = ?");
 $stmt->execute([$file_id]);
 
-// Ruta relativa, sin /turnos-pro para que funcione igual en Railway
+// Volver a la historia del paciente
 redirect("paciente-historia.php?id=" . $file['patient_id']);
