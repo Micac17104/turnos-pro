@@ -12,11 +12,11 @@ require __DIR__ . '/includes/helpers.php';
 $mañana = date("Y-m-d", strtotime("+1 day"));
 
 $stmt = $pdo->prepare("
-    SELECT t.hora, c.name, c.phone
+    SELECT t.time, c.name, c.phone
     FROM appointments t
     JOIN clients c ON c.id = t.client_id
-    WHERE t.user_id = ? AND t.fecha = ?
-    ORDER BY t.hora ASC
+    WHERE t.user_id = ? AND t.day = ?
+    ORDER BY t.time ASC
 ");
 $stmt->execute([$user_id, $mañana]);
 $turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -39,12 +39,12 @@ require __DIR__ . '/includes/sidebar.php';
             <?php foreach ($turnos as $t): ?>
                 <?php
                 $telefono = preg_replace('/\D/', '', $t['phone']);
-                $mensaje = urlencode("Hola {$t['name']}! Te recordamos tu turno mañana a las {$t['hora']}.");
+                $mensaje = urlencode("Hola {$t['name']}! Te recordamos tu turno mañana a las {$t['time']}.");
                 ?>
                 <a href="https://wa.me/549<?= $telefono ?>?text=<?= $mensaje ?>"
                    target="_blank"
                    class="block text-blue-600 underline">
-                   Enviar a <?= h($t['name']) ?> (<?= h($t['hora']) ?>)
+                   Enviar a <?= h($t['name']) ?> (<?= h($t['time']) ?>)
                 </a>
             <?php endforeach; ?>
         </div>

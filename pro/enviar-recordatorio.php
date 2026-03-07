@@ -12,9 +12,9 @@ require __DIR__ . '/includes/mailer.php';
 
 $turno_id = require_param($_GET, 'turno_id');
 
-// Obtener turno
+// Obtener turno (IMPORTANTE: usa day y time)
 $stmt = $pdo->prepare("
-    SELECT t.fecha, t.hora, c.name, c.email
+    SELECT t.day, t.time, c.name, c.email
     FROM appointments t
     JOIN clients c ON c.id = t.client_id
     WHERE t.id = ? AND t.user_id = ?
@@ -27,7 +27,7 @@ if (!$turno) {
 }
 
 $subject = "Recordatorio de turno";
-$message = "Hola {$turno['name']}, te recordamos tu turno el {$turno['fecha']} a las {$turno['hora']}.";
+$message = "Hola {$turno['name']}, te recordamos tu turno el {$turno['day']} a las {$turno['time']}.";
 
 enviarEmail($turno['email'], $subject, $message);
 
