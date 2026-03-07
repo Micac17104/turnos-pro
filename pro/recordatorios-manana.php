@@ -15,7 +15,7 @@ $stmt = $pdo->prepare("
     SELECT t.time, c.name, c.phone
     FROM appointments t
     JOIN clients c ON c.id = t.client_id
-    WHERE t.user_id = ? AND t.day = ?
+    WHERE t.user_id = ? AND t.date = ?
     ORDER BY t.time ASC
 ");
 $stmt->execute([$user_id, $mañana]);

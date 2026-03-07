@@ -14,12 +14,12 @@ $current = "agenda";
 
 $mañana = date("Y-m-d", strtotime("+1 day"));
 
-// Obtener turnos del profesional (IMPORTANTE: usa day y time)
+// Obtener turnos del profesional
 $stmt = $pdo->prepare("
-    SELECT t.id, t.day, t.time, c.name, c.phone, c.email
+    SELECT t.id, t.date, t.time, c.name, c.phone, c.email
     FROM appointments t
     JOIN clients c ON c.id = t.client_id
-    WHERE t.user_id = ? AND t.day = ?
+    WHERE t.user_id = ? AND t.date = ?
     ORDER BY t.time ASC
 ");
 $stmt->execute([$user_id, $mañana]);
@@ -28,6 +28,7 @@ $turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';
 ?>
+
 <main class="flex-1 p-8">
 
     <div class="flex items-center justify-between mb-8">
@@ -82,4 +83,5 @@ require __DIR__ . '/includes/sidebar.php';
     <?php endif; ?>
 
 </main>
+
 <?php require __DIR__ . '/includes/footer.php'; ?>
