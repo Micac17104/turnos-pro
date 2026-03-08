@@ -9,8 +9,8 @@ $success = "";
 $stmt = $pdo->prepare("
     SELECT id, name
     FROM users
-    WHERE center_id = ?
-      AND role = 'professional'
+    WHERE account_type = 'professional'
+      AND parent_center_id = ?
     ORDER BY name
 ");
 $stmt->execute([$center_id]);
