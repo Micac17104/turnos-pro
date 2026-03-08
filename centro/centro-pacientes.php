@@ -7,16 +7,17 @@ $search = trim($_GET['search'] ?? '');
 // Buscar pacientes SOLO del centro
 if ($search !== '') {
     $stmt = $pdo->prepare("
-        SELECT id, name, email, phone
+        SELECT id, name, email, phone, dni
         FROM clients
         WHERE center_id = ?
-        AND (name LIKE ? OR email LIKE ?)
+        AND (name LIKE ? OR email LIKE ? OR dni LIKE ?)
         ORDER BY name
     ");
-    $stmt->execute([$center_id, "%$search%", "%$search%"]);
+    $like = "%$search%";
+    $stmt->execute([$center_id, $like, $like, $like]);
 } else {
     $stmt = $pdo->prepare("
-        SELECT id, name, email, phone
+        SELECT id, name, email, phone, dni
         FROM clients
         WHERE center_id = ?
         ORDER BY name
@@ -62,7 +63,7 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
         <h2>Pacientes del centro</h2>
 
         <form method="GET" style="margin-bottom:15px;">
-            <input type="text" name="search" placeholder="Buscar por nombre o email" value="<?= htmlspecialchars($search) ?>">
+            <input type="text" name="search" placeholder="Buscar por nombre, email o DNI" value="<?= htmlspecialchars($search) ?>">
             <button class="btn">Buscar</button>
             <a href="centro-pacientes-nuevo.php" class="btn" style="background:#22c55e;">+ Nuevo paciente</a>
         </form>
@@ -70,6 +71,7 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
         <table>
             <tr>
                 <th>Nombre</th>
+                <th>DNI</th>
                 <th>Email</th>
                 <th>Teléfono</th>
                 <th>Acciones</th>
@@ -78,6 +80,7 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
             <?php foreach ($pacientes as $p): ?>
             <tr>
                 <td><?= htmlspecialchars($p['name']) ?></td>
+                <td><?= htmlspecialchars($p['dni']) ?></td>
                 <td><?= htmlspecialchars($p['email']) ?></td>
                 <td><?= htmlspecialchars($p['phone']) ?></td>
                 <td>
@@ -87,7 +90,7 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
             <?php endforeach; ?>
 
             <?php if (empty($pacientes)): ?>
-            <tr><td colspan="4">No se encontraron pacientes.</td></tr>
+            <tr><td colspan="5">No se encontraron pacientes.</td></tr>
             <?php endif; ?>
         </table>
     </div>

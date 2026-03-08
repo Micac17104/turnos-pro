@@ -18,7 +18,7 @@ if ($check->fetch()) {
 
 // Obtener datos del paciente SOLO si pertenece al centro
 $stmt = $pdo->prepare("
-    SELECT id, name, email, phone
+    SELECT id, name, email, phone, dni
     FROM clients
     WHERE id = ? AND center_id = ?
 ");
@@ -28,6 +28,17 @@ $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$paciente) {
     die("Paciente no encontrado o no pertenece a este centro.");
 }
+
+// Profesionales que atienden a este paciente (centro)
+$stmt = $pdo->prepare("
+    SELECT cs.name
+    FROM patient_professionals pp
+    JOIN center_staff cs ON cs.id = pp.staff_id
+    WHERE pp.patient_id = ? AND pp.center_id = ?
+    ORDER BY cs.name
+");
+$stmt->execute([$client_id, $center_id]);
+$profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Base query historial
 $query = "
@@ -89,8 +100,17 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 
     <div class="card">
         <h2><?= htmlspecialchars($paciente['name']) ?></h2>
+        <p><strong>DNI:</strong> <?= htmlspecialchars($paciente['dni']) ?></p>
         <p><strong>Email:</strong> <?= htmlspecialchars($paciente['email'] ?: '-') ?></p>
         <p><strong>Teléfono:</strong> <?= htmlspecialchars($paciente['phone'] ?: '-') ?></p>
+
+        <p><strong>Profesionales que lo atienden:</strong>
+            <?php if (!empty($profesionales)): ?>
+                <?= htmlspecialchars(implode(', ', array_column($profesionales, 'name'))) ?>
+            <?php else: ?>
+                <span>- Sin profesionales asignados -</span>
+            <?php endif; ?>
+        </p>
 
         <br>
 
