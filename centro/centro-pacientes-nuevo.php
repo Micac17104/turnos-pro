@@ -5,11 +5,12 @@ require __DIR__ . '/../config.php';
 $errors = [];
 $success = "";
 
-// Cargar profesionales del centro
+// Cargar profesionales del centro desde users
 $stmt = $pdo->prepare("
     SELECT id, name
-    FROM center_staff
+    FROM users
     WHERE center_id = ?
+      AND role = 'professional'
     ORDER BY name
 ");
 $stmt->execute([$center_id]);
@@ -41,7 +42,7 @@ if ($_POST) {
 
     if (empty($errors)) {
 
-        // Verificar que no exista ya un paciente con ese DNI en el mismo centro
+        // Verificar DNI único dentro del centro
         $stmt = $pdo->prepare("
             SELECT id FROM clients
             WHERE center_id = ? AND dni = ?

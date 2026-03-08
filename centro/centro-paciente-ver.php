@@ -29,13 +29,13 @@ if (!$paciente) {
     die("Paciente no encontrado o no pertenece a este centro.");
 }
 
-// Profesionales que atienden a este paciente (centro)
+// Profesionales que atienden a este paciente (desde users)
 $stmt = $pdo->prepare("
-    SELECT cs.name
+    SELECT u.name
     FROM patient_professionals pp
-    JOIN center_staff cs ON cs.id = pp.staff_id
+    JOIN users u ON u.id = pp.staff_id
     WHERE pp.patient_id = ? AND pp.center_id = ?
-    ORDER BY cs.name
+    ORDER BY u.name
 ");
 $stmt->execute([$client_id, $center_id]);
 $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
