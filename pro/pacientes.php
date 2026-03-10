@@ -125,13 +125,16 @@ require __DIR__ . '/includes/sidebar.php';
         <form method="POST" action="paciente-guardar.php">
 
             <input type="text" name="name" placeholder="Nombre completo" required
-                   class="w-full p-3 mb-3 border rounded">
+       class="w-full p-3 mb-3 border rounded">
 
-            <input type="text" name="phone" placeholder="Teléfono" required
-                   class="w-full p-3 mb-3 border rounded">
+<input type="text" name="dni" placeholder="DNI" required
+       class="w-full p-3 mb-3 border rounded">
 
-            <input type="email" name="email" placeholder="Email"
-                   class="w-full p-3 mb-3 border rounded">
+<input type="text" name="phone" placeholder="Teléfono" required
+       class="w-full p-3 mb-3 border rounded">
+
+<input type="email" name="email" placeholder="Email"
+       class="w-full p-3 mb-3 border rounded">
 
             <div class="flex justify-end gap-3 mt-4">
                 <button type="button"

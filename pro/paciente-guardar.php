@@ -9,11 +9,12 @@ require __DIR__ . '/includes/helpers.php';
 
 // Datos del formulario
 $name  = trim($_POST['name'] ?? '');
+$dni   = trim($_POST['dni'] ?? '');
 $phone = trim($_POST['phone'] ?? '');
 $email = trim($_POST['email'] ?? '');
 
 // Validación básica
-if ($name === '' || $phone === '') {
+if ($name === '' || $phone === '' || $dni === '') {
     die("Datos incompletos.");
 }
 
@@ -32,11 +33,11 @@ if ($email !== '') {
     }
 }
 
-// Insertar paciente SIN cuenta (password NULL)
+// Insertar paciente con DNI
 $stmt = $pdo->prepare("
-    INSERT INTO clients (user_id, name, phone, email, password)
-    VALUES (?, ?, ?, ?, NULL)
+    INSERT INTO clients (user_id, name, dni, phone, email, password)
+    VALUES (?, ?, ?, ?, ?, NULL)
 ");
-$stmt->execute([$user_id, $name, $phone, $email]);
+$stmt->execute([$user_id, $name, $dni, $phone, $email]);
 
 redirect("pacientes.php");
