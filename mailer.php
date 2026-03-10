@@ -34,7 +34,7 @@ function enviarEmail($destinatario, $asunto, $mensajeHtml) {
 
     } catch (Exception $e) {
         error_log("Error enviando email: {$mail->ErrorInfo}");
-        return false;
+        return false; 
     }
 }
 
