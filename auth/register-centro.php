@@ -36,16 +36,23 @@ if ($_POST) {
     // Crear centro
     if (empty($errors)) {
 
+        // SUSCRIPCIÓN: primer mes gratis
+        $today = date('Y-m-d');
+        $end   = date('Y-m-d', strtotime('+1 month'));
+
         // Crear usuario tipo centro
         $stmt = $pdo->prepare("
-            INSERT INTO users (name, email, password, account_type)
-            VALUES (?, ?, ?, 'center')
+            INSERT INTO users 
+            (name, email, password, account_type, subscription_start, subscription_end, is_active, last_payment)
+            VALUES (?, ?, ?, 'center', ?, ?, 1, NULL)
         ");
 
         $stmt->execute([
             $name,
             $email,
-            password_hash($password, PASSWORD_BCRYPT)
+            password_hash($password, PASSWORD_BCRYPT),
+            $today,
+            $end
         ]);
 
         $center_id = $pdo->lastInsertId();

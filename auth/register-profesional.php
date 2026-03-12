@@ -40,10 +40,14 @@ if ($_POST) {
     // Crear cuenta
     if (empty($errors)) {
 
+        // SUSCRIPCIÓN: primer mes gratis
+        $today = date('Y-m-d');
+        $end   = date('Y-m-d', strtotime('+1 month'));
+
         $stmt = $pdo->prepare("
             INSERT INTO users 
-            (name, email, password, profession, phone, city, accepts_insurance, account_type) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'professional')
+            (name, email, password, profession, phone, city, accepts_insurance, account_type, subscription_start, subscription_end, is_active, last_payment) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'professional', ?, ?, 1, NULL)
         ");
 
         $stmt->execute([
@@ -53,7 +57,9 @@ if ($_POST) {
             $profession,
             $phone,
             $city,
-            $accepts_insurance
+            $accepts_insurance,
+            $today,
+            $end
         ]);
 
         header("Location: login.php?registered=1");
