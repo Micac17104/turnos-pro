@@ -9,6 +9,11 @@
     <a href="centro-pacientes.php">Pacientes</a>
     <a href="centro-configuracion.php">Configuración</a>
     <a href="centro-recordatorios.php">Recordatorios</a>
+    <div class="card">
+    <h3>Suscripción</h3>
+    <p>Elegí o renová el plan del centro.</p>
+    <a href="planes.php" class="btn">Ver planes</a>
+</div>
     <a href="../auth/logout.php" class="logout">Salir</a>
 </div>
 

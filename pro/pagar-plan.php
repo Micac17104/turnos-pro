@@ -4,7 +4,7 @@ require __DIR__ . '/includes/db.php';
 require __DIR__ . '/../vendor/autoload.php'; // ← RUTA CORREGIDA
 
 // TU ACCESS TOKEN DE MERCADO PAGO
-MercadoPago\SDK::setAccessToken("TU_ACCESS_TOKEN_AQUI");
+MercadoPago\SDK::setAccessToken("APP_USR-936741788731989-031211-5eed533a498e365afb70fd29c65ad0bc-3260786753");
 
 // Datos del profesional
 $pro_id = $user_id; // viene del login del profesional

@@ -45,6 +45,11 @@
             Perfil
         </a>
 
+        <a href="planes.php"
+   class="inline-block px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+    Pagar suscripción
+</a>
+
         <a href="/auth/logout.php"
            class="block px-4 py-2 rounded-lg hover:bg-red-100 text-red-600">
             Cerrar sesión
