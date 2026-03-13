@@ -17,6 +17,11 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['account_type'])) {
         header("Location: /centro/centro-dashboard.php");
         exit;
     }
+
+    if ($user['account_type'] === 'admin') {
+    header("Location: /admin/admin-dashboard.php");
+    exit;
+}
 }
 
 // Procesar login
