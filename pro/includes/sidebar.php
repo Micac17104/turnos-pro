@@ -5,6 +5,7 @@
     </div>
 
     <nav class="space-y-1">
+
         <a href="/pro/dashboard.php"
            class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'dashboard' ? 'bg-slate-100 font-semibold' : '' ?>">
             Dashboard
@@ -45,15 +46,21 @@
             Perfil
         </a>
 
-        <a href="planes.php"
-   class="inline-block px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
-    Pagar suscripción
-</a>
+        <a href="/pro/planes.php"
+           class="block px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+            Pagar suscripción
+        </a>
+
+        <a href="/cancelar-suscripcion.php"
+           class="block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+            Cancelar suscripción
+        </a>
 
         <a href="/auth/logout.php"
            class="block px-4 py-2 rounded-lg hover:bg-red-100 text-red-600">
             Cerrar sesión
         </a>
+
     </nav>
 
 </aside>

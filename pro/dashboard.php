@@ -18,9 +18,32 @@ $prefs = $prefs_json ? json_decode($prefs_json, true) : [
     "mostrar_ultimos_pagos" => true
 ];
 
-/**
- * Genera los últimos 6 meses en formato YYYY-MM
- */
+/* ============================
+   ALERTA DE SUSCRIPCIÓN
+============================ */
+$stmt = $pdo->prepare("SELECT subscription_end, is_active FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$sub = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$alerta = null;
+
+if ($sub) {
+    if (!empty($sub['subscription_end'])) {
+        $hoy = new DateTime();
+        $fin = new DateTime($sub['subscription_end']);
+        $diff = (int)$hoy->diff($fin)->format('%r%a');
+
+        if ($diff <= 5 && $diff >= 0) {
+            $alerta = "Tu suscripción vence en $diff día" . ($diff == 1 ? '' : 's') . ".";
+        } elseif ($diff < 0) {
+            $alerta = "Tu suscripción está vencida. Debés renovarla para seguir usando el sistema.";
+        }
+    }
+}
+
+/* ============================
+   FUNCIONES DE FECHAS
+============================ */
 function ultimos_6_meses() {
     $meses = [];
     for ($i = 5; $i >= 0; $i--) {
@@ -29,23 +52,11 @@ function ultimos_6_meses() {
     return $meses;
 }
 
-/**
- * Convierte YYYY-MM a "Ene 2026" sin usar strftime()
- */
 function formatear_mes($ym) {
     $meses = [
-        "01" => "Ene",
-        "02" => "Feb",
-        "03" => "Mar",
-        "04" => "Abr",
-        "05" => "May",
-        "06" => "Jun",
-        "07" => "Jul",
-        "08" => "Ago",
-        "09" => "Sep",
-        "10" => "Oct",
-        "11" => "Nov",
-        "12" => "Dic"
+        "01" => "Ene", "02" => "Feb", "03" => "Mar", "04" => "Abr",
+        "05" => "May", "06" => "Jun", "07" => "Jul", "08" => "Ago",
+        "09" => "Sep", "10" => "Oct", "11" => "Nov", "12" => "Dic"
     ];
 
     $anio = substr($ym, 0, 4);
@@ -56,7 +67,9 @@ function formatear_mes($ym) {
 
 $meses = ultimos_6_meses();
 
-// --- TURNOS POR MES ---
+/* ============================
+   TURNOS POR MES
+============================ */
 $stmt = $pdo->prepare("
     SELECT DATE_FORMAT(date, '%Y-%m') AS mes, COUNT(*) AS total
     FROM appointments
@@ -67,13 +80,14 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $turnos_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Rellenar con 0
 $turnos_mes = [];
 foreach ($meses as $m) {
     $turnos_mes[$m] = isset($turnos_raw[$m]) ? (int)$turnos_raw[$m] : 0;
 }
 
-// --- INGRESOS POR MES ---
+/* ============================
+   INGRESOS POR MES
+============================ */
 $stmt = $pdo->prepare("
     SELECT DATE_FORMAT(date, '%Y-%m') AS mes, COALESCE(SUM(amount),0) AS total
     FROM appointments
@@ -86,16 +100,16 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $ingresos_raw = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Rellenar con 0
 $ingresos_mes = [];
 foreach ($meses as $m) {
     $ingresos_mes[$m] = isset($ingresos_raw[$m]) ? (float)$ingresos_raw[$m] : 0;
 }
 
-// Etiquetas formateadas
 $labels = array_map('formatear_mes', $meses);
 
-// --- TURNOS POR MÉTODO DE PAGO ---
+/* ============================
+   TURNOS POR MÉTODO DE PAGO
+============================ */
 $stmt = $pdo->prepare("
     SELECT payment_method, COUNT(*) AS total
     FROM appointments
@@ -107,7 +121,9 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $turnos_metodo = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// --- INGRESOS POR MÉTODO DE PAGO ---
+/* ============================
+   INGRESOS POR MÉTODO DE PAGO
+============================ */
 $stmt = $pdo->prepare("
     SELECT payment_method, SUM(amount) AS total
     FROM appointments
@@ -120,7 +136,9 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $ingresos_metodo = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// --- PRÓXIMOS TURNOS ---
+/* ============================
+   PRÓXIMOS TURNOS
+============================ */
 $stmt = $pdo->prepare("
     SELECT a.*, c.name AS paciente
     FROM appointments a
@@ -133,7 +151,9 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $proximos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// --- ÚLTIMOS PAGOS ---
+/* ============================
+   ÚLTIMOS PAGOS
+============================ */
 $stmt = $pdo->prepare("
     SELECT a.date, a.time, a.amount, c.name AS paciente
     FROM appointments a
@@ -151,6 +171,17 @@ include __DIR__ . '/includes/sidebar.php';
 ?>
 
 <div class="flex-1 p-8">
+
+    <?php if ($alerta): ?>
+        <div class="mb-4 px-4 py-3 rounded-lg 
+            <?= strpos($alerta, 'vencida') !== false ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800' ?>">
+            <?= $alerta ?>
+            &nbsp;|&nbsp;
+            <a href="/pro/planes.php" class="underline font-semibold">Pagar suscripción</a>
+            &nbsp;|&nbsp;
+            <a href="/cancelar-suscripcion.php" class="underline">Cancelar</a>
+        </div>
+    <?php endif; ?>
 
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-slate-900">Dashboard</h1>
@@ -229,25 +260,21 @@ include __DIR__ . '/includes/sidebar.php';
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
-        <!-- TURNOS POR MES -->
         <div class="bg-white p-6 rounded-xl shadow border">
             <h3 class="font-semibold mb-3 text-sm">Turnos por mes</h3>
             <canvas id="chartTurnosMes"></canvas>
         </div>
 
-        <!-- INGRESOS POR MES -->
         <div class="bg-white p-6 rounded-xl shadow border">
             <h3 class="font-semibold mb-3 text-sm">Ingresos por mes</h3>
             <canvas id="chartIngresosMes"></canvas>
         </div>
 
-        <!-- TURNOS POR MÉTODO -->
         <div class="bg-white p-6 rounded-xl shadow border">
             <h3 class="font-semibold mb-3 text-sm">Turnos por método de pago</h3>
             <canvas id="chartTurnosMetodo"></canvas>
         </div>
 
-        <!-- INGRESOS POR MÉTODO -->
         <div class="bg-white p-6 rounded-xl shadow border">
             <h3 class="font-semibold mb-3 text-sm">Ingresos por método de pago</h3>
             <canvas id="chartIngresosMetodo"></canvas>
@@ -261,7 +288,6 @@ include __DIR__ . '/includes/sidebar.php';
     Chart.defaults.font.size = 13;
     Chart.defaults.color = '#334155';
 
-    // TURNOS POR MES
     new Chart(document.getElementById('chartTurnosMes'), {
         type: 'line',
         data: {
@@ -277,7 +303,6 @@ include __DIR__ . '/includes/sidebar.php';
         }
     });
 
-    // INGRESOS POR MES
     new Chart(document.getElementById('chartIngresosMes'), {
         type: 'bar',
         data: {
@@ -292,7 +317,6 @@ include __DIR__ . '/includes/sidebar.php';
         }
     });
 
-    // TURNOS POR MÉTODO
     new Chart(document.getElementById('chartTurnosMetodo'), {
         type: 'bar',
         data: {
@@ -307,7 +331,6 @@ include __DIR__ . '/includes/sidebar.php';
         }
     });
 
-    // INGRESOS POR MÉTODO
     new Chart(document.getElementById('chartIngresosMetodo'), {
         type: 'bar',
         data: {

@@ -1,9 +1,34 @@
 <?php
 session_start();
 require '../config.php';
+require __DIR__ . '/../pro/includes/db.php';
 
-$center_id = $_SESSION['user_id'] ?? $_SESSION['center_id'] ?? null;
-if (!$center_id) { header("Location: ../auth/login.php"); exit; }
+$center_id = $_SESSION['user_id'] ?? null;
+if (!$center_id) {
+    header("Location: ../auth/login.php");
+    exit;
+}
+
+// Traer info de suscripción
+$stmt = $pdo->prepare("SELECT subscription_end, is_active FROM users WHERE id = ?");
+$stmt->execute([$center_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$alerta_suscripcion = null;
+
+if ($user) {
+    if (!empty($user['subscription_end'])) {
+        $hoy = new DateTime();
+        $fin = new DateTime($user['subscription_end']);
+        $diff = (int) $hoy->diff($fin)->format('%r%a');
+
+        if ($diff <= 5 && $diff >= 0) {
+            $alerta_suscripcion = "La suscripción del centro vence en $diff día" . ($diff == 1 ? '' : 's') . ". Renovala para evitar suspensión.";
+        } elseif ($diff < 0) {
+            $alerta_suscripcion = "La suscripción del centro está vencida. Deben renovarla para seguir usando el sistema.";
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -19,6 +44,9 @@ body{margin:0;font-family:Arial;background:#f1f5f9;}
 .card h3{margin:0 0 10px;font-size:18px;color:#0f172a;}
 .card p{margin:0 0 16px;color:#475569;font-size:14px;}
 .btn{display:inline-block;padding:10px 16px;border-radius:999px;font-size:14px;text-decoration:none;background:#0ea5e9;color:white;}
+.alert{margin-bottom:16px;padding:12px 16px;border-radius:12px;font-size:14px;}
+.alert-warning{background:#fef3c7;color:#92400e;}
+.alert-danger{background:#fee2e2;color:#b91c1c;}
 </style>
 </head>
 <body>
@@ -37,6 +65,17 @@ body{margin:0;font-family:Arial;background:#f1f5f9;}
 </div>
 
 <div class="main">
+
+    <?php if ($alerta_suscripcion): ?>
+        <div class="alert <?= (strpos($alerta_suscripcion, 'vencida') !== false) ? 'alert-danger' : 'alert-warning' ?>">
+            <?= htmlspecialchars($alerta_suscripcion) ?>
+            &nbsp;|&nbsp;
+            <a href="planes.php" style="text-decoration:underline;font-weight:bold;color:inherit;">Ver planes</a>
+            &nbsp;|&nbsp;
+            <a href="../cancelar-suscripcion.php" style="text-decoration:underline;color:inherit;">Cancelar suscripción</a>
+        </div>
+    <?php endif; ?>
+
     <h2>Panel del centro</h2>
     <p style="color:#475569;margin-bottom:24px;">Seleccioná una sección para administrar tu centro.</p>
 
