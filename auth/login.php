@@ -13,15 +13,15 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['account_type'])) {
         exit;
     }
 
-    if ($_SESSION['account_type'] === 'center' || $_SESSION['account_type'] === 'secretary') {
+    if ($_SESSION['account_type'] === 'center') {
         header("Location: /centro/centro-dashboard.php");
         exit;
     }
 
-    if ($user['account_type'] === 'admin') {
-    header("Location: /admin/admin-dashboard.php");
-    exit;
-}
+    if ($_SESSION['account_type'] === 'admin') {
+        header("Location: /admin/admin-dashboard.php");
+        exit;
+    }
 }
 
 // Procesar login
@@ -46,8 +46,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        if ($user['account_type'] === 'center' || $user['account_type'] === 'secretary') {
+        if ($user['account_type'] === 'center') {
             header("Location: /centro/centro-dashboard.php");
+            exit;
+        }
+
+        if ($user['account_type'] === 'admin') {
+            header("Location: /admin/admin-dashboard.php");
             exit;
         }
     }
