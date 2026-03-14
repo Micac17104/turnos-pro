@@ -4,6 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['user_id']) || $_SESSION['account_type'] !== 'admin') {
-    header("Location: /auth/login.php");
+    header("Location: /admin/login.php");
     exit;
 }
