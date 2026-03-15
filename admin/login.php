@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="text-red-600 text-sm mb-4 text-center"><?= $error ?></p>
     <?php endif; ?>
 
-    <form method="POST" class="space-y-4">
+    <form method="POST" action="/admin/login.php" class="space-y-4">
 
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
