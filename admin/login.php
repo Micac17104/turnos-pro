@@ -1,13 +1,4 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    echo "<pre>";
-    var_dump($_POST);
-    echo "</pre>";
-    exit;
-
-    // resto del código...
-}
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
