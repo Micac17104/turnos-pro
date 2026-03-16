@@ -2,6 +2,7 @@
 session_save_path(__DIR__ . '/../sessions');
 session_start();
 
+<?php
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';
