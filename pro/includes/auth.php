@@ -3,7 +3,37 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Solo profesionales
+/*
+|--------------------------------------------------------------------------
+| 1) Permitir acceso a páginas de pago aunque la cuenta esté inactiva
+|--------------------------------------------------------------------------
+|
+| Estas páginas deben ser accesibles incluso si la suscripción está vencida,
+| porque son justamente las páginas donde el usuario puede pagar y reactivar
+| su cuenta. Si auth.php las bloquea, el usuario nunca podría pagar.
+|
+*/
+
+$allowed_pages = [
+    'planes.php',
+    'pago-preferencia-sus.php',
+    'pago-exitoso-sus.php',
+    'pago-fallido-sus.php',
+    'pago-pendiente-sus.php'
+];
+
+$current_page = basename($_SERVER['PHP_SELF']);
+
+if (in_array($current_page, $allowed_pages)) {
+    return; // permitir acceso sin restricciones
+}
+
+/*
+|--------------------------------------------------------------------------
+| 2) Solo profesionales pueden acceder al panel
+|--------------------------------------------------------------------------
+*/
+
 if (!isset($_SESSION['user_id']) || $_SESSION['account_type'] !== 'professional') {
     header("Location: /auth/login.php");
     exit;
@@ -13,19 +43,29 @@ require __DIR__ . '/../includes/db.php';
 
 $user_id = $_SESSION['user_id'];
 
-// Obtener datos del usuario
+/*
+|--------------------------------------------------------------------------
+| 3) Obtener datos del usuario
+|--------------------------------------------------------------------------
+*/
+
 $stmt = $pdo->prepare("SELECT is_active, subscription_end FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Si no existe el usuario
+// Si no existe el usuario (caso raro pero seguro)
 if (!$user) {
     session_destroy();
     header("Location: /auth/login.php");
     exit;
 }
 
-// Fecha actual
+/*
+|--------------------------------------------------------------------------
+| 4) Validar suscripción
+|--------------------------------------------------------------------------
+*/
+
 $today = strtotime(date('Y-m-d'));
 $end   = strtotime($user['subscription_end']);
 
