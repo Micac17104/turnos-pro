@@ -10,6 +10,11 @@ $stmt = $pdo->query("
 
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
+<?php include __DIR__ . '/includes/header.php'; ?>
+<?php include __DIR__ . '/includes/sidebar.php'; ?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -63,3 +68,5 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 </body>
 </html>
+
+<?php include __DIR__ . '/../pro/includes/footer.php'; ?>
