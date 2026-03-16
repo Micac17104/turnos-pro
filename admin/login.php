@@ -32,6 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    echo "<pre>";
+var_dump($user);
+echo "</pre>";
+exit;
+
     if ($user && $user['account_type'] === 'admin' && password_verify($password, $user['password'])) {
 
         $_SESSION['user_id'] = $user['id'];
