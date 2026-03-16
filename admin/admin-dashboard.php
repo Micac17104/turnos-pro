@@ -2,6 +2,7 @@
 require __DIR__ . '/auth-admin.php';
 require __DIR__ . '/../pro/includes/db.php';
 
+// Consultas
 $total_users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $total_prof = $pdo->query("SELECT COUNT(*) FROM users WHERE account_type='professional'")->fetchColumn();
 $total_centros = $pdo->query("SELECT COUNT(*) FROM users WHERE account_type='center'")->fetchColumn();
@@ -41,4 +42,4 @@ $total_activos = $pdo->query("SELECT COUNT(*) FROM users WHERE is_active=1")->fe
 
 </div>
 
-<?php include __DIR__ . '/includes/footer.php'; ?>
+<?php include __DIR__ . '/../pro/includes/footer.php'; ?>

@@ -43,4 +43,4 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 </div>
 
-<?php include __DIR__ . '/includes/footer.php'; ?>
+<?php include __DIR__ . '/../pro/includes/footer.php'; ?>
