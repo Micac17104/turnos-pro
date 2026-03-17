@@ -1,9 +1,6 @@
 <?php
 // /pro/includes/header.php
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
 // Título por defecto
 if (!isset($page_title)) {
@@ -35,4 +32,3 @@ if (!function_exists('h')) {
 
 <!-- CONTENEDOR PRINCIPAL DEL PANEL -->
 <div class="min-h-screen flex">
-    
