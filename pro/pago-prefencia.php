@@ -7,6 +7,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 MercadoPago\SDK::setAccessToken("APP_USR-936741788731989-031211-5eed533a498e365afb70fd29c65ad0bc-3260786753");
 
+
 if (!isset($_GET['plan'])) {
     die("Plan inválido");
 }
