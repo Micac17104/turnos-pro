@@ -41,7 +41,7 @@ $precio = 8000;
                 $<?= number_format($precio, 0, ',', '.') ?>
             </p>
 
-            <a href="pago-preferencia.php?plan=<?= $plan ?>"
+            <a href="pago-preferencia-sus.php?plan=<?= $plan ?>"
                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                Pagar con MercadoPago
             </a>
