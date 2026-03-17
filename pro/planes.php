@@ -1,6 +1,7 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 /* ---------------------------------------------------------
    1) Validación de sesión ANTES de enviar cualquier HTML
