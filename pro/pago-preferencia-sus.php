@@ -4,17 +4,12 @@ session_start();
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Validar usuario ANTES de auth.php y ANTES de cualquier header()
+// Validar usuario (solo que esté logueado, NO suscripción)
 $user_id = $_SESSION['user_id'] ?? null;
 if (!$user_id) {
     header("Location: /auth/login.php");
     exit;
 }
-
-// Ahora sí: validar suscripción y whitelist
-require __DIR__ . '/includes/auth.php';
-
-MercadoPago\SDK::setAccessToken("APP_USR-936741788731989-031211-5eed533a498e365afb70fd29c65ad0bc-3260786753");
 
 // Validar plan
 if (!isset($_GET['plan'])) {
@@ -32,6 +27,8 @@ if (!isset($precios[$plan])) {
 }
 
 $precio = $precios[$plan];
+
+MercadoPago\SDK::setAccessToken("APP_USR-936741788731989-031211-5eed533a498e365afb70fd29c65ad0bc-3260786753");
 
 // Crear preferencia
 $preference = new MercadoPago\Preference();
@@ -52,7 +49,6 @@ $preference->metadata = [
 
 $baseUrl = "https://turnos-pro-production.up.railway.app";
 
-// URLs de retorno
 $preference->back_urls = [
     "success" => $baseUrl . "/pro/pago-exitoso-sus.php",
     "failure" => $baseUrl . "/pro/pago-fallido-sus.php",
@@ -60,13 +56,9 @@ $preference->back_urls = [
 ];
 
 $preference->auto_return = "all";
-
-// Webhook
 $preference->notification_url = $baseUrl . "/webhooks/mercadopago.php";
 
-// Guardar preferencia
 $preference->save();
 
-// Redirigir a MercadoPago
 header("Location: " . $preference->init_point);
 exit;
