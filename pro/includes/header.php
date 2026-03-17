@@ -35,3 +35,4 @@ if (!function_exists('h')) {
 
 <!-- CONTENEDOR PRINCIPAL DEL PANEL -->
 <div class="min-h-screen flex">
+    
