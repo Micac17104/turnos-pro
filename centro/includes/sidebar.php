@@ -9,11 +9,15 @@
     <a href="centro-pacientes.php">Pacientes</a>
     <a href="centro-configuracion.php">Configuración</a>
     <a href="centro-recordatorios.php">Recordatorios</a>
-    <div class="card">
-    <h3>Suscripción</h3>
-    <p>Elegí o renová el plan del centro.</p>
-    <a href="planes.php" class="btn">Ver planes</a>
-</div>
+    <a href="planes.php"
+           class="block px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+            Pagar suscripción
+        </a>
+
+        <a href="/cancelar-suscripcion.php"
+           class="block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+            Cancelar suscripción
+        </a>
     <a href="../auth/logout.php" class="logout">Salir</a>
 </div>
 
