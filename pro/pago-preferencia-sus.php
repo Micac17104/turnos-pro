@@ -1,12 +1,14 @@
 <?php
 
-session_save_path(__DIR__ . '/../sessions');
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Validar usuario (solo que esté logueado, NO suscripción)
+// Validar usuario (solo login)
 $user_id = $_SESSION['user_id'] ?? null;
+
 if (!$user_id) {
     header("Location: /auth/login.php");
     exit;
@@ -37,11 +39,11 @@ $preference = new MercadoPago\Preference();
 $item = new MercadoPago\Item();
 $item->title = "Suscripción mensual profesional - Plan $plan";
 $item->quantity = 1;
-$item->unit_price = $precio;
+$item->unit_price = (float)$precio;
 
 $preference->items = [$item];
 
-// Metadata para el webhook
+// Metadata
 $preference->metadata = [
     "user_id"   => $user_id,
     "plan"      => $plan,
@@ -56,7 +58,7 @@ $preference->back_urls = [
     "pending" => $baseUrl . "/pro/pago-pendiente-sus.php",
 ];
 
-$preference->auto_return = "all";
+$preference->auto_return = "approved";
 $preference->notification_url = $baseUrl . "/webhooks/mercadopago.php";
 
 $preference->save();
