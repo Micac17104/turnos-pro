@@ -1,6 +1,4 @@
 <?php
-echo "ENTRÉ A PAGO-PREFERENCIA-SUS.PHP";
-exit;
 
 session_save_path(__DIR__ . '/../sessions');
 session_start();
