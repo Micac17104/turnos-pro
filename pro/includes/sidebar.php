@@ -1,3 +1,7 @@
+<?php
+// /pro/includes/sidebar.php
+?>
+
 <aside class="w-64 bg-white border-r border-slate-200 min-h-screen p-6">
 
     <div class="mb-4">

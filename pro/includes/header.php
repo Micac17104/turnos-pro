@@ -5,12 +5,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Si no viene definido, asignar título por defecto
+// Título por defecto
 if (!isset($page_title)) {
     $page_title = 'Panel profesional';
 }
 
-// Función h() por si no está cargada aún
+// Función h() por si no está definida
 if (!function_exists('h')) {
     function h($str) {
         return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
@@ -28,7 +28,7 @@ if (!function_exists('h')) {
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Estilos propios -->
-    <link rel="stylesheet" href="/pro/assets/css/app.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
 </head>
 
 <body class="bg-slate-100 text-slate-900">

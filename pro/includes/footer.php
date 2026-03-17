@@ -3,6 +3,8 @@
 ?>
 </div> <!-- cierre flex principal -->
 
-<script src="/pro/assets/js/app.js"></script>
+<!-- Scripts propios -->
+<script src="/assets/js/app.js"></script>
+
 </body>
 </html>
