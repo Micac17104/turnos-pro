@@ -32,6 +32,15 @@
 <a href="centro-recordatorios.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
     Recordatorios
 </a>
+
+<a href="pagar-suscripcion.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Pagar suscripción
+</a>
+
+<a href="cancelar-suscripcion.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Cancelar suscripción
+</a>
+
     <a href="../auth/logout.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
     Salir
 </a>
