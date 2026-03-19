@@ -1,24 +1,40 @@
 <div class="sidebar">
     <h2>TurnosPro</h2>
 
-    <a href="centro-dashboard.php">Dashboard</a>
-    <a href="centro-profesionales.php">Profesionales</a>
-    <a href="centro-turnos.php">Turnos</a>
-    <a href="centro-agenda.php">Agenda diaria</a>
-    <a href="centro-agenda-semanal.php">Agenda semanal</a>
-    <a href="centro-pacientes.php">Pacientes</a>
-    <a href="centro-configuracion.php">Configuración</a>
-    <a href="centro-recordatorios.php">Recordatorios</a>
-    <a href="planes.php"
-           class="block px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
-            Pagar suscripción
-        </a>
+   <a href="centro-dashboard.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Dashboard
+</a>
 
-        <a href="/cancelar-suscripcion.php"
-           class="block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-            Cancelar suscripción
-        </a>
-    <a href="../auth/logout.php" class="logout">Salir</a>
+<a href="centro-profesionales.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Profesionales
+</a>
+
+<a href="centro-turnos.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Turnos
+</a>
+
+<a href="centro-agenda.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Agenda diaria
+</a>
+
+<a href="centro-agenda-semanal.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Agenda semanal
+</a>
+
+<a href="centro-pacientes.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Pacientes
+</a>
+
+<a href="centro-configuracion.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Configuración
+</a>
+
+<a href="centro-recordatorios.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Recordatorios
+</a>
+    <a href="../auth/logout.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+    Salir
+</a>
 </div>
 
 <style>
