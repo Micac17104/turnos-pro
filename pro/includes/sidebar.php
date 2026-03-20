@@ -55,10 +55,11 @@
             Pagar suscripción
         </a>
 
-        <a href="/cancelar-suscripcion.php"
-           class="block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-            Cancelar suscripción
-        </a>
+      <a href="/cancelar-suscripcion.php"
+   onclick="return confirm('¿Seguro que querés cancelar tu suscripción? Perderás acceso al panel.');"
+   class="block px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg">
+   Cancelar suscripción
+</a>
 
         <a href="/auth/logout.php"
            class="block px-4 py-2 rounded-lg hover:bg-red-100 text-red-600">

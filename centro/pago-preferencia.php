@@ -3,14 +3,18 @@ session_start();
 require '../config.php';
 require __DIR__ . '/../vendor/autoload.php';
 
-MercadoPago\SDK::setAccessToken("APP_USR-936741788731989-031211-5eed533a498e365afb70fd29c65ad0bc-3260786753");
+// Credenciales reales
+MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
 
+// Validar usuario del centro o secretaria
 $center_id = $_SESSION['user_id'] ?? null;
+
 if (!$center_id || ($_SESSION['account_type'] !== 'center' && $_SESSION['account_type'] !== 'secretary')) {
     header("Location: /auth/login.php");
     exit;
 }
 
+// Validar plan
 if (!isset($_GET['plan'])) {
     die("Plan inválido");
 }
@@ -31,22 +35,25 @@ if (!isset($precios[$plan])) {
 
 $precio = $precios[$plan];
 
+// Crear preferencia
 $preference = new MercadoPago\Preference();
 
 $item = new MercadoPago\Item();
 $item->title = "Suscripción mensual centro - Plan $plan profesionales";
 $item->quantity = 1;
-$item->unit_price = $precio;
+$item->unit_price = (float)$precio;
 
 $preference->items = [$item];
 
+// Metadata para el webhook
 $preference->metadata = [
     "user_id"   => $center_id,
     "plan"      => $plan,
     "user_type" => "center",
 ];
 
-$baseUrl = "https://turnos-pro-production.up.railway.app";
+// URL base de tu dominio real
+$baseUrl = "https://www.turnosaura.com";
 
 $preference->back_urls = [
     "success" => $baseUrl . "/centro/pago-exitoso.php",
@@ -55,9 +62,12 @@ $preference->back_urls = [
 ];
 
 $preference->auto_return = "approved";
+
+// Webhook compartido
 $preference->notification_url = $baseUrl . "/webhooks/mercadopago.php";
 
 $preference->save();
 
+// Redirigir al checkout
 header("Location: " . $preference->init_point);
 exit;

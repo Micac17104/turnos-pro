@@ -43,6 +43,12 @@ if (!$center_id || ($_SESSION['account_type'] !== 'center' && $_SESSION['account
             5 => 28000
         ];
 
+        <?php if (isset($_GET['expired'])): ?>
+    <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
+        Tu suscripción está inactiva. Pagá para recuperar acceso.
+    </div>
+<?php endif; ?>
+
         foreach ($planes as $profesionales => $precio):
         ?>
             <div class="bg-white shadow rounded-xl p-6 text-center border">

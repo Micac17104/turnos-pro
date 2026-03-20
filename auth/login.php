@@ -77,6 +77,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Iniciar sesión
     </h1>
 
+    <?php if (isset($_GET['cancelada'])): ?>
+    <p class="text-red-600 text-sm mb-4 text-center">
+        Tu suscripción fue cancelada. Podés volver a activarla pagando nuevamente.
+    </p>
+<?php endif; ?>
+
     <?php if (!empty($error)): ?>
         <p class="text-red-600 text-sm mb-4 text-center"><?= $error ?></p>
     <?php endif; ?>

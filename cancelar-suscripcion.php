@@ -10,23 +10,19 @@ if (!$user_id || !$account_type) {
     exit;
 }
 
+// Cancelar suscripción
 $stmt = $pdo->prepare("
     UPDATE users
-    SET subscription_end = CURDATE(),
+    SET 
+        subscription_end = CURDATE(),
         is_active = 0
     WHERE id = ?
 ");
 $stmt->execute([$user_id]);
 
-if ($account_type === 'professional') {
-    header("Location: /pro/dashboard.php?cancelada=1");
-    exit;
-}
+// Cerrar sesión para bloquear acceso inmediato
+session_destroy();
 
-if ($account_type === 'center' || $account_type === 'secretary') {
-    header("Location: /centro/centro-dashboard.php?cancelada=1");
-    exit;
-}
-
-header("Location: /auth/login.php");
+// Redirigir a login con mensaje
+header("Location: /auth/login.php?cancelada=1");
 exit;
