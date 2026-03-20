@@ -1,12 +1,10 @@
 <?php
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Validar usuario (solo login)
 $user_id = $_SESSION['user_id'] ?? null;
 
 if (!$user_id) {
@@ -14,7 +12,6 @@ if (!$user_id) {
     exit;
 }
 
-// Validar plan
 if (!isset($_GET['plan'])) {
     die("Plan inválido");
 }
@@ -31,7 +28,7 @@ if (!isset($precios[$plan])) {
 
 $precio = $precios[$plan];
 
-MercadoPago\SDK::setAccessToken("APP_USR-936741788731989-031211-5eed533a498e365afb70fd29c65ad0bc-3260786753");
+MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
 
 // Crear preferencia
 $preference = new MercadoPago\Preference();
@@ -50,7 +47,7 @@ $preference->metadata = [
     "user_type" => "professional",
 ];
 
-$baseUrl = "https://turnos-pro-production.up.railway.app";
+$baseUrl = "https://www.turnosaura.com";
 
 $preference->back_urls = [
     "success" => $baseUrl . "/pro/pago-exitoso-sus.php",

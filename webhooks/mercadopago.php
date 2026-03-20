@@ -2,7 +2,7 @@
 require __DIR__ . '/../pro/includes/db.php';
 require __DIR__ . '/../vendor/autoload.php';
 
-MercadoPago\SDK::setAccessToken("APP_USR-936741788731989-031211-5eed533a498e365afb70fd29c65ad0bc-3260786753");
+MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
 
 // Leer el cuerpo del webhook
 $body = file_get_contents("php://input");
@@ -43,14 +43,12 @@ $end   = $user && $user['subscription_end'] ? strtotime($user['subscription_end'
 
 // Calcular nueva fecha de vencimiento
 if ($end > $today) {
-    // Renovación sobre una suscripción activa
     $new_end = date('Y-m-d', strtotime($user['subscription_end'] . ' +1 month'));
 } else {
-    // Suscripción vencida o primera vez
     $new_end = date('Y-m-d', strtotime('+1 month'));
 }
 
-// Actualizar suscripción SIEMPRE
+// Actualizar suscripción
 $stmt2 = $pdo->prepare("
     UPDATE users
     SET 
