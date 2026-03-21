@@ -1,20 +1,29 @@
 <?php
-session_start();
-require '../config.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../pro/includes/db.php';
 
-// Credenciales reales
-MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
-
-// Validar usuario del centro o secretaria
 $center_id = $_SESSION['user_id'] ?? null;
+$account_type = $_SESSION['account_type'] ?? null;
 
-if (!$center_id || ($_SESSION['account_type'] !== 'center' && $_SESSION['account_type'] !== 'secretary')) {
+if (!$center_id || !in_array($account_type, ['center', 'secretary'])) {
     header("Location: /auth/login.php");
     exit;
 }
 
-// Validar plan
+// Traer datos del centro (email)
+$stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+$stmt->execute([$center_id]);
+$center = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$center) {
+    header("Location: /auth/login.php");
+    exit;
+}
+
 if (!isset($_GET['plan'])) {
     die("Plan inválido");
 }
@@ -33,41 +42,35 @@ if (!isset($precios[$plan])) {
     die("Plan no encontrado");
 }
 
-$precio = $precios[$plan];
+$precio = (float)$precios[$plan];
 
-// Crear preferencia
-$preference = new MercadoPago\Preference();
+MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
 
-$item = new MercadoPago\Item();
-$item->title = "Suscripción mensual centro - Plan $plan profesionales";
-$item->quantity = 1;
-$item->unit_price = (float)$precio;
-
-$preference->items = [$item];
-
-// Metadata para el webhook
-$preference->metadata = [
-    "user_id"   => $center_id,
-    "plan"      => $plan,
-    "user_type" => "center",
-];
-
-// URL base de tu dominio real
 $baseUrl = "https://www.turnosaura.com";
 
-$preference->back_urls = [
-    "success" => $baseUrl . "/centro/pago-exitoso.php",
-    "failure" => $baseUrl . "/centro/pago-fallido.php",
-    "pending" => $baseUrl . "/centro/pago-pendiente.php",
+$preapproval = new MercadoPago\Preapproval();
+$preapproval->payer_email = $center['email'];
+$preapproval->back_url = $baseUrl . "/centro/pago-exitoso.php";
+$preapproval->reason = "Suscripción mensual centro - Plan $plan profesionales";
+$preapproval->external_reference = (string)$center_id;
+
+$preapproval->auto_recurring = [
+    "frequency" => 1,
+    "frequency_type" => "months",
+    "transaction_amount" => $precio,
+    "currency_id" => "ARS"
 ];
 
-$preference->auto_return = "approved";
+if ($preapproval->save()) {
+    $stmt2 = $pdo->prepare("
+        UPDATE users
+        SET mp_preapproval_id = ?, mp_subscription_status = 'active'
+        WHERE id = ?
+    ");
+    $stmt2->execute([$preapproval->id, $center_id]);
 
-// Webhook compartido
-$preference->notification_url = $baseUrl . "/webhooks/mercadopago.php";
-
-$preference->save();
-
-// Redirigir al checkout
-header("Location: " . $preference->init_point);
-exit;
+    header("Location: " . $preapproval->init_point);
+    exit;
+} else {
+    die("No se pudo crear la suscripción. Intentalo más tarde.");
+}
