@@ -1,6 +1,7 @@
 <?php
 session_start();
 require __DIR__ . '/pro/includes/db.php';
+require __DIR__ . '/vendor/autoload.php';
 
 $user_id = $_SESSION['user_id'] ?? null;
 $account_type = $_SESSION['account_type'] ?? null;
@@ -10,19 +11,37 @@ if (!$user_id || !$account_type) {
     exit;
 }
 
-// Cancelar suscripción
-$stmt = $pdo->prepare("
+// Traer preapproval_id
+$stmt = $pdo->prepare("SELECT mp_preapproval_id FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$preapproval_id = $user['mp_preapproval_id'] ?? null;
+
+// Cancelar en Mercado Pago
+if ($preapproval_id) {
+    MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
+
+    $preapproval = MercadoPago\Preapproval::find_by_id($preapproval_id);
+    if ($preapproval) {
+        $preapproval->status = "cancelled";
+        $preapproval->update();
+    }
+}
+
+// Cancelar en tu base
+$stmt2 = $pdo->prepare("
     UPDATE users
     SET 
+        is_active = 0,
         subscription_end = CURDATE(),
-        is_active = 0
+        mp_subscription_status = 'cancelled'
     WHERE id = ?
 ");
-$stmt->execute([$user_id]);
+$stmt2->execute([$user_id]);
 
-// Cerrar sesión para bloquear acceso inmediato
+// Cerrar sesión
 session_destroy();
 
-// Redirigir a login con mensaje
 header("Location: /auth/login.php?cancelada=1");
 exit;

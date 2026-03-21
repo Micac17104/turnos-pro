@@ -76,6 +76,47 @@ body{margin:0;font-family:Arial;background:#f1f5f9;}
         </div>
     <?php endif; ?>
 
+    <?php
+require __DIR__ . '/../pro/includes/db.php';
+
+$user_id = $_SESSION['user_id'];
+$stmt = $pdo->prepare("SELECT subscription_end, mp_subscription_status FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$today = strtotime(date('Y-m-d'));
+$end   = strtotime($user['subscription_end']);
+$dias_restantes = ($end - $today) / 86400;
+
+// Mostrar aviso solo si está en prueba (primer mes)
+if ($user['mp_subscription_status'] === 'active') {
+
+    if ($dias_restantes <= 3 && $dias_restantes > 0) {
+
+        $mensaje = "";
+
+        if ($dias_restantes == 3) {
+            $mensaje = "Tu período de prueba termina en 3 días. Si no agregás un método de pago, tu cuenta será suspendida.";
+        }
+
+        if ($dias_restantes == 2) {
+            $mensaje = "Tu período de prueba termina en 2 días. Agregá un método de pago para evitar la suspensión.";
+        }
+
+        if ($dias_restantes == 1) {
+            $mensaje = "Tu período de prueba termina mañana. Si no agregás un método de pago, tu cuenta será suspendida.";
+        }
+
+        if ($mensaje !== "") {
+            echo "
+            <div class='bg-yellow-100 text-yellow-800 p-4 rounded-lg mb-4 border border-yellow-300'>
+                <strong>Atención:</strong> $mensaje
+            </div>";
+        }
+    }
+}
+?>
+
     <h2>Panel del centro</h2>
     <p style="color:#475569;margin-bottom:24px;">Seleccioná una sección para administrar tu centro.</p>
 
