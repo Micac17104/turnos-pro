@@ -10,7 +10,8 @@ if (!isset($_SESSION['user_id']) ||
     exit;
 }
 
-require __DIR__ . '/../pro/includes/db.php';
+// RUTA CORRECTA A LA DB
+require __DIR__ . '/../../pro/includes/db.php';
 
 $center_id = $_SESSION['user_id'];
 

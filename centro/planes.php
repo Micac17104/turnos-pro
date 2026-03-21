@@ -31,9 +31,16 @@ if (!$center_id || ($_SESSION['account_type'] !== 'center' && $_SESSION['account
         </div>
     </div>
 
+    <?php if (isset($_GET['expired'])): ?>
+        <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
+            Tu suscripción está inactiva. Pagá para recuperar acceso.
+        </div>
+    <?php endif; ?>
+
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Elegí tu plan de suscripción</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
         <?php
         $planes = [
             1 => 8000,
@@ -42,12 +49,6 @@ if (!$center_id || ($_SESSION['account_type'] !== 'center' && $_SESSION['account
             4 => 23000,
             5 => 28000
         ];
-
-        <?php if (isset($_GET['expired'])): ?>
-    <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
-        Tu suscripción está inactiva. Pagá para recuperar acceso.
-    </div>
-<?php endif; ?>
 
         foreach ($planes as $profesionales => $precio):
         ?>
@@ -63,6 +64,7 @@ if (!$center_id || ($_SESSION['account_type'] !== 'center' && $_SESSION['account
                 </a>
             </div>
         <?php endforeach; ?>
+
     </div>
 
 </div>
