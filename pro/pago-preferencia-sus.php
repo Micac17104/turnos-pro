@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require __DIR__ . '/../vendor/autoload.php';
-require __DIR__ . '/../pro/includes/db.php';
+require __DIR__ . '/includes/db.php';
 
 $user_id = $_SESSION['user_id'] ?? null;
 
@@ -13,8 +13,8 @@ if (!$user_id || $_SESSION['account_type'] !== 'professional') {
     exit;
 }
 
-// Traer datos del usuario (para el email)
-$stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+// Traer email
+$stmt = $pdo->prepare("SELECT email, mp_preapproval_id FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -43,7 +43,24 @@ MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956ca
 
 $baseUrl = "https://www.turnosaura.com";
 
-// Crear suscripción (preapproval)
+/*
+|--------------------------------------------------------------------------
+| 1) Cancelar suscripción previa si existe
+|--------------------------------------------------------------------------
+*/
+if (!empty($user['mp_preapproval_id'])) {
+    $old = MercadoPago\Preapproval::find_by_id($user['mp_preapproval_id']);
+    if ($old && isset($old->status) && $old->status !== "cancelled") {
+        $old->status = "cancelled";
+        $old->update();
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| 2) Crear nueva suscripción automática
+|--------------------------------------------------------------------------
+*/
 $preapproval = new MercadoPago\Preapproval();
 $preapproval->payer_email = $user['email'];
 $preapproval->back_url = $baseUrl . "/pro/pago-exitoso-sus.php";
@@ -58,7 +75,8 @@ $preapproval->auto_recurring = [
 ];
 
 if ($preapproval->save()) {
-    // Guardar el preapproval_id en la base
+
+    // Guardar nuevo preapproval_id
     $stmt2 = $pdo->prepare("
         UPDATE users
         SET mp_preapproval_id = ?, mp_subscription_status = 'active'
@@ -68,6 +86,7 @@ if ($preapproval->save()) {
 
     header("Location: " . $preapproval->init_point);
     exit;
+
 } else {
     die("No se pudo crear la suscripción. Intentalo más tarde.");
 }

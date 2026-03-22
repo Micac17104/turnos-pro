@@ -14,8 +14,8 @@ if (!$center_id || !in_array($account_type, ['center', 'secretary'])) {
     exit;
 }
 
-// Traer datos del centro (email)
-$stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+// Traer email y preapproval previo
+$stmt = $pdo->prepare("SELECT email, mp_preapproval_id FROM users WHERE id = ?");
 $stmt->execute([$center_id]);
 $center = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -48,6 +48,24 @@ MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956ca
 
 $baseUrl = "https://www.turnosaura.com";
 
+/*
+|--------------------------------------------------------------------------
+| 1) Cancelar suscripción previa si existe
+|--------------------------------------------------------------------------
+*/
+if (!empty($center['mp_preapproval_id'])) {
+    $old = MercadoPago\Preapproval::find_by_id($center['mp_preapproval_id']);
+    if ($old && isset($old->status) && $old->status !== "cancelled") {
+        $old->status = "cancelled";
+        $old->update();
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| 2) Crear nueva suscripción automática
+|--------------------------------------------------------------------------
+*/
 $preapproval = new MercadoPago\Preapproval();
 $preapproval->payer_email = $center['email'];
 $preapproval->back_url = $baseUrl . "/centro/pago-exitoso.php";
@@ -62,6 +80,7 @@ $preapproval->auto_recurring = [
 ];
 
 if ($preapproval->save()) {
+
     $stmt2 = $pdo->prepare("
         UPDATE users
         SET mp_preapproval_id = ?, mp_subscription_status = 'active'
@@ -71,6 +90,7 @@ if ($preapproval->save()) {
 
     header("Location: " . $preapproval->init_point);
     exit;
+
 } else {
     die("No se pudo crear la suscripción. Intentalo más tarde.");
 }

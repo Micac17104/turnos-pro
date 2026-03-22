@@ -11,19 +11,21 @@ if (!$user_id || !$account_type) {
     exit;
 }
 
-// Traer preapproval_id
+// Obtener preapproval_id
 $stmt = $pdo->prepare("SELECT mp_preapproval_id FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $preapproval_id = $user['mp_preapproval_id'] ?? null;
 
-// Cancelar en Mercado Pago
-if ($preapproval_id) {
+// Cancelar en Mercado Pago SOLO si existe preapproval_id
+if (!empty($preapproval_id)) {
+
     MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
 
     $preapproval = MercadoPago\Preapproval::find_by_id($preapproval_id);
-    if ($preapproval) {
+
+    if ($preapproval && isset($preapproval->status)) {
         $preapproval->status = "cancelled";
         $preapproval->update();
     }
@@ -35,7 +37,8 @@ $stmt2 = $pdo->prepare("
     SET 
         is_active = 0,
         subscription_end = CURDATE(),
-        mp_subscription_status = 'cancelled'
+        mp_subscription_status = 'cancelled',
+        mp_preapproval_id = NULL
     WHERE id = ?
 ");
 $stmt2->execute([$user_id]);
