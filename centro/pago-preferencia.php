@@ -1,10 +1,11 @@
 <?php
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require '/app/vendor/autoload.php';
-// require __DIR__ . '/../pro/includes/db.php';
+require __DIR__ . '/../pro/includes/db.php';   // PRIMERO LA DB
+require '/app/vendor/autoload.php';           // DESPUÉS EL AUTOLOAD
 
 use MercadoPago\SDK;
 use MercadoPago\Preapproval;
