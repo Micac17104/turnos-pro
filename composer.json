@@ -1,7 +1,7 @@
 {
   "require": {
-    "mercadopago/dx-php": "^2.6",
     "ext-pdo": "*",
-    "ext-pdo_mysql": "*"
+    "ext-pdo_mysql": "*",
+    "mercadopago/sdk": "^0.5.6"
   }
 }
