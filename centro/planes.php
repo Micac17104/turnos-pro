@@ -58,7 +58,7 @@ if (!$center_id || ($_SESSION['account_type'] !== 'center' && $_SESSION['account
                 </h2>
                 <p class="text-3xl font-semibold mb-4">$<?= number_format($precio, 0, ',', '.') ?></p>
 
-                <a href="/centro-pago-preferencia.php?plan=<?= $profesionales ?>"
+                <a href="pago-preferencia.php?plan=<?= $profesionales ?>"
                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                    Pagar con MercadoPago
                 </a>
