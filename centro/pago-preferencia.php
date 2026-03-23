@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require '/app/vendor/autoload.php';
-require __DIR__ . '/../pro/includes/db.php';
+// require __DIR__ . '/../pro/includes/db.php';
 
 use MercadoPago\SDK;
 use MercadoPago\Preapproval;
