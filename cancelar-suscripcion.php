@@ -3,6 +3,9 @@ session_start();
 require __DIR__ . '/pro/includes/db.php';
 require __DIR__ . '/vendor/autoload.php';
 
+use MercadoPago\SDK;
+use MercadoPago\Preapproval;
+
 $user_id = $_SESSION['user_id'] ?? null;
 $account_type = $_SESSION['account_type'] ?? null;
 
@@ -21,9 +24,9 @@ $preapproval_id = $user['mp_preapproval_id'] ?? null;
 // Cancelar en Mercado Pago SOLO si existe preapproval_id
 if (!empty($preapproval_id)) {
 
-    MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
+    SDK::setAccessToken("APP_USR-XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
-    $preapproval = MercadoPago\Preapproval::find_by_id($preapproval_id);
+    $preapproval = Preapproval::find_by_id($preapproval_id);
 
     if ($preapproval && isset($preapproval->status)) {
         $preapproval->status = "cancelled";
@@ -43,7 +46,6 @@ $stmt2 = $pdo->prepare("
 ");
 $stmt2->execute([$user_id]);
 
-// Cerrar sesión
 session_destroy();
 
 header("Location: /auth/login.php?cancelada=1");
