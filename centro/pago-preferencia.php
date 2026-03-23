@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+require '/app/vendor/autoload.php';
 require __DIR__ . '/../pro/includes/db.php';
 
 use MercadoPago\SDK;
