@@ -1,5 +1,7 @@
 <?php
 
+die("ESTE ES EL ARCHIVO NUEVO");
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
