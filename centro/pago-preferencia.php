@@ -4,8 +4,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require __DIR__ . '/../pro/includes/db.php';   // PRIMERO LA DB
-require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+require __DIR__ . '/../pro/includes/db.php';
+require '/app/vendor/autoload.php';
 
 use MercadoPago\SDK;
 use MercadoPago\Preapproval;
