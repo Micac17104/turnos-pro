@@ -1,2 +1,4 @@
 <?php
-echo is_dir('/app/vendor/mercadopago') ? 'SDK INSTALADO' : 'SDK NO INSTALADO';
+require '/app/vendor/autoload.php';
+
+echo class_exists('MercadoPago\SDK') ? 'SDK VIEJO' : 'SDK NUEVO';
