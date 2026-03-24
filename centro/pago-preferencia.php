@@ -1,7 +1,5 @@
 <?php
 
-die("ESTE ES EL ARCHIVO NUEVO");
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -9,8 +7,8 @@ if (session_status() === PHP_SESSION_NONE) {
 require __DIR__ . '/../pro/includes/db.php';
 require '/app/vendor/autoload.php';
 
-use MercadoPago\SDK;
-use MercadoPago\Preapproval;
+use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Client\Preapproval\PreapprovalClient;
 
 $center_id = $_SESSION['user_id'] ?? null;
 $account_type = $_SESSION['account_type'] ?? null;
@@ -20,7 +18,6 @@ if (!$center_id || !in_array($account_type, ['center', 'secretary'])) {
     exit;
 }
 
-// Traer email y preapproval previo
 $stmt = $pdo->prepare("SELECT email, mp_preapproval_id FROM users WHERE id = ?");
 $stmt->execute([$center_id]);
 $center = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -50,8 +47,9 @@ if (!isset($precios[$plan])) {
 
 $precio = (float)$precios[$plan];
 
-SDK::setAccessToken("APP_USR-XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+MercadoPagoConfig::setAccessToken("APP_USR-XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
+$client = new PreapprovalClient();
 $baseUrl = "https://www.turnosaura.com";
 
 /*
@@ -60,10 +58,12 @@ $baseUrl = "https://www.turnosaura.com";
 |--------------------------------------------------------------------------
 */
 if (!empty($center['mp_preapproval_id'])) {
-    $old = Preapproval::find_by_id($center['mp_preapproval_id']);
-    if ($old && isset($old->status) && $old->status !== "cancelled") {
-        $old->status = "cancelled";
-        $old->update();
+    try {
+        $client->update($center['mp_preapproval_id'], [
+            "status" => "cancelled"
+        ]);
+    } catch (Exception $e) {
+        // Si falla, seguimos igual
     }
 }
 
@@ -72,20 +72,19 @@ if (!empty($center['mp_preapproval_id'])) {
 | 2) Crear nueva suscripción automática
 |--------------------------------------------------------------------------
 */
-$preapproval = new Preapproval();
-$preapproval->payer_email = $center['email'];
-$preapproval->back_url = $baseUrl . "/centro/pago-exitoso.php";
-$preapproval->reason = "Suscripción mensual centro - Plan $plan profesionales";
-$preapproval->external_reference = (string)$center_id;
-
-$preapproval->auto_recurring = [
-    "frequency" => 1,
-    "frequency_type" => "months",
-    "transaction_amount" => $precio,
-    "currency_id" => "ARS"
-];
-
-if ($preapproval->save()) {
+try {
+    $preapproval = $client->create([
+        "payer_email" => $center['email'],
+        "back_url" => $baseUrl . "/centro/pago-exitoso.php",
+        "reason" => "Suscripción mensual centro - Plan $plan profesionales",
+        "external_reference" => (string)$center_id,
+        "auto_recurring" => [
+            "frequency" => 1,
+            "frequency_type" => "months",
+            "transaction_amount" => $precio,
+            "currency_id" => "ARS"
+        ]
+    ]);
 
     $stmt2 = $pdo->prepare("
         UPDATE users
@@ -97,6 +96,6 @@ if ($preapproval->save()) {
     header("Location: " . $preapproval->init_point);
     exit;
 
-} else {
-    die("No se pudo crear la suscripción. Intentalo más tarde.");
+} catch (Exception $e) {
+    die("No se pudo crear la suscripción. Error: " . $e->getMessage());
 }
