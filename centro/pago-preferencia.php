@@ -47,9 +47,8 @@ if (!isset($precios[$plan])) {
 
 $precio = (float)$precios[$plan];
 
-MercadoPagoConfig::setAccessToken("APP_USR-XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+SDK::setAccessToken("APP_USR-XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
-$client = new PreapprovalClient();
 $baseUrl = "https://www.turnosaura.com";
 
 /*
@@ -58,12 +57,10 @@ $baseUrl = "https://www.turnosaura.com";
 |--------------------------------------------------------------------------
 */
 if (!empty($center['mp_preapproval_id'])) {
-    try {
-        $client->update($center['mp_preapproval_id'], [
-            "status" => "cancelled"
-        ]);
-    } catch (Exception $e) {
-        // Si falla, seguimos igual
+    $old = Preapproval::find_by_id($center['mp_preapproval_id']);
+    if ($old && isset($old->status) && $old->status !== "cancelled") {
+        $old->status = "cancelled";
+        $old->update();
     }
 }
 
@@ -72,19 +69,20 @@ if (!empty($center['mp_preapproval_id'])) {
 | 2) Crear nueva suscripción automática
 |--------------------------------------------------------------------------
 */
-try {
-    $preapproval = $client->create([
-        "payer_email" => $center['email'],
-        "back_url" => $baseUrl . "/centro/pago-exitoso.php",
-        "reason" => "Suscripción mensual centro - Plan $plan profesionales",
-        "external_reference" => (string)$center_id,
-        "auto_recurring" => [
-            "frequency" => 1,
-            "frequency_type" => "months",
-            "transaction_amount" => $precio,
-            "currency_id" => "ARS"
-        ]
-    ]);
+$preapproval = new Preapproval();
+$preapproval->payer_email = $center['email'];
+$preapproval->back_url = $baseUrl . "/centro/pago-exitoso.php";
+$preapproval->reason = "Suscripción mensual centro - Plan $plan profesionales";
+$preapproval->external_reference = (string)$center_id;
+
+$preapproval->auto_recurring = [
+    "frequency" => 1,
+    "frequency_type" => "months",
+    "transaction_amount" => $precio,
+    "currency_id" => "ARS"
+];
+
+if ($preapproval->save()) {
 
     $stmt2 = $pdo->prepare("
         UPDATE users
@@ -96,6 +94,6 @@ try {
     header("Location: " . $preapproval->init_point);
     exit;
 
-} catch (Exception $e) {
-    die("No se pudo crear la suscripción. Error: " . $e->getMessage());
+} else {
+    die("No se pudo crear la suscripción. Intentalo más tarde.");
 }
