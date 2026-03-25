@@ -7,8 +7,8 @@ if (session_status() === PHP_SESSION_NONE) {
 require __DIR__ . '/../pro/includes/db.php';
 require '/app/vendor/autoload.php';
 
-use MercadoPago\MercadoPagoConfig;
-use MercadoPago\Client\Preapproval\PreapprovalClient;
+use MercadoPago\SDK;
+use MercadoPago\Preapproval;
 
 $center_id = $_SESSION['user_id'] ?? null;
 $account_type = $_SESSION['account_type'] ?? null;
