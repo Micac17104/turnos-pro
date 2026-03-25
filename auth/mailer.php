@@ -16,8 +16,8 @@ function enviarEmail($to, $subject, $body) {
         $mail->SMTPAuth = true;
 
         // ⚠️ REEMPLAZAR ESTO POR TU EMAIL Y CONTRASEÑA DE APLICACIÓN
-        $mail->Username = 'TU_EMAIL@gmail.com';
-        $mail->Password = 'CONTRASEÑA_DE_APLICACIÓN';
+        $mail->Username = 'turnospro2@gmail.com';
+        $mail->Password = 'uebk ejts gydl zyhb';
 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
