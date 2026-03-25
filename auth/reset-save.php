@@ -6,7 +6,7 @@ $password = $_POST['password'] ?? '';
 $password2 = $_POST['password2'] ?? '';
 
 if ($password !== $password2) {
-    header("Location: reset.php?token=$token&error=1");
+    header("Location: reset-password.php?token=$token&error=1");
     exit;
 }
 

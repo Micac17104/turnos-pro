@@ -38,13 +38,12 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$email, $token, $expires]);
 
-// Link real de Railway
-$reset_link = "https://turnos-pro-production.up.railway.app/reset.php?token=$token";
+// URL correcta del reset
+$reset_link = "https://www.turnosaura.com/auth/reset-password.php?token=$token";
 
 // Enviar email
-$subject = "Restablecer contraseña - TurnosPro";
+$subject = "Restablecer contraseña - TurnosAura";
 $message = "Hola, hacé clic en este enlace para restablecer tu contraseña:\n\n$reset_link\n\nEste enlace vence en 1 hora.";
-$headers = "From: no-reply@turnospro.com";
 
 require __DIR__ . '/mailer.php';
 enviarEmail($email, $subject, $message);
