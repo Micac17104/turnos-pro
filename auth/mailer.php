@@ -1,7 +1,5 @@
 <?php
 
-$mail->SMTPDebug = 2;
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -9,29 +7,32 @@ require __DIR__ . '/PHPMailer/src/Exception.php';
 require __DIR__ . '/PHPMailer/src/PHPMailer.php';
 require __DIR__ . '/PHPMailer/src/SMTP.php';
 
+// DEBUG: verificar si PHPMailer se cargó
+if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    die("PHPMailer NO se cargó. Revisá la carpeta /auth/PHPMailer/src");
+}
+
 function enviarEmail($to, $subject, $body) {
     $mail = new PHPMailer(true);
 
+    // DEBUG: activar logs SMTP
+    $mail->SMTPDebug = 2;
+
     try {
-        // CONFIG SMTP GMAIL
+        // CONFIG SMTP
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
 
-        // ⚠️ REEMPLAZAR ESTO POR TU EMAIL Y CONTRASEÑA DE APLICACIÓN
         $mail->Username = 'turnospro2@gmail.com';
-        $mail->Password = 'uebk ejts gydl zyhb';
+        $mail->Password = 'ybuu unbd keye ziql';
 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        // Remitente
-        $mail->setFrom('no-reply@turnospro.com', 'TurnosPro');
-
-        // Destinatario
+        $mail->setFrom('no-reply@turnosaura.com', 'TurnosAura');
         $mail->addAddress($to);
 
-        // Contenido
         $mail->isHTML(false);
         $mail->Subject = $subject;
         $mail->Body    = $body;
@@ -40,6 +41,7 @@ function enviarEmail($to, $subject, $body) {
         return true;
 
     } catch (Exception $e) {
+        echo "ERROR SMTP: " . $e->getMessage();
         return false;
     }
 }
