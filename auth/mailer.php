@@ -1,4 +1,7 @@
 <?php
+
+$mail->SMTPDebug = 2;
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
