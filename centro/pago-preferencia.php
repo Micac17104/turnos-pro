@@ -47,7 +47,8 @@ if (!isset($precios[$plan])) {
 
 $precio = (float)$precios[$plan];
 
-SDK::setAccessToken("APP_USR-XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+// ACCESS TOKEN DE PRODUCCIÓN
+SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
 
 $baseUrl = "https://www.turnosaura.com";
 
@@ -57,10 +58,14 @@ $baseUrl = "https://www.turnosaura.com";
 |--------------------------------------------------------------------------
 */
 if (!empty($center['mp_preapproval_id'])) {
-    $old = Preapproval::find_by_id($center['mp_preapproval_id']);
-    if ($old && isset($old->status) && $old->status !== "cancelled") {
-        $old->status = "cancelled";
-        $old->update();
+    try {
+        $old = Preapproval::find_by_id($center['mp_preapproval_id']);
+        if ($old && isset($old->status) && $old->status !== "cancelled") {
+            $old->status = "cancelled";
+            $old->update();
+        }
+    } catch (Exception $e) {
+        // Si falla, seguimos igual
     }
 }
 
