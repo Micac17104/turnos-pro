@@ -56,9 +56,12 @@ if ($request === '') {
             <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
 
                 <!-- Logo disimulado -->
-                <div class="logo-wrapper">
-                    <img src="assets/logo.jpeg" class="logo-img" alt="TurnosAura">
-                </div>
+               <div class="flex items-center gap-3">
+    <div class="bg-white border border-slate-200 shadow-sm rounded-xl px-3 py-2">
+        <img src="assets/logo.jpeg" class="h-8" alt="TurnosAura">
+    </div>
+    <span class="text-xl font-semibold text-slate-900">TurnosAura</span>
+</div>
 
                 <!-- Menú -->
                 <nav class="hidden md:flex gap-8 text-slate-700 font-medium">
@@ -171,9 +174,9 @@ if ($request === '') {
                          class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
                          alt="Profesional 2">
 
-                    <img src="assets/dashboard.jpeg"
-                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
-                         alt="Dashboard">
+                  <img src="assets/dashboard.jpeg"
+     class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
+     alt="Dashboard">
 
                 </div>
             </div>
@@ -184,7 +187,7 @@ if ($request === '') {
 </section>
 
                 <!-- SECCIÓN: CÓMO FUNCIONA -->
-        <section class="py-16 lg:py-20 bg-white">
+        <section id="como-funciona" class="py-16 lg:py-20 bg-white">
             <div class="max-w-6xl mx-auto px-6">
                 <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">
                     ¿Cómo funciona TurnosAura?
@@ -215,7 +218,7 @@ if ($request === '') {
         </section>
 
         <!-- SECCIÓN: TESTIMONIOS -->
-        <section class="py-16 lg:py-20 bg-slate-50">
+        <section id="testimonios" class="py-16 lg:py-20 bg-slate-50">
             <div class="max-w-6xl mx-auto px-6">
                 <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">
                     Profesionales que confían en TurnosAura
