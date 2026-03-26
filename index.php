@@ -20,21 +20,29 @@ if ($request === '') {
         <script src="https://cdn.tailwindcss.com"></script>
 
         <style>
-            .hero-logo {
-                max-width: 130px;
+            /* Logo disimulado */
+            .logo-wrapper {
+                background: white;
+                padding: 8px 14px;
+                border-radius: 12px;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
             }
-            @media (max-width: 768px) {
-                .hero-logo {
-                    max-width: 110px;
-                    margin: 0 auto;
-                }
+            .logo-img {
+                max-height: 42px;
             }
-            .mockup {
-                max-width: 360px;
+
+            /* Panel derecho compacto */
+            .side-panel {
+                width: 340px;
             }
-            @media (max-width: 768px) {
-                .mockup {
-                    max-width: 260px;
+
+            @media (max-width: 1024px) {
+                .side-panel {
+                    width: 100%;
+                    max-width: 380px;
                     margin: 0 auto;
                 }
             }
@@ -43,60 +51,138 @@ if ($request === '') {
 
     <body class="bg-slate-50">
 
-        <!-- HERO NUEVO (compacto y moderno) -->
-        <div class="w-full flex flex-col items-center text-center px-6 pt-10 lg:pt-16">
+        <!-- MENÚ SUPERIOR -->
+        <header class="w-full bg-white border-b border-slate-200 shadow-sm fixed top-0 left-0 z-50">
+            <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
 
-            <!-- LOGO REAL (más chico y elegante) -->
-            <img src="assets/logo.jpeg" alt="TurnosAura" class="hero-logo mb-4">
+                <!-- Logo disimulado -->
+                <div class="logo-wrapper">
+                    <img src="assets/logo.jpeg" class="logo-img" alt="TurnosAura">
+                </div>
 
-            <!-- TITULAR -->
-            <h1 class="text-3xl lg:text-4xl font-bold text-slate-900 leading-tight mb-3">
-                Gestión de turnos simple,<br class="hidden lg:block">
-                moderna y profesional.
-            </h1>
+                <!-- Menú -->
+                <nav class="hidden md:flex gap-8 text-slate-700 font-medium">
+                    <a href="#inicio" class="hover:text-slate-900">Inicio</a>
+                    <a href="#como-funciona" class="hover:text-slate-900">Cómo funciona</a>
+                    <a href="#fotos" class="hover:text-slate-900">Fotos</a>
+                    <a href="#testimonios" class="hover:text-slate-900">Testimonios</a>
+                    <a href="auth/login.php" class="hover:text-slate-900">Ingresar</a>
+                </nav>
+            </div>
+        </header>
 
-            <!-- FRASE PROBLEMA → SOLUCIÓN -->
-            <p class="text-lg text-slate-700 font-semibold mb-4">
-                Un sistema que trabaja por vos.
-            </p>
+        <!-- ESPACIADO POR EL HEADER FIJO -->
+        <div class="h-[70px]"></div>
 
-            <!-- SUBTÍTULO -->
-            <p class="text-base text-slate-600 mb-6 max-w-xl">
-                Una plataforma pensada para centros, profesionales independientes y pacientes.
-                Agenda online, recordatorios automáticos y una experiencia clara y moderna.
-            </p>
+        <!-- HERO NUEVO -->
+        <section id="inicio" class="max-w-7xl mx-auto px-6 py-10 lg:py-20 flex flex-col lg:flex-row items-center gap-12">
 
-            <!-- CTA -->
-            <a href="auth/login.php"
-               class="inline-block bg-slate-900 text-white px-6 py-3 rounded-lg text-base shadow hover:bg-slate-800 transition mb-10">
-                Comenzar ahora
-            </a>
+            <!-- IZQUIERDA -->
+            <div class="flex-1">
 
-            <!-- MOCKUP REAL (más chico y centrado) -->
-            <img src="assets/dashboard.jpeg"
-                 class="mockup rounded-xl shadow-lg border border-slate-200 mb-14"
-                 alt="Dashboard TurnosAura">
+                <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-4">
+                    Gestión de turnos simple,<br>
+                    moderna y profesional.
+                </h1>
+
+                <p class="text-xl text-slate-700 font-semibold mb-4">
+                    Un sistema que trabaja por vos.
+                </p>
+
+                <p class="text-lg text-slate-600 mb-8 max-w-xl">
+                    Una plataforma pensada para centros, profesionales independientes y pacientes.
+                    Agenda online, recordatorios automáticos y una experiencia clara y moderna.
+                </p>
+
+                <a href="auth/login.php"
+                   class="inline-block bg-slate-900 text-white px-8 py-3 rounded-lg text-lg shadow hover:bg-slate-800 transition">
+                    Comenzar ahora
+                </a>
+
+            </div>
+
+            <!-- DERECHA: PANEL COMPACTO -->
+            <div class="side-panel bg-white border border-slate-200 shadow-xl p-6 rounded-xl">
+
+                <h2 class="text-xl font-semibold text-slate-900 mb-5 text-center">
+                    Ingresar como
+                </h2>
+
+                <a href="auth/login.php"
+                   class="block w-full text-center bg-slate-900 text-white py-3 rounded-lg mb-3 hover:bg-slate-800 transition">
+                    Soy profesional o centro
+                </a>
+
+                <a href="public/login-paciente.php"
+                   class="block w-full text-center bg-slate-200 text-slate-800 py-3 rounded-lg hover:bg-slate-300 transition">
+                    Soy paciente
+                </a>
+
+            </div>
+
+        </section>
+
+        <!-- SECCIÓN DE FOTOS -->
+<section id="fotos" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">
+            Conocé cómo se ve por dentro
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+            <!-- COLUMNA IZQUIERDA: CENTRO -->
+            <div>
+                <h3 class="text-xl font-semibold text-slate-800 mb-6 text-center lg:text-left">
+                    Panel del Centro
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+                    <img src="assets/centro-1.jpeg"
+                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
+                         alt="Centro 1">
+
+                    <img src="assets/centro-2.jpeg"
+                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
+                         alt="Centro 2">
+
+                    <img src="assets/centro-3.jpeg"
+                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
+                         alt="Centro 3">
+
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: PROFESIONAL -->
+            <div>
+                <h3 class="text-xl font-semibold text-slate-800 mb-6 text-center lg:text-left">
+                    Panel del Profesional
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+                    <img src="assets/profesional-1.jpeg"
+                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
+                         alt="Profesional 1">
+
+                    <img src="assets/profesional-2.jpeg"
+                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
+                         alt="Profesional 2">
+
+                    <img src="assets/dashboard.jpeg"
+                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
+                         alt="Dashboard">
+
+                </div>
+            </div>
+
         </div>
 
-        <!-- PANEL DERECHO NUEVO (compacto, limpio, moderno) -->
-        <div class="w-full max-w-md mx-auto bg-white border border-slate-200 shadow-xl p-6 rounded-xl mb-16">
+    </div>
+</section>
 
-            <h2 class="text-xl font-semibold text-slate-900 mb-5 text-center">
-                Ingresar como
-            </h2>
-
-            <a href="auth/login.php"
-               class="block w-full text-center bg-slate-900 text-white py-3 rounded-lg mb-3 hover:bg-slate-800 transition">
-                Soy profesional o centro
-            </a>
-
-            <a href="public/login-paciente.php"
-               class="block w-full text-center bg-slate-200 text-slate-800 py-3 rounded-lg hover:bg-slate-300 transition">
-                Soy paciente
-            </a>
-
-    
-        </div>
                 <!-- SECCIÓN: CÓMO FUNCIONA -->
         <section class="py-16 lg:py-20 bg-white">
             <div class="max-w-6xl mx-auto px-6">
