@@ -25,12 +25,12 @@ function enviarEmail($to, $subject, $body) {
         $mail->SMTPAuth = true;
 
         $mail->Username = 'turnospro2@gmail.com';
-        $mail->Password = 'ybuu unbd keye ziql';
+        $mail->Password = 'ybuuunbdkeyeziql';
 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('no-reply@turnosaura.com', 'TurnosAura');
+        $mail->setFrom('turnospro2@gmail.com', 'TurnosAura');
         $mail->addAddress($to);
 
         $mail->isHTML(false);
