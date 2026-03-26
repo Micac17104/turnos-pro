@@ -18,9 +18,12 @@ if ($request === '') {
         <meta charset="UTF-8">
         <title>TurnosAura - Gestión moderna de turnos</title>
         <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- Fuente Monoton -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Monoton&display=swap" rel="stylesheet">
+
         <style>
             .logo-font {
                 font-family: "Monoton", system-ui;
@@ -31,30 +34,41 @@ if ($request === '') {
 
     <body class="bg-slate-50">
 
+        <!-- LAYOUT PRINCIPAL -->
         <div class="flex min-h-screen">
 
             <!-- IZQUIERDA: HERO -->
             <div class="flex-1 flex flex-col justify-center px-8 lg:px-20">
 
+                <!-- LOGO -->
                 <div class="mb-6">
                     <span class="logo-font text-3xl text-slate-900">TurnosAura</span>
                 </div>
 
+                <!-- TITULAR -->
                 <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-6">
                     Gestión de turnos simple,<br>
                     moderna y profesional.
                 </h1>
 
-                <p class="text-lg text-slate-600 mb-8 max-w-xl">
-                    Una plataforma pensada para centros, profesionales independientes y pacientes.
-                    Agenda online, recordatorios y una experiencia clara y moderna.
+                <!-- FRASE PROBLEMA → SOLUCIÓN -->
+                <p class="text-xl text-slate-700 font-semibold mb-6">
+                    Un sistema que trabaja por vos.
                 </p>
 
+                <!-- SUBTÍTULO -->
+                <p class="text-lg text-slate-600 mb-8 max-w-xl">
+                    Una plataforma pensada para centros, profesionales independientes y pacientes.
+                    Agenda online, recordatorios automáticos y una experiencia clara y moderna.
+                </p>
+
+                <!-- CTA -->
                 <a href="auth/login.php"
                    class="inline-block bg-slate-900 text-white px-8 py-3 rounded-lg text-lg shadow hover:bg-slate-800 transition">
                     Comenzar ahora
                 </a>
 
+                <!-- MOCKUP -->
                 <div class="mt-12">
                     <img src="https://via.placeholder.com/600x350"
                          class="rounded-xl shadow-lg border border-slate-200 max-w-full"
@@ -85,6 +99,89 @@ if ($request === '') {
             </div>
 
         </div>
+
+        <!-- SECCIÓN BENEFICIOS -->
+        <section class="py-20 bg-white">
+            <div class="max-w-6xl mx-auto px-6">
+                <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">
+                    Todo lo que necesitás para trabajar mejor
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+                    <div class="p-6 bg-slate-50 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-xl font-semibold text-slate-900 mb-3">Para profesionales</h3>
+                        <p class="text-slate-600">
+                            Agenda online, recordatorios automáticos, historial de pacientes y una experiencia moderna.
+                        </p>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-xl font-semibold text-slate-900 mb-3">Para centros</h3>
+                        <p class="text-slate-600">
+                            Múltiples profesionales, salas, reportes, permisos y administración centralizada.
+                        </p>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-xl font-semibold text-slate-900 mb-3">Para pacientes</h3>
+                        <p class="text-slate-600">
+                            Turnos rápidos, recordatorios, historial y una experiencia simple desde cualquier dispositivo.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- PREGUNTAS FRECUENTES -->
+        <section class="py-20 bg-slate-100">
+            <div class="max-w-4xl mx-auto px-6">
+                <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">
+                    Preguntas frecuentes
+                </h2>
+
+                <div class="space-y-6">
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-2">¿Necesito instalar algo?</h3>
+                        <p class="text-slate-600">No. TurnosAura funciona 100% online desde cualquier dispositivo.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-2">¿Puedo usarlo si trabajo solo?</h3>
+                        <p class="text-slate-600">Sí. Está pensado tanto para profesionales independientes como para centros.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-2">¿Los pacientes necesitan registrarse?</h3>
+                        <p class="text-slate-600">No. Pueden sacar turnos sin crear una cuenta.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-2">¿Cómo funcionan los recordatorios?</h3>
+                        <p class="text-slate-600">El sistema envía recordatorios automáticos por WhatsApp o email.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-slate-900 text-slate-300 py-10 mt-20">
+            <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between">
+
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-3">TurnosAura</h3>
+                    <p class="text-slate-400">Gestión moderna de turnos para profesionales y centros.</p>
+                </div>
+
+                <div class="mt-6 md:mt-0">
+                    <p class="text-slate-400">© <?php echo date('Y'); ?> TurnosAura</p>
+                </div>
+
+            </div>
+        </footer>
 
     </body>
     </html>
