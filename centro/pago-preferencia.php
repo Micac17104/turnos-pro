@@ -75,7 +75,7 @@ if (!empty($center['mp_preapproval_id'])) {
 |--------------------------------------------------------------------------
 */
 $preapproval = new Preapproval();
-$preapproval->payer_email = $center['email'];
+// $preapproval->payer_email = $center['email'];   // ❌ LA SACAMOS
 $preapproval->back_url = $baseUrl . "/centro/pago-exitoso.php";
 $preapproval->reason = "Suscripción mensual centro - Plan $plan profesionales";
 $preapproval->external_reference = (string)$center_id;
