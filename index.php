@@ -54,12 +54,15 @@ if ($request === '') {
         <!-- MENÚ SUPERIOR -->
         <header class="w-full bg-white border-b border-slate-200 shadow-sm fixed top-0 left-0 z-50">
             <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-
-                <!-- Logo disimulado -->
-               <div class="flex items-center gap-3">
-    <div class="bg-white border border-slate-200 shadow-sm rounded-xl px-3 py-2">
-        <img src="assets/logo.jpeg" class="h-8" alt="TurnosAura">
+<!-- LOGO SOLO ÍCONO (recortado) -->
+<div class="flex items-center gap-3">
+    <div class="overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200"
+         style="width:42px; height:42px;">
+        <img src="assets/logo.jpeg"
+             alt="TurnosAura"
+             class="w-full h-full object-cover object-center">
     </div>
+
     <span class="text-xl font-semibold text-slate-900">TurnosAura</span>
 </div>
 
@@ -175,8 +178,9 @@ if ($request === '') {
                          alt="Profesional 2">
 
                   <img src="assets/dashboard.jpeg"
-     class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
-     alt="Dashboard">
+                  class="w-full rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
+                         alt="dashboard">
+     
 
                 </div>
             </div>
