@@ -21,20 +21,20 @@ if ($request === '') {
 
         <style>
             .hero-logo {
-                max-width: 150px;
+                max-width: 130px;
             }
             @media (max-width: 768px) {
                 .hero-logo {
-                    max-width: 120px;
+                    max-width: 110px;
                     margin: 0 auto;
                 }
             }
             .mockup {
-                max-width: 420px;
+                max-width: 360px;
             }
             @media (max-width: 768px) {
                 .mockup {
-                    max-width: 300px;
+                    max-width: 260px;
                     margin: 0 auto;
                 }
             }
@@ -43,66 +43,59 @@ if ($request === '') {
 
     <body class="bg-slate-50">
 
-        <!-- LAYOUT PRINCIPAL -->
-        <div class="flex flex-col lg:flex-row min-h-screen">
+        <!-- HERO NUEVO (compacto y moderno) -->
+        <div class="w-full flex flex-col items-center text-center px-6 pt-10 lg:pt-16">
 
-            <!-- IZQUIERDA: HERO COMPACTO -->
-            <div class="flex-1 flex flex-col justify-center px-8 lg:px-20 pt-10 lg:pt-16">
+            <!-- LOGO REAL (más chico y elegante) -->
+            <img src="assets/logo.jpeg" alt="TurnosAura" class="hero-logo mb-4">
 
-                <!-- LOGO REAL (CHICO) -->
-                <img src="assets/logo.jpeg" alt="TurnosAura" class="hero-logo mb-4 lg:mb-6">
+            <!-- TITULAR -->
+            <h1 class="text-3xl lg:text-4xl font-bold text-slate-900 leading-tight mb-3">
+                Gestión de turnos simple,<br class="hidden lg:block">
+                moderna y profesional.
+            </h1>
 
-                <!-- TITULAR -->
-                <h1 class="text-3xl lg:text-4xl font-bold text-slate-900 leading-tight mb-3">
-                    Gestión de turnos simple,<br>
-                    moderna y profesional.
-                </h1>
+            <!-- FRASE PROBLEMA → SOLUCIÓN -->
+            <p class="text-lg text-slate-700 font-semibold mb-4">
+                Un sistema que trabaja por vos.
+            </p>
 
-                <!-- FRASE PROBLEMA → SOLUCIÓN -->
-                <p class="text-lg text-slate-700 font-semibold mb-4">
-                    Un sistema que trabaja por vos.
-                </p>
+            <!-- SUBTÍTULO -->
+            <p class="text-base text-slate-600 mb-6 max-w-xl">
+                Una plataforma pensada para centros, profesionales independientes y pacientes.
+                Agenda online, recordatorios automáticos y una experiencia clara y moderna.
+            </p>
 
-                <!-- SUBTÍTULO -->
-                <p class="text-base text-slate-600 mb-6 max-w-xl">
-                    Una plataforma pensada para centros, profesionales independientes y pacientes.
-                    Agenda online, recordatorios automáticos y una experiencia clara y moderna.
-                </p>
+            <!-- CTA -->
+            <a href="auth/login.php"
+               class="inline-block bg-slate-900 text-white px-6 py-3 rounded-lg text-base shadow hover:bg-slate-800 transition mb-10">
+                Comenzar ahora
+            </a>
 
-                <!-- CTA -->
-                <a href="auth/login.php"
-                   class="inline-block bg-slate-900 text-white px-6 py-3 rounded-lg text-base shadow hover:bg-slate-800 transition">
-                    Comenzar ahora
-                </a>
+            <!-- MOCKUP REAL (más chico y centrado) -->
+            <img src="assets/dashboard.jpeg"
+                 class="mockup rounded-xl shadow-lg border border-slate-200 mb-14"
+                 alt="Dashboard TurnosAura">
+        </div>
 
-                <!-- MOCKUP REAL (CHICO) -->
-                <div class="mt-8 lg:mt-10">
-                    <img src="assets/dashboard.jpeg"
-                         class="mockup rounded-xl shadow-lg border border-slate-200"
-                         alt="Dashboard TurnosAura">
-                </div>
+        <!-- PANEL DERECHO NUEVO (compacto, limpio, moderno) -->
+        <div class="w-full max-w-md mx-auto bg-white border border-slate-200 shadow-xl p-6 rounded-xl mb-16">
 
-            </div>
+            <h2 class="text-xl font-semibold text-slate-900 mb-5 text-center">
+                Ingresar como
+            </h2>
 
-            <!-- DERECHA: PANEL DE USUARIO (COMPACTO) -->
-            <div class="w-full lg:w-[340px] bg-white border-l border-slate-200 shadow-xl p-6 lg:p-8 flex flex-col justify-center mt-10 lg:mt-0">
+            <a href="auth/login.php"
+               class="block w-full text-center bg-slate-900 text-white py-3 rounded-lg mb-3 hover:bg-slate-800 transition">
+                Soy profesional o centro
+            </a>
 
-                <h2 class="text-xl font-semibold text-slate-900 mb-5 text-center">
-                    Ingresar como
-                </h2>
+            <a href="public/login-paciente.php"
+               class="block w-full text-center bg-slate-200 text-slate-800 py-3 rounded-lg hover:bg-slate-300 transition">
+                Soy paciente
+            </a>
 
-                <a href="auth/login.php"
-                   class="block w-full text-center bg-slate-900 text-white py-3 rounded-lg mb-3 hover:bg-slate-800 transition">
-                    Soy profesional o centro
-                </a>
-
-                <a href="public/login-paciente.php"
-                   class="block w-full text-center bg-slate-200 text-slate-800 py-3 rounded-lg hover:bg-slate-300 transition">
-                    Soy paciente
-                </a>
-
-            </div>
-
+    
         </div>
                 <!-- SECCIÓN: CÓMO FUNCIONA -->
         <section class="py-16 lg:py-20 bg-white">
