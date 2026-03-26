@@ -9,84 +9,72 @@ if ($request === 'favicon.ico') {
     exit;
 }
 
-// 3) Si la URL está vacía → mostrar tu home actual
+// 3) Si la URL está vacía → mostrar la landing nueva
 if ($request === '') {
     ?>
     <!DOCTYPE html>
     <html lang="es">
     <head>
-    <meta charset="UTF-8">
-    <title>TurnosPro</title>
-
-    <style>
-        body {
-            margin:0;
-            padding:0;
-            background:#f1f5f9;
-            font-family:Arial, sans-serif;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
-            color:#0f172a;
-        }
-
-        .container {
-            background:white;
-            padding:40px;
-            border-radius:20px;
-            box-shadow:0 10px 30px rgba(0,0,0,0.08);
-            text-align:center;
-            width:350px;
-        }
-
-        h1 {
-            margin-bottom:20px;
-            font-size:26px;
-            font-weight:700;
-        }
-
-        .btn {
-            display:block;
-            width:100%;
-            padding:14px;
-            margin-top:15px;
-            border-radius:12px;
-            text-decoration:none;
-            font-size:16px;
-            font-weight:600;
-            transition:0.2s ease;
-        }
-
-        .btn-prof {
-            background:linear-gradient(135deg, #0ea5e9, #22c55e);
-            color:white;
-        }
-
-        .btn-prof:hover {
-            opacity:0.9;
-        }
-
-        .btn-pac {
-            background:#e2e8f0;
-            color:#334155;
-        }
-
-        .btn-pac:hover {
-            background:#cbd5e1;
-        }
-    </style>
-
+        <meta charset="UTF-8">
+        <title>TurnosAura - Gestión moderna de turnos</title>
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
-    <body>
 
-    <div class="container">
-        <h1>TurnosPro</h1>
-        <p>Elegí cómo querés ingresar</p>
+    <body class="bg-slate-50">
 
-        <a href="auth/login.php" class="btn btn-prof">Soy profesional o centro</a>
-        <a href="public/login-paciente.php" class="btn btn-pac">Soy paciente</a>
-    </div>
+        <div class="flex min-h-screen">
+
+            <!-- IZQUIERDA: HERO -->
+            <div class="flex-1 flex flex-col justify-center px-20">
+
+                <h1 class="text-5xl font-bold text-slate-900 leading-tight mb-6">
+                    Gestión de turnos simple,<br>
+                    moderna y profesional.
+                </h1>
+
+                <p class="text-lg text-slate-600 mb-8 max-w-xl">
+                    TurnosAura es la plataforma diseñada para centros, profesionales independientes y pacientes.
+                    Agenda online, recordatorios automáticos y una experiencia premium.
+                </p>
+
+                <a href="/pro/login.php"
+                   class="inline-block bg-slate-900 text-white px-8 py-3 rounded-lg text-lg shadow hover:bg-slate-800 transition">
+                    Comenzar ahora
+                </a>
+
+                <div class="mt-12">
+                    <img src="https://via.placeholder.com/600x350"
+                         class="rounded-xl shadow-lg border border-slate-200"
+                         alt="Dashboard TurnosAura">
+                </div>
+
+            </div>
+
+            <!-- DERECHA: PANEL DE USUARIO -->
+            <div class="w-[380px] bg-white border-l border-slate-200 shadow-xl p-10 flex flex-col justify-center">
+
+                <h2 class="text-2xl font-semibold text-slate-900 mb-6 text-center">
+                    Ingresar como
+                </h2>
+
+                <a href="/pro/login.php"
+                   class="block w-full text-center bg-slate-900 text-white py-3 rounded-lg mb-4 hover:bg-slate-800 transition">
+                    Profesional
+                </a>
+
+                <a href="/centro/login.php"
+                   class="block w-full text-center bg-slate-700 text-white py-3 rounded-lg mb-4 hover:bg-slate-600 transition">
+                    Centro
+                </a>
+
+                <a href="/public/index.php"
+                   class="block w-full text-center bg-slate-500 text-white py-3 rounded-lg hover:bg-slate-400 transition">
+                    Paciente
+                </a>
+
+            </div>
+
+        </div>
 
     </body>
     </html>
