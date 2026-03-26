@@ -41,7 +41,7 @@ if ($request === '') {
             <div class="flex-1 flex flex-col justify-center px-8 lg:px-20 pt-10 lg:pt-20">
 
                 <!-- LOGO REAL -->
-                <img src="assets/logo.png" alt="TurnosAura" class="hero-logo mb-6 lg:mb-10">
+                <img src="assets/logo.jpeg" alt="TurnosAura" class="hero-logo mb-6 lg:mb-10">
 
                 <!-- TITULAR -->
                 <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-4">
@@ -68,7 +68,7 @@ if ($request === '') {
 
                 <!-- MOCKUP REAL -->
                 <div class="mt-10 lg:mt-12">
-                    <img src="assets/dashboard-profesional.png"
+                    <img src="assets/dashboard.jpeg"
                          class="rounded-xl shadow-lg border border-slate-200 max-w-full"
                          alt="Dashboard TurnosAura">
                 </div>
