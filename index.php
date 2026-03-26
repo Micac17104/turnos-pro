@@ -21,11 +21,20 @@ if ($request === '') {
 
         <style>
             .hero-logo {
-                max-width: 220px;
+                max-width: 150px;
             }
             @media (max-width: 768px) {
                 .hero-logo {
-                    max-width: 160px;
+                    max-width: 120px;
+                    margin: 0 auto;
+                }
+            }
+            .mockup {
+                max-width: 420px;
+            }
+            @media (max-width: 768px) {
+                .mockup {
+                    max-width: 300px;
                     margin: 0 auto;
                 }
             }
@@ -37,53 +46,53 @@ if ($request === '') {
         <!-- LAYOUT PRINCIPAL -->
         <div class="flex flex-col lg:flex-row min-h-screen">
 
-            <!-- IZQUIERDA: HERO -->
-            <div class="flex-1 flex flex-col justify-center px-8 lg:px-20 pt-10 lg:pt-20">
+            <!-- IZQUIERDA: HERO COMPACTO -->
+            <div class="flex-1 flex flex-col justify-center px-8 lg:px-20 pt-10 lg:pt-16">
 
-                <!-- LOGO REAL -->
-                <img src="assets/logo.jpeg" alt="TurnosAura" class="hero-logo mb-6 lg:mb-10">
+                <!-- LOGO REAL (CHICO) -->
+                <img src="assets/logo.jpeg" alt="TurnosAura" class="hero-logo mb-4 lg:mb-6">
 
                 <!-- TITULAR -->
-                <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-4">
+                <h1 class="text-3xl lg:text-4xl font-bold text-slate-900 leading-tight mb-3">
                     Gestión de turnos simple,<br>
                     moderna y profesional.
                 </h1>
 
                 <!-- FRASE PROBLEMA → SOLUCIÓN -->
-                <p class="text-xl text-slate-700 font-semibold mb-6">
+                <p class="text-lg text-slate-700 font-semibold mb-4">
                     Un sistema que trabaja por vos.
                 </p>
 
                 <!-- SUBTÍTULO -->
-                <p class="text-lg text-slate-600 mb-8 max-w-xl">
+                <p class="text-base text-slate-600 mb-6 max-w-xl">
                     Una plataforma pensada para centros, profesionales independientes y pacientes.
                     Agenda online, recordatorios automáticos y una experiencia clara y moderna.
                 </p>
 
                 <!-- CTA -->
                 <a href="auth/login.php"
-                   class="inline-block bg-slate-900 text-white px-8 py-3 rounded-lg text-lg shadow hover:bg-slate-800 transition">
+                   class="inline-block bg-slate-900 text-white px-6 py-3 rounded-lg text-base shadow hover:bg-slate-800 transition">
                     Comenzar ahora
                 </a>
 
-                <!-- MOCKUP REAL -->
-                <div class="mt-10 lg:mt-12">
+                <!-- MOCKUP REAL (CHICO) -->
+                <div class="mt-8 lg:mt-10">
                     <img src="assets/dashboard.jpeg"
-                         class="rounded-xl shadow-lg border border-slate-200 max-w-full"
+                         class="mockup rounded-xl shadow-lg border border-slate-200"
                          alt="Dashboard TurnosAura">
                 </div>
 
             </div>
 
-            <!-- DERECHA: PANEL DE USUARIO -->
-            <div class="w-full lg:w-[380px] bg-white border-l border-slate-200 shadow-xl p-8 lg:p-10 flex flex-col justify-center mt-10 lg:mt-0">
+            <!-- DERECHA: PANEL DE USUARIO (COMPACTO) -->
+            <div class="w-full lg:w-[340px] bg-white border-l border-slate-200 shadow-xl p-6 lg:p-8 flex flex-col justify-center mt-10 lg:mt-0">
 
-                <h2 class="text-2xl font-semibold text-slate-900 mb-6 text-center">
+                <h2 class="text-xl font-semibold text-slate-900 mb-5 text-center">
                     Ingresar como
                 </h2>
 
                 <a href="auth/login.php"
-                   class="block w-full text-center bg-slate-900 text-white py-3 rounded-lg mb-4 hover:bg-slate-800 transition">
+                   class="block w-full text-center bg-slate-900 text-white py-3 rounded-lg mb-3 hover:bg-slate-800 transition">
                     Soy profesional o centro
                 </a>
 
@@ -96,7 +105,7 @@ if ($request === '') {
 
         </div>
                 <!-- SECCIÓN: CÓMO FUNCIONA -->
-        <section class="py-20 lg:py-24 bg-white">
+        <section class="py-16 lg:py-20 bg-white">
             <div class="max-w-6xl mx-auto px-6">
                 <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">
                     ¿Cómo funciona TurnosAura?
@@ -127,7 +136,7 @@ if ($request === '') {
         </section>
 
         <!-- SECCIÓN: TESTIMONIOS -->
-        <section class="py-20 lg:py-24 bg-slate-50">
+        <section class="py-16 lg:py-20 bg-slate-50">
             <div class="max-w-6xl mx-auto px-6">
                 <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">
                     Profesionales que confían en TurnosAura
@@ -161,7 +170,7 @@ if ($request === '') {
         </section>
 
         <!-- CTA FINAL -->
-        <section class="py-20 lg:py-24 bg-white text-center">
+        <section class="py-16 lg:py-20 bg-white text-center">
             <h2 class="text-3xl font-bold text-slate-900 mb-4">
                 Empezá a organizar tus turnos hoy
             </h2>
@@ -210,3 +219,5 @@ if (file_exists($path)) {
     http_response_code(404);
     echo "Página no encontrada.";
 }
+
+
