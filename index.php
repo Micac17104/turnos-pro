@@ -56,13 +56,9 @@ if ($request === '') {
             <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
 <!-- LOGO SOLO ÍCONO (recortado) -->
 <div class="flex items-center gap-3">
-    <div class="overflow-hidden rounded-xl bg-white shadow-sm border border-slate-200"
-         style="width:42px; height:42px;">
-        <img src="assets/logo.jpeg"
-             alt="TurnosAura"
-             class="w-full h-full object-cover object-center">
+    <div class="bg-white border border-slate-200 shadow-sm rounded-xl px-3 py-2">
+        <img src="assets/logo.jpeg" class="h-8" alt="TurnosAura">
     </div>
-
     <span class="text-xl font-semibold text-slate-900">TurnosAura</span>
 </div>
 
@@ -155,8 +151,8 @@ if ($request === '') {
                          alt="Centro 2">
 
                     <img src="assets/centro-3.jpeg"
-                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
-                         alt="Centro 3">
+     class="w-full h-64 rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
+     alt="Centro 3">
 
                 </div>
             </div>
@@ -177,9 +173,9 @@ if ($request === '') {
                          class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
                          alt="Profesional 2">
 
-                  <img src="assets/dashboard.jpeg"
-                  class="w-full rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
-                         alt="dashboard">
+                 <img src="assets/dashboard.jpeg"
+     class="w-full h-64 rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
+     alt="Dashboard">
      
 
                 </div>
