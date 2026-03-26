@@ -20,16 +20,7 @@ if ($request === '') {
         <script src="https://cdn.tailwindcss.com"></script>
 
         <style>
-            /* Logo disimulado */
-            .logo-wrapper {
-                background: white;
-                padding: 8px 14px;
-                border-radius: 12px;
-                box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-            }
+           
             .logo-img {
                 max-height: 42px;
             }
