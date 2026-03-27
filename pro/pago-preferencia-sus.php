@@ -5,11 +5,10 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require __DIR__ . '/../pro/includes/db.php';
-require __DIR__ . '/../vendor/autoload.php'; // <-- ESTA ES LA CORRECTA
+require __DIR__ . '/../vendor/autoload.php';
 
-// NO USAR NAMESPACES CON LA SDK VIEJA
-// use MercadoPago\SDK;
-// use MercadoPago\Preapproval;
+use MercadoPago\SDK;
+use MercadoPago\Preapproval;
 
 $user_id = $_SESSION['user_id'] ?? null;
 
@@ -44,7 +43,7 @@ if (!isset($precios[$plan])) {
 $precio = (float)$precios[$plan];
 
 // ACCESS TOKEN DE PRODUCCIÓN
-MercadoPago\SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
+SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
 
 $baseUrl = "https://www.turnosaura.com";
 
@@ -55,7 +54,7 @@ $baseUrl = "https://www.turnosaura.com";
 */
 if (!empty($user['mp_preapproval_id'])) {
     try {
-        $old = MercadoPago\Preapproval::find_by_id($user['mp_preapproval_id']);
+        $old = Preapproval::find_by_id($user['mp_preapproval_id']);
         if ($old && isset($old->status) && $old->status !== "cancelled") {
             $old->status = "cancelled";
             $old->update();
@@ -70,7 +69,7 @@ if (!empty($user['mp_preapproval_id'])) {
 | 2) Crear nueva suscripción automática
 |--------------------------------------------------------------------------
 */
-$preapproval = new MercadoPago\Preapproval();
+$preapproval = new Preapproval();
 $preapproval->payer_email = $user['email'];
 $preapproval->back_url = $baseUrl . "/pro/pago-exitoso-sus.php";
 $preapproval->reason = "Suscripción mensual profesional - Plan $plan";
