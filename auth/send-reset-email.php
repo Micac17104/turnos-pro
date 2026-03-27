@@ -46,7 +46,10 @@ $subject = "Restablecer contraseña - TurnosAura";
 $message = "Hola, hacé clic en este enlace para restablecer tu contraseña:\n\n$reset_link\n\nEste enlace vence en 1 hora.";
 
 require __DIR__ . '/mailer.php';
-enviarEmail($email, $subject, $message);
+
+if (!enviarEmail($email, $subject, $message)) {
+    die("No se pudo enviar el email. Intentá más tarde.");
+}
 
 // Redirigir
 header("Location: forgot-password.php?sent=1");
