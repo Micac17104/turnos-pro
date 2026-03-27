@@ -119,63 +119,99 @@ if ($request === '') {
 <section id="fotos" class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-6">
 
-        <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">
+        <h2 class="text-3xl font-bold text-slate-900 text-center mb-8">
             Conocé cómo se ve por dentro
         </h2>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <!-- BOTÓN PARA MOSTRAR GALERÍA -->
+        <div class="text-center mb-12">
+            <button id="toggleGaleria"
+                class="px-8 py-3 bg-slate-900 text-white rounded-xl text-lg font-semibold shadow-md hover:bg-slate-800 transition">
+                Ver imágenes y videos
+            </button>
+        </div>
 
-            <!-- COLUMNA IZQUIERDA: CENTRO -->
-            <div>
-                <h3 class="text-xl font-semibold text-slate-800 mb-6 text-center lg:text-left">
-                    Panel del Centro
-                </h3>
+        <!-- GALERÍA OCULTA POR DEFECTO -->
+        <div id="galeriaContenido" class="hidden opacity-0 transition-all duration-500">
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
-                    <img src="assets/centro-1.jpeg"
-                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
-                         alt="Centro 1">
+                <!-- COLUMNA IZQUIERDA: CENTRO -->
+                <div>
+                    <h3 class="text-xl font-semibold text-slate-800 mb-6 text-center lg:text-left">
+                        Panel del Centro
+                    </h3>
 
-                    <img src="assets/centro-2.jpeg"
-                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
-                         alt="Centro 2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
-                    <img src="assets/centro-3.jpeg"
-     class="w-full h-64 rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
-     alt="Centro 3">
+                        <img src="assets/centro-1.jpeg"
+                             class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
+                             alt="Centro 1">
 
+                        <img src="assets/centro-2.jpeg"
+                             class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
+                             alt="Centro 2">
+
+                        <img src="assets/centro-3.jpeg"
+                             class="w-full h-64 rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
+                             alt="Centro 3">
+
+                    </div>
                 </div>
-            </div>
 
-            <!-- COLUMNA DERECHA: PROFESIONAL -->
-            <div>
-                <h3 class="text-xl font-semibold text-slate-800 mb-6 text-center lg:text-left">
-                    Panel del Profesional
-                </h3>
+                <!-- COLUMNA DERECHA: PROFESIONAL -->
+                <div>
+                    <h3 class="text-xl font-semibold text-slate-800 mb-6 text-center lg:text-left">
+                        Panel del Profesional
+                    </h3>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
-                    <img src="assets/profesional-1.jpeg"
-                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
-                         alt="Profesional 1">
+                        <img src="assets/profesional-1.jpeg"
+                             class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
+                             alt="Profesional 1">
 
-                    <img src="assets/profesional-2.jpeg"
-                         class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
-                         alt="Profesional 2">
+                        <img src="assets/profesional-2.jpeg"
+                             class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
+                             alt="Profesional 2">
 
-                 <img src="assets/dashboard.jpeg"
-     class="w-full h-64 rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
-     alt="Dashboard">
-     
+                        <img src="assets/dashboard.jpeg"
+                             class="w-full h-64 rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
+                             alt="Dashboard">
 
+                    </div>
                 </div>
+
             </div>
 
         </div>
 
     </div>
 </section>
+
+<!-- SCRIPT PARA MOSTRAR/OCULTAR -->
+<script>
+    const btn = document.getElementById("toggleGaleria");
+    const galeria = document.getElementById("galeriaContenido");
+
+    btn.addEventListener("click", () => {
+        const isHidden = galeria.classList.contains("hidden");
+
+        if (isHidden) {
+            galeria.classList.remove("hidden");
+            setTimeout(() => galeria.classList.remove("opacity-0"), 10);
+            btn.textContent = "Ocultar imágenes y videos";
+
+            // Scroll suave hacia la galería
+            galeria.scrollIntoView({ behavior: "smooth" });
+
+        } else {
+            galeria.classList.add("opacity-0");
+            setTimeout(() => galeria.classList.add("hidden"), 300);
+            btn.textContent = "Ver imágenes y videos";
+        }
+    });
+</script>
 
                 <!-- SECCIÓN: CÓMO FUNCIONA -->
         <section id="como-funciona" class="py-16 lg:py-20 bg-white">
