@@ -223,7 +223,7 @@ if ($request === '') {
                 </div>
 
                 <div class="mt-6 md:mt-0">
-                    <p class="text-slate-400">© <?php echo date('Y'); ?> TurnosAura</p>
+                    <p class="text-slate-400">© <?php echo date('Y'); ?> Creado por www.aura17web.com</p>
                 </div>
 
             </div>
