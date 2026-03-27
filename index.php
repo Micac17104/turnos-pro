@@ -48,7 +48,7 @@ if ($request === '') {
 <!-- LOGO SOLO ÍCONO (recortado) -->
 <div class="flex items-center gap-3">
     <div class="bg-white border border-slate-200 shadow-sm rounded-xl px-3 py-2">
-        <img src="assets/logo.jpeg" class="h-8" alt="TurnosAura">
+       <img src="/assets/logo.jpeg" class="h-10 w-auto" alt="TurnosAura">
     </div>
     <span class="text-xl font-semibold text-slate-900">TurnosAura</span>
 </div>
