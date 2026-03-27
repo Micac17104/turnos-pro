@@ -220,10 +220,17 @@ if ($request === '') {
                     <p class="text-slate-400">Gestión moderna de turnos para profesionales y centros.</p>
                 </div>
 
-                <div class="mt-6 md:mt-0">
-                    <p class="text-slate-400">© <?php echo date('Y'); ?> Creado por www.aura17web.com</p>
-                </div>
-
+             <div class="mt-6 md:mt-0">
+    <p class="text-slate-400">
+        © <?php echo date('Y'); ?> 
+        Creado por 
+        <a href="https://www.aura17web.com" 
+           target="_blank" 
+           class="text-slate-400 hover:text-slate-200 underline transition">
+            www.aura17web.com
+        </a>
+    </p>
+</div>
             </div>
         </footer>
 
