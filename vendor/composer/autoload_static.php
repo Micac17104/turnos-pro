@@ -4,19 +4,73 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInita8dc9929e1480fc2660b5d9f589c89ff
+class ComposerStaticInit602e86733d3d06b69ac9e2b0f9393e45
 {
+    public static $prefixLengthsPsr4 = array (
+        'P' =>
+        array (
+            'Psr\\Cache\\' => 10,
+        ),
+        'M' =>
+        array (
+            'MercadoPago\\' => 12,
+        ),
+        'D' =>
+        array (
+            'Doctrine\\Persistence\\' => 21,
+            'Doctrine\\Deprecations\\' => 22,
+            'Doctrine\\Common\\Lexer\\' => 22,
+            'Doctrine\\Common\\Annotations\\' => 28,
+            'Doctrine\\Common\\' => 16,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'Psr\\Cache\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/cache/src',
+        ),
+        'MercadoPago\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/mercadopago/dx-php/src/MercadoPago',
+            1 => __DIR__ . '/..' . '/mercadopago/dx-php/tests',
+            2 => __DIR__ . '/..' . '/mercadopago/dx-php/src/MercadoPago/Generic',
+            3 => __DIR__ . '/..' . '/mercadopago/dx-php/src/MercadoPago/Entities',
+            4 => __DIR__ . '/..' . '/mercadopago/dx-php/src/MercadoPago/Entities/Shared',
+        ),
+        'Doctrine\\Persistence\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/persistence/src/Persistence',
+        ),
+        'Doctrine\\Deprecations\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/deprecations/src',
+        ),
+        'Doctrine\\Common\\Lexer\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/lexer/src',
+        ),
+        'Doctrine\\Common\\Annotations\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/annotations/lib/Doctrine/Common/Annotations',
+        ),
+        'Doctrine\\Common\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/common/src',
+            1 => __DIR__ . '/..' . '/doctrine/event-manager/src',
+        ),
+    );
+
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'MP' => __DIR__ . '/..' . '/mercadopago/sdk/lib/mercadopago.php',
-        'MPRestClient' => __DIR__ . '/..' . '/mercadopago/sdk/lib/mercadopago.php',
-        'MercadoPagoException' => __DIR__ . '/..' . '/mercadopago/sdk/lib/mercadopago.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInita8dc9929e1480fc2660b5d9f589c89ff::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit602e86733d3d06b69ac9e2b0f9393e45::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit602e86733d3d06b69ac9e2b0f9393e45::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit602e86733d3d06b69ac9e2b0f9393e45::$classMap;
 
         }, null, ClassLoader::class);
     }
