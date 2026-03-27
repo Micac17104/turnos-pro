@@ -115,103 +115,25 @@ if ($request === '') {
 
         </section>
 
-        <!-- SECCIÓN DE FOTOS -->
+       <!-- SECCIÓN DE FOTOS / TOUR -->
 <section id="fotos" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-6">
+    <div class="max-w-7xl mx-auto px-6 text-center">
 
-        <h2 class="text-3xl font-bold text-slate-900 text-center mb-8">
+        <h2 class="text-3xl font-bold text-slate-900 mb-6">
             Conocé cómo se ve por dentro
         </h2>
 
-        <!-- BOTÓN PARA MOSTRAR GALERÍA -->
-        <div class="text-center mb-12">
-            <button id="toggleGaleria"
-                class="px-8 py-3 bg-slate-900 text-white rounded-xl text-lg font-semibold shadow-md hover:bg-slate-800 transition">
-                Ver imágenes y videos
-            </button>
-        </div>
+        <p class="text-slate-600 max-w-2xl mx-auto mb-10">
+            Mirá un recorrido real del panel del profesional y del centro. Videos cortos, claros y modernos.
+        </p>
 
-        <!-- GALERÍA OCULTA POR DEFECTO -->
-        <div id="galeriaContenido" class="hidden opacity-0 transition-all duration-500">
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
-                <!-- COLUMNA IZQUIERDA: CENTRO -->
-                <div>
-                    <h3 class="text-xl font-semibold text-slate-800 mb-6 text-center lg:text-left">
-                        Panel del Centro
-                    </h3>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-                        <img src="assets/centro-1.jpeg"
-                             class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
-                             alt="Centro 1">
-
-                        <img src="assets/centro-2.jpeg"
-                             class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
-                             alt="Centro 2">
-
-                        <img src="assets/centro-3.jpeg"
-                             class="w-full h-64 rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
-                             alt="Centro 3">
-
-                    </div>
-                </div>
-
-                <!-- COLUMNA DERECHA: PROFESIONAL -->
-                <div>
-                    <h3 class="text-xl font-semibold text-slate-800 mb-6 text-center lg:text-left">
-                        Panel del Profesional
-                    </h3>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-                        <img src="assets/profesional-1.jpeg"
-                             class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
-                             alt="Profesional 1">
-
-                        <img src="assets/profesional-2.jpeg"
-                             class="w-full rounded-xl shadow-md border border-slate-200 object-cover"
-                             alt="Profesional 2">
-
-                        <img src="assets/dashboard.jpeg"
-                             class="w-full h-64 rounded-xl shadow-md border border-slate-200 object-cover sm:col-span-2"
-                             alt="Dashboard">
-
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
+        <a href="/tour.php"
+           class="inline-block px-10 py-4 bg-slate-900 text-white rounded-xl text-lg font-semibold shadow-md hover:bg-slate-800 transition">
+            Ver recorrido del sistema →
+        </a>
 
     </div>
 </section>
-
-<!-- SCRIPT PARA MOSTRAR/OCULTAR -->
-<script>
-    const btn = document.getElementById("toggleGaleria");
-    const galeria = document.getElementById("galeriaContenido");
-
-    btn.addEventListener("click", () => {
-        const isHidden = galeria.classList.contains("hidden");
-
-        if (isHidden) {
-            galeria.classList.remove("hidden");
-            setTimeout(() => galeria.classList.remove("opacity-0"), 10);
-            btn.textContent = "Ocultar imágenes y videos";
-
-            // Scroll suave hacia la galería
-            galeria.scrollIntoView({ behavior: "smooth" });
-
-        } else {
-            galeria.classList.add("opacity-0");
-            setTimeout(() => galeria.classList.add("hidden"), 300);
-            btn.textContent = "Ver imágenes y videos";
-        }
-    });
-</script>
 
                 <!-- SECCIÓN: CÓMO FUNCIONA -->
         <section id="como-funciona" class="py-16 lg:py-20 bg-white">
