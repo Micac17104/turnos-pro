@@ -33,9 +33,10 @@
     Recordatorios
 </a>
 
-<a href="planes.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
-    Pagar suscripción
-</a>
+<a href="/centro/pago-preferencia-sus-centro.php?plan=1">Plan 1 profesional</a>
+<a href="/centro/pago-preferencia-sus-centro.php?plan=2">Plan 2 profesionales</a>
+<a href="/centro/pago-preferencia-sus-centro.php?plan=3">Plan 3 profesionales</a>
+...
 
 <a href="/cancelar-suscripcion.php"
    onclick="return confirm('¿Seguro que querés cancelar tu suscripción? Perderás acceso al panel.');"

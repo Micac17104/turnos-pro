@@ -71,7 +71,7 @@ try {
 
     $preapproval = new Preapproval();
     $preapproval->payer_email = $user['email'];
-    $preapproval->back_url = $baseUrl . "/pro/pago-exitoso-sus.php";
+    $preapproval->back_url = $baseUrl . "/pro/dashboard.php";
     $preapproval->reason = "Suscripción mensual profesional - Plan $plan";
     $preapproval->external_reference = (string)$user_id;
 
@@ -82,7 +82,6 @@ try {
         "currency_id" => "ARS"
     ];
 
-    // *** CLAVE PARA QUE FUNCIONE ***
     $preapproval->status = "authorized";
 
     mp_log(["request_sent" => $preapproval]);
@@ -116,5 +115,3 @@ try {
     mp_log(["exception" => $e->getMessage()]);
     die("Error al procesar la suscripción.");
 }
-
-?>

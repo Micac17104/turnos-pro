@@ -50,10 +50,9 @@
             Perfil
         </a>
 
-        <a href="/pro/planes.php"
-           class="block px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
-            Pagar suscripción
-        </a>
+       <a href="/pro/pago-preferencia-sus.php?plan=1" class="btn btn-primary">
+    Suscribirme al plan profesional
+</a>
 
       <a href="/cancelar-suscripcion.php"
    onclick="return confirm('¿Seguro que querés cancelar tu suscripción? Perderás acceso al panel.');"
