@@ -50,7 +50,7 @@
             Perfil
         </a>
 
-       <a href="/pro/pago-preferencia-sus.php?plan=1" class="btn btn-primary">
+    <a href="/pro/suscribirse-profesional.php" class="btn btn-primary">
     Suscribirme al plan profesional
 </a>
 
