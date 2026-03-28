@@ -1,17 +1,11 @@
 <?php
 
-/* ---------------------------------------------------------
-| LOG DE MERCADO PAGO
---------------------------------------------------------- */
 function mp_log($data) {
     $logFile = __DIR__ . "/mp-log.txt";
     $entry = "[" . date("Y-m-d H:i:s") . "] " . print_r($data, true) . "\n\n";
     file_put_contents($logFile, $entry, FILE_APPEND);
 }
 
-/* ---------------------------------------------------------
-| SESIÓN
---------------------------------------------------------- */
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -22,9 +16,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use MercadoPago\SDK;
 use MercadoPago\Preapproval;
 
-/* ---------------------------------------------------------
-| VALIDAR USUARIO
---------------------------------------------------------- */
 $user_id = $_SESSION['user_id'] ?? null;
 
 if (!$user_id || $_SESSION['account_type'] !== 'professional') {
@@ -41,9 +32,6 @@ if (!$user) {
     exit;
 }
 
-/* ---------------------------------------------------------
-| VALIDAR PLAN
---------------------------------------------------------- */
 if (!isset($_GET['plan'])) {
     die("Plan inválido");
 }
@@ -60,20 +48,13 @@ if (!isset($precios[$plan])) {
 
 $precio = (float)$precios[$plan];
 
-/* ---------------------------------------------------------
-| MERCADO PAGO - ACCESS TOKEN
---------------------------------------------------------- */
 SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
 
 $baseUrl = "https://www.turnosaura.com";
 
-/* ---------------------------------------------------------
-| 1) CANCELAR SUSCRIPCIÓN PREVIA
---------------------------------------------------------- */
 if (!empty($user['mp_preapproval_id'])) {
     try {
         $old = Preapproval::find_by_id($user['mp_preapproval_id']);
-
         mp_log(["cancel_previous" => $old]);
 
         if ($old && isset($old->status) && $old->status !== "cancelled") {
@@ -86,9 +67,6 @@ if (!empty($user['mp_preapproval_id'])) {
     }
 }
 
-/* ---------------------------------------------------------
-| 2) CREAR NUEVA SUSCRIPCIÓN
---------------------------------------------------------- */
 try {
 
     $preapproval = new Preapproval();
@@ -104,12 +82,13 @@ try {
         "currency_id" => "ARS"
     ];
 
-    /* LOG antes de enviar */
+    // *** CLAVE PARA QUE FUNCIONE ***
+    $preapproval->status = "authorized";
+
     mp_log(["request_sent" => $preapproval]);
 
     $saved = $preapproval->save();
 
-    /* LOG después de enviar */
     mp_log([
         "save_result" => $saved,
         "response" => $preapproval
@@ -117,7 +96,6 @@ try {
 
     if ($saved && isset($preapproval->id) && isset($preapproval->init_point)) {
 
-        /* Guardar en BD */
         $stmt2 = $pdo->prepare("
             UPDATE users
             SET mp_preapproval_id = ?, mp_subscription_status = 'active'
