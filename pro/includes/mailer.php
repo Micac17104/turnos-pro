@@ -3,9 +3,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 // Cargar PHPMailer desde /auth/PHPMailer/src/
-require __DIR__ . '/../auth/PHPMailer/src/Exception.php';
-require __DIR__ . '/../auth/PHPMailer/src/PHPMailer.php';
-require __DIR__ . '/../auth/PHPMailer/src/SMTP.php';
+require __DIR__ . '/../../auth/PHPMailer/src/Exception.php';
+require __DIR__ . '/../../auth/PHPMailer/src/PHPMailer.php';
+require __DIR__ . '/../../auth/PHPMailer/src/SMTP.php';
 
 function enviarEmail($destinatario, $asunto, $mensajeHtml) {
     $mail = new PHPMailer(true);
@@ -16,16 +16,16 @@ function enviarEmail($destinatario, $asunto, $mensajeHtml) {
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
 
-        // 👉 REEMPLAZAR ESTO POR TU EMAIL
+        // TU EMAIL
         $mail->Username = 'turnospro2@gmail.com';
 
-        // 👉 REEMPLAZAR ESTO POR TU APP PASSWORD
+        // TU APP PASSWORD
         $mail->Password = 'ybuuunbdkeyeziql';
 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        // Remitente (debe ser el mismo email del Username)
+        // Remitente
         $mail->setFrom('turnospro2@gmail.com', 'TurnosAura');
 
         // Destinatario
