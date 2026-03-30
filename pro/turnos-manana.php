@@ -34,6 +34,12 @@ require __DIR__ . '/includes/sidebar.php';
     <div class="flex items-center justify-between mb-8">
         <h1 class="text-2xl font-semibold text-slate-900">Turnos de mañana</h1>
 
+        <?php if (isset($_GET['sent']) && $_GET['sent'] == 1): ?>
+    <div class="mb-4 p-3 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg">
+        ✔ Recordatorio enviado correctamente
+    </div>
+<?php endif; ?>
+
         <button
             onclick="window.location.href='agenda.php'"
             class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-300">
