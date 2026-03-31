@@ -54,6 +54,32 @@ if (!empty($turno['notify_professional_email']) && !empty($turno['professional_m
     @mail($turno['profesional_email'], "Turno cancelado por el paciente", $msgPro);
 }
 
+// Notificar al profesional por WhatsApp si corresponde
+if (!empty($turno['notify_professional_whatsapp'])) {
+
+    // Normalizar teléfono del profesional
+    $telefonoPro = preg_replace('/\D/', '', $turno['profesional_telefono'] ?? '');
+
+    if (!empty($telefonoPro)) {
+
+        // Mensaje al profesional (si querés usar el mismo que el email)
+        $msgProWhats = str_replace(
+            ['{paciente}', '{fecha}', '{hora}'],
+            [
+                $turno['paciente_nombre'],
+                date('d/m/Y', strtotime($turno['date'])),
+                substr($turno['time'], 0, 5)
+            ],
+            $turno['professional_message']
+        );
+
+        // Enviar WhatsApp usando tu API
+        $url = "https://api.callmebot.com/whatsapp.php?phone={$telefonoPro}&text=" . urlencode($msgProWhats);
+
+        @file_get_contents($url);
+    }
+}
+
 // Pantalla simple de cancelación
 ?>
 <!DOCTYPE html>
