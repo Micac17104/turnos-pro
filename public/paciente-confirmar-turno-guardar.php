@@ -31,6 +31,7 @@ if (!$paciente_id) {
     $name  = trim($_POST['nombre'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $phone = trim($_POST['telefono'] ?? '');
+    $dni   = trim($_POST['dni'] ?? '');
 
     if (!$pro_id || !$date || !$time || !$name || !$email) {
         die("Datos incompletos.");
@@ -44,46 +45,53 @@ if (!$paciente_id) {
     if (!$paciente) {
         // Crear paciente nuevo y ASOCIARLO AL CENTRO si corresponde
         $stmt = $pdo->prepare("
-            INSERT INTO clients (name, email, phone, center_id)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO clients (name, email, phone, dni, center_id)
+            VALUES (?, ?, ?, ?, ?)
         ");
-        $stmt->execute([$name, $email, $phone, $center_id]);
+        $stmt->execute([$name, $email, $phone, $dni, $center_id]);
 
         $paciente_id = $pdo->lastInsertId();
         $_SESSION['paciente_id'] = $paciente_id;
 
     } else {
         $paciente_id = $paciente['id'];
+
+        // Si el paciente no tenía DNI y ahora sí lo ingresó → actualizar
+        if (empty($paciente['dni']) && !empty($dni)) {
+            $stmt = $pdo->prepare("UPDATE clients SET dni = ? WHERE id = ?");
+            $stmt->execute([$dni, $paciente_id]);
+        }
+
         $name  = $paciente['name'];
         $email = $paciente['email'];
         $phone = $paciente['phone'];
+        $dni   = $paciente['dni'] ?? $dni;
     }
 
 // -----------------------------
 // PACIENTE LOGUEADO
 // -----------------------------
 } else {
-$stmt = $pdo->prepare("SELECT name, email, phone, center_id FROM clients WHERE id = ?");
-$stmt->execute([$paciente_id]);
-$paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$paciente) {
-    die("Paciente no encontrado.");
-}
+    $stmt = $pdo->prepare("SELECT name, email, phone, dni, center_id FROM clients WHERE id = ?");
+    $stmt->execute([$paciente_id]);
+    $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Si el paciente no tiene center_id y el profesional pertenece a un centro → asignarlo
-if (empty($paciente['center_id']) && !empty($center_id)) {
-    $stmt = $pdo->prepare("UPDATE clients SET center_id = ? WHERE id = ?");
-    $stmt->execute([$center_id, $paciente_id]);
-    $paciente['center_id'] = $center_id; // actualizar en memoria
-}
     if (!$paciente) {
         die("Paciente no encontrado.");
+    }
+
+    // Si el paciente no tiene center_id y el profesional pertenece a un centro → asignarlo
+    if (empty($paciente['center_id']) && !empty($center_id)) {
+        $stmt = $pdo->prepare("UPDATE clients SET center_id = ? WHERE id = ?");
+        $stmt->execute([$center_id, $paciente_id]);
+        $paciente['center_id'] = $center_id;
     }
 
     $name  = $paciente['name'];
     $email = $paciente['email'];
     $phone = $paciente['phone'];
+    $dni   = $paciente['dni'] ?? null;
 }
 
 // -----------------------------
@@ -103,10 +111,10 @@ if ($stmt->fetch()) {
 // CREAR TURNO
 // -----------------------------
 $stmt = $pdo->prepare("
-    INSERT INTO appointments (user_id, center_id, client_id, date, time, status, reminder_sent)
-    VALUES (?, ?, ?, ?, ?, 'confirmed', 0)
+    INSERT INTO appointments (user_id, center_id, client_id, date, time, dni, status, reminder_sent)
+    VALUES (?, ?, ?, ?, ?, ?, 'confirmed', 0)
 ");
-$stmt->execute([$pro_id, $center_id, $paciente_id, $date, $time]);
+$stmt->execute([$pro_id, $center_id, $paciente_id, $date, $time, $dni]);
 
 $turno_id = $pdo->lastInsertId();
 

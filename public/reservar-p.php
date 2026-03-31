@@ -108,6 +108,9 @@ foreach ($rows as $r) {
             <label class="block mb-2 text-sm">Teléfono</label>
             <input name="phone" required class="w-full mb-4 p-2 border rounded">
 
+            <label class="block mb-2 text-sm">DNI</label>
+<input name="dni" required class="w-full mb-4 p-2 border rounded">
+
             <label class="block mb-2 text-sm">Email (opcional)</label>
             <input name="email" class="w-full mb-4 p-2 border rounded">
 
