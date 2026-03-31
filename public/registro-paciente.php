@@ -10,11 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $nombre   = $_POST['nombre'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
+    $dni      = $_POST['dni'] ?? '';   // ← AGREGADO
     $email    = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
     // Verificar si el paciente YA tiene una cuenta creada por él mismo
-    // (user_id = 0 significa "cuenta creada por el paciente")
     $stmt = $pdo->prepare("SELECT id FROM clients WHERE email = ? AND user_id = 0 AND password IS NOT NULL");
     $stmt->execute([$email]);
     $cuentaPaciente = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -35,10 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Si existe, actualizamos ese registro con la contraseña
             $stmt = $pdo->prepare("
                 UPDATE clients
-                SET phone = ?, password = ?
+                SET phone = ?, dni = ?, password = ?
                 WHERE id = ?
             ");
-            $stmt->execute([$telefono, $hash, $clienteExistente['id']]);
+            $stmt->execute([$telefono, $dni, $hash, $clienteExistente['id']]);
 
             $_SESSION['paciente_id'] = $clienteExistente['id'];
             $_SESSION['paciente_nombre'] = $clienteExistente['name'];
@@ -47,16 +47,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Si no existe, lo creamos como paciente sin profesional asignado
             $stmt = $pdo->prepare("
-                INSERT INTO clients (user_id, name, phone, email, password)
-                VALUES (0, ?, ?, ?, ?)
+                INSERT INTO clients (user_id, name, phone, dni, email, password)
+                VALUES (0, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$nombre, $telefono, $email, $hash]);
+            $stmt->execute([$nombre, $telefono, $dni, $email, $hash]);
 
             $_SESSION['paciente_id'] = $pdo->lastInsertId();
             $_SESSION['paciente_nombre'] = $nombre;
         }
 
-        // RUTA CORRECTA PARA RAILWAY
         header("Location: paciente-dashboard.php");
         exit;
     }
@@ -119,6 +118,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="post">
         <input type="text" name="nombre" placeholder="Nombre completo" required>
         <input type="text" name="telefono" placeholder="Teléfono" required>
+
+        <!-- DNI AGREGADO -->
+        <input type="text" name="dni" placeholder="DNI" required>
+
         <input type="email" name="email" placeholder="Email" required>
         <input type="password" name="password" placeholder="Contraseña" required>
 

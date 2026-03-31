@@ -12,9 +12,10 @@ if (!isset($_SESSION['paciente_id'])) {
 
 $paciente_id = $_SESSION['paciente_id'];
 
-$name = trim($_POST['name'] ?? '');
-$email = trim($_POST['email'] ?? '');
-$phone = trim($_POST['phone'] ?? '');
+$name     = trim($_POST['name'] ?? '');
+$email    = trim($_POST['email'] ?? '');
+$phone    = trim($_POST['phone'] ?? '');
+$dni      = trim($_POST['dni'] ?? '');   // ← AGREGADO
 $password = trim($_POST['password'] ?? '');
 
 if (!$name || !$email) {
@@ -44,18 +45,18 @@ if ($paciente['user_id'] == 0) {
 
             $stmt3 = $pdo->prepare("
                 UPDATE clients
-                SET name = ?, email = ?, phone = ?, password = ?
+                SET name = ?, email = ?, phone = ?, dni = ?, password = ?
                 WHERE id = ?
             ");
-            $stmt3->execute([$name, $email, $phone, $hash, $clienteProfesional['id']]);
+            $stmt3->execute([$name, $email, $phone, $dni, $hash, $clienteProfesional['id']]);
 
         } else {
             $stmt3 = $pdo->prepare("
                 UPDATE clients
-                SET name = ?, email = ?, phone = ?
+                SET name = ?, email = ?, phone = ?, dni = ?
                 WHERE id = ?
             ");
-            $stmt3->execute([$name, $email, $phone, $clienteProfesional['id']]);
+            $stmt3->execute([$name, $email, $phone, $dni, $clienteProfesional['id']]);
         }
 
         // Actualizar sesión al registro correcto
@@ -73,18 +74,18 @@ if ($password !== '') {
 
     $stmt = $pdo->prepare("
         UPDATE clients
-        SET name = ?, email = ?, phone = ?, password = ?
+        SET name = ?, email = ?, phone = ?, dni = ?, password = ?
         WHERE id = ?
     ");
-    $stmt->execute([$name, $email, $phone, $hash, $paciente_id]);
+    $stmt->execute([$name, $email, $phone, $dni, $hash, $paciente_id]);
 
 } else {
     $stmt = $pdo->prepare("
         UPDATE clients
-        SET name = ?, email = ?, phone = ?
+        SET name = ?, email = ?, phone = ?, dni = ?
         WHERE id = ?
     ");
-    $stmt->execute([$name, $email, $phone, $paciente_id]);
+    $stmt->execute([$name, $email, $phone, $dni, $paciente_id]);
 }
 
 $_SESSION['paciente_nombre'] = $name;

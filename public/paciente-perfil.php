@@ -25,10 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? null;
     $phone = $_POST['phone'] ?? null;
     $city  = $_POST['city']  ?? null;
+    $dni   = $_POST['dni']   ?? null;   // ← AGREGADO
 
     // Construcción dinámica del SQL si cambia contraseña
     $password_sql = "";
-    $params = [$name, $email, $phone, $city];
+    $params = [$name, $email, $phone, $city, $dni]; // ← AGREGADO
 
     if (!empty($_POST['password'])) {
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
@@ -40,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt = $pdo->prepare("
         UPDATE clients 
-        SET name = ?, email = ?, phone = ?, city = ?
+        SET name = ?, email = ?, phone = ?, city = ?, dni = ?
         $password_sql
         WHERE id = ?
     ");
@@ -74,6 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <label class="block text-sm font-medium text-slate-700 mb-1">Teléfono</label>
     <input type="text" name="phone"
            value="<?= htmlspecialchars($paciente['phone']) ?>"
+           class="w-full border rounded-lg p-2 mb-4">
+
+    <!-- DNI AGREGADO -->
+    <label class="block text-sm font-medium text-slate-700 mb-1">DNI</label>
+    <input type="text" name="dni"
+           value="<?= htmlspecialchars($paciente['dni'] ?? '') ?>"
            class="w-full border rounded-lg p-2 mb-4">
 
     <label class="block text-sm font-medium text-slate-700 mb-1">Ciudad</label>
