@@ -85,7 +85,7 @@ if (!empty($_FILES['profile_image']['name'])) {
 
     if (in_array($ext, $permitidos)) {
 
-        $upload_dir = __DIR__ . "/../uploads/";
+        $upload_dir = __DIR__ . "/../public/uploads/";
 
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
