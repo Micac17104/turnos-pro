@@ -8,7 +8,7 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
 
 // CONFIGURACIÓN
-$BASE_URL = 'https://tusitio.com'; // ⚠️ CAMBIAR por tu dominio real
+$BASE_URL = 'https://www.turnosaura.com'; // ⚠️ CAMBIAR por tu dominio real
 
 // Buscamos turnos próximos con recordatorio habilitado
 // Regla: faltan aproximadamente X horas (config del profesional o 24 por defecto)

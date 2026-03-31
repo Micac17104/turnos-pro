@@ -77,7 +77,7 @@ $stmt->execute([
 // ===============================
 // 6) FOTO DE PERFIL
 // ===============================
-if (!empty($_FILES['profile_image']['name'])) {
+if (!empty($_FILES['profile_image']['tmp_name'])) {
 
     $file = $_FILES['profile_image'];
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -85,6 +85,7 @@ if (!empty($_FILES['profile_image']['name'])) {
 
     if (in_array($ext, $permitidos)) {
 
+        // 6A — Guardar archivo en /uploads/
         $upload_dir = __DIR__ . "/../public/uploads/";
 
         if (!is_dir($upload_dir)) {
@@ -95,9 +96,17 @@ if (!empty($_FILES['profile_image']['name'])) {
         $ruta_final = $upload_dir . $nombre_final;
 
         if (move_uploaded_file($file['tmp_name'], $ruta_final)) {
+
+            // Guardar nombre del archivo
             $stmt = $pdo->prepare("UPDATE users SET profile_image=? WHERE id=?");
             $stmt->execute([$nombre_final, $user_id]);
         }
+
+        // 6B — Guardar también como BLOB para la landing
+        $blob = file_get_contents($ruta_final);
+
+        $stmt = $pdo->prepare("UPDATE users SET profile_image_blob=? WHERE id=?");
+        $stmt->execute([$blob, $user_id]);
     }
 }
 
