@@ -40,6 +40,12 @@ require __DIR__ . '/includes/sidebar.php';
     </div>
 <?php endif; ?>
 
+<?php if (isset($_GET['sent']) && $_GET['sent'] == 0): ?>
+    <div class="mb-4 p-3 bg-red-100 text-red-800 border border-red-300 rounded-lg">
+        ❌ Error al enviar el recordatorio
+    </div>
+<?php endif; ?>
+
         <button
             onclick="window.location.href='agenda.php'"
             class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-300">

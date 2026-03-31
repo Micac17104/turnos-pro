@@ -29,6 +29,12 @@ if (!$turno) {
 $subject = "Recordatorio de turno";
 $message = "Hola {$turno['name']}, te recordamos tu turno el {$turno['date']} a las {$turno['time']}.";
 
-enviarEmail($turno['email'], $subject, $message);
+$ok = enviarEmail($turno['email'], $subject, $message);
+
+if ($ok) {
+    redirect("turnos-manana.php?sent=1");
+} else {
+    redirect("turnos-manana.php?sent=0");
+}
 
 redirect("turnos-manana.php?sent=1");
