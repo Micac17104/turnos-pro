@@ -53,27 +53,98 @@ $dias = [
 <title><?= htmlspecialchars($pro['name']) ?> - Profesional</title>
 
 <style>
-body { background:#f1f5f9; font-family:Arial; margin:0; padding:0; }
-.container { max-width:900px; margin:40px auto; background:white; padding:30px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.08); }
+<style>
+body {
+    background:#f8fafc;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    margin:0;
+    padding:0;
+}
 
-.header { display:flex; gap:20px; align-items:center; margin-bottom:30px; }
-.header img { width:140px; height:140px; border-radius:20px; object-fit:cover; border:3px solid #e2e8f0; }
+.container {
+    max-width: 900px;
+    margin: 50px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+}
 
-h1 { margin:0; font-size:28px; color:#0f172a; }
-.prof { color:#475569; margin-top:4px; }
+/* HEADER */
+.header {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    margin-bottom: 35px;
+}
 
-.section-title { font-size:20px; font-weight:700; margin-top:30px; margin-bottom:10px; color:#0f172a; }
+.header img {
+    width: 160px;
+    height: 160px;
+    border-radius: 20px;
+    object-fit: cover;
+    border: 4px solid #e2e8f0;
+    background: #f1f5f9;
+}
 
+h1 {
+    margin: 0;
+    font-size: 32px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.prof {
+    color: #475569;
+    font-size: 18px;
+    margin-top: 6px;
+}
+
+/* TITULOS DE SECCIÓN */
+.section-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 12px;
+    color: #0f172a;
+}
+
+/* TEXTO */
+p {
+    color: #475569;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+/* LISTA DE HORARIOS */
+ul {
+    padding-left: 20px;
+}
+
+ul li {
+    margin-bottom: 8px;
+    color: #334155;
+}
+
+/* BOTÓN */
 .btn-primary {
-    background: linear-gradient(135deg, #22c55e, #0ea5e9);
-    padding: 14px 22px;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #0ea5e9, #22c55e);
+    padding: 16px 26px;
+    border-radius: 14px;
     color: white;
     text-decoration: none;
     font-weight: 600;
-    display:inline-block;
-    margin-top:20px;
+    display: inline-block;
+    margin-top: 30px;
+    font-size: 17px;
+    transition: 0.2s;
 }
+
+.btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+</style>
 </style>
 </head>
 <body>
@@ -84,7 +155,7 @@ h1 { margin:0; font-size:28px; color:#0f172a; }
         <?php if (!empty($pro['profile_image_blob'])): ?>
             <img src="data:image/jpeg;base64,<?= base64_encode($pro['profile_image_blob']) ?>">
         <?php else: ?>
-            <img src="https://via.placeholder.com/140x140?text=Sin+Foto">
+           <img src="https://placehold.co/140x140/eee/555?text=Sin+Foto">
         <?php endif; ?>
 
         <div>
