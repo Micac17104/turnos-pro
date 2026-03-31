@@ -20,7 +20,6 @@ if (!$pro) {
     die("Profesional no encontrado.");
 }
 
-// Si el profesional pertenece a un centro → ese es el center_id del turno y del paciente nuevo
 $center_id = $pro['parent_center_id'] ?: null;
 
 // -----------------------------
@@ -43,7 +42,8 @@ if (!$paciente_id) {
     $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$paciente) {
-        // Crear paciente nuevo y ASOCIARLO AL CENTRO si corresponde
+
+        // Crear paciente nuevo
         $stmt = $pdo->prepare("
             INSERT INTO clients (name, email, phone, dni, center_id)
             VALUES (?, ?, ?, ?, ?)
@@ -52,11 +52,13 @@ if (!$paciente_id) {
 
         $paciente_id = $pdo->lastInsertId();
         $_SESSION['paciente_id'] = $paciente_id;
+        $_SESSION['paciente_nombre'] = $name;
 
     } else {
+
         $paciente_id = $paciente['id'];
 
-        // Si el paciente no tenía DNI y ahora sí lo ingresó → actualizar
+        // Actualizar DNI si estaba vacío
         if (empty($paciente['dni']) && !empty($dni)) {
             $stmt = $pdo->prepare("UPDATE clients SET dni = ? WHERE id = ?");
             $stmt->execute([$dni, $paciente_id]);
@@ -66,6 +68,8 @@ if (!$paciente_id) {
         $email = $paciente['email'];
         $phone = $paciente['phone'];
         $dni   = $paciente['dni'] ?? $dni;
+
+        $_SESSION['paciente_nombre'] = $name;
     }
 
 // -----------------------------
@@ -81,7 +85,6 @@ if (!$paciente_id) {
         die("Paciente no encontrado.");
     }
 
-    // Si el paciente no tiene center_id y el profesional pertenece a un centro → asignarlo
     if (empty($paciente['center_id']) && !empty($center_id)) {
         $stmt = $pdo->prepare("UPDATE clients SET center_id = ? WHERE id = ?");
         $stmt->execute([$center_id, $paciente_id]);
@@ -92,6 +95,8 @@ if (!$paciente_id) {
     $email = $paciente['email'];
     $phone = $paciente['phone'];
     $dni   = $paciente['dni'] ?? null;
+
+    $_SESSION['paciente_nombre'] = $name;
 }
 
 // -----------------------------
