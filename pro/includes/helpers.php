@@ -16,3 +16,7 @@ function require_param(array $source, string $key, string $errorMessage = 'Datos
     }
     return trim($source[$key]);
 }
+
+function generate_token(int $length = 32): string {
+    return bin2hex(random_bytes($length / 2));
+}
