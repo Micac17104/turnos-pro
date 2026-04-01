@@ -6,7 +6,7 @@ require __DIR__ . '/paciente-layout.php';
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
 
-$paciente_id = $_SESSION['paciente_id'];
+$paciente_id = $_SESSION['paciente_id'] ?? null;
 
 $user_id = $_GET['user_id'] ?? null;
 $fecha   = $_GET['fecha'] ?? null;
@@ -27,6 +27,15 @@ if (!$pro) {
     echo "<p class='text-red-600'>Profesional no encontrado.</p>";
     echo "</main></div></body></html>";
     exit;
+}
+
+// Si el paciente está logueado, traemos sus datos
+$paciente = null;
+
+if ($paciente_id) {
+    $stmt = $pdo->prepare("SELECT name, email, phone FROM clients WHERE id = ?");
+    $stmt->execute([$paciente_id]);
+    $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 ?>
 
@@ -60,12 +69,39 @@ if (!$pro) {
 
     </div>
 
-    <!-- RUTA CORRECTA PARA RAILWAY -->
     <form action="paciente-confirmar-turno-guardar.php" method="post" class="space-y-4">
 
         <input type="hidden" name="user_id" value="<?= $user_id ?>">
         <input type="hidden" name="fecha" value="<?= $fecha ?>">
         <input type="hidden" name="hora" value="<?= $hora ?>">
+
+        <?php if ($paciente): ?>
+            <!-- Paciente logueado: enviamos sus datos automáticamente -->
+            <input type="hidden" name="nombre" value="<?= h($paciente['name']) ?>">
+            <input type="hidden" name="email" value="<?= h($paciente['email']) ?>">
+            <input type="hidden" name="telefono" value="<?= h($paciente['phone']) ?>">
+
+            <p class="text-slate-600 text-sm">
+                Reservando como <strong><?= h($paciente['name']) ?></strong> (<?= h($paciente['email']) ?>)
+            </p>
+
+        <?php else: ?>
+            <!-- Paciente NO logueado: pedimos datos -->
+            <div>
+                <label class="text-sm text-slate-600">Nombre completo</label>
+                <input type="text" name="nombre" required class="w-full border rounded-lg p-2">
+            </div>
+
+            <div>
+                <label class="text-sm text-slate-600">Email</label>
+                <input type="email" name="email" required class="w-full border rounded-lg p-2">
+            </div>
+
+            <div>
+                <label class="text-sm text-slate-600">Teléfono</label>
+                <input type="text" name="telefono" class="w-full border rounded-lg p-2">
+            </div>
+        <?php endif; ?>
 
         <button class="w-full py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition">
             Confirmar turno
@@ -73,7 +109,6 @@ if (!$pro) {
 
     </form>
 
-    <!-- RUTA CORRECTA -->
     <a href="horarios.php?pro=<?= $user_id ?>&date=<?= $fecha ?>"
        class="block mt-6 text-slate-600 hover:text-slate-900 text-sm">
         ← Elegir otro horario
@@ -82,6 +117,5 @@ if (!$pro) {
 </div>
 
 <?php
-// CIERRE DEL LAYOUT
 echo "</main></div></body></html>";
 ?>
