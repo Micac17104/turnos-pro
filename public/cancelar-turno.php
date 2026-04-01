@@ -5,6 +5,7 @@ session_start();
 require __DIR__ . '/paciente-layout.php';
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
+require __DIR__ . '/../auth/mailer.php'; // ← USAMOS EL MAILER BUENO
 
 $paciente_id = $_SESSION['paciente_id'];
 $turno_id    = $_GET['id'] ?? null;
@@ -45,7 +46,7 @@ $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
 
 // -----------------------------
-// EMAIL AL PROFESIONAL
+// EMAIL AL PROFESIONAL (PHPMailer)
 // -----------------------------
 if (!empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
 
@@ -59,7 +60,7 @@ if (!empty($turno['notify_professional_email']) && !empty($turno['professional_m
         $turno['professional_message']
     );
 
-    @mail($turno['profesional_email'], "Turno cancelado por el paciente", $msgPro);
+    enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
 }
 
 // -----------------------------

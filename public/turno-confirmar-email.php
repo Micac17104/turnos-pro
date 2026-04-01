@@ -1,105 +1,111 @@
 <?php
-session_save_path(__DIR__ . '/sessions');
+// /public/cron-enviar-recordatorios.php
+
+session_save_path(__DIR__ . '/../sessions');
 session_start();
 
-require __DIR__ . '/config.php';
-require __DIR__ . '/pro/includes/helpers.php';
+require __DIR__ . '/../config.php';
+require __DIR__ . '/../pro/includes/helpers.php';
+require __DIR__ . '/../auth/mailer.php'; // ← USAMOS EL MAILER BUENO
 
-$id    = $_GET['id'] ?? null;
-$token = $_GET['token'] ?? null;
+// CONFIGURACIÓN
+$BASE_URL = 'https://www.turnosaura.com';
 
-if (!$id || !$token) {
-    die("Link inválido.");
-}
-
-// Buscar turno con token
-$stmt = $pdo->prepare("
+// Buscar turnos próximos con recordatorio habilitado
+$sql = "
     SELECT 
-        a.*,
-        c.name  AS paciente_nombre,
+        a.id,
+        a.user_id,
+        a.client_id,
+        a.date,
+        a.time,
+        a.status,
+        a.email_token,
+        c.name AS paciente_nombre,
         c.email AS paciente_email,
-        u.name  AS profesional_nombre,
+        u.name AS profesional_nombre,
         u.email AS profesional_email,
-        ns.notify_professional_email,
-        ns.professional_message
+        ns.reminder_enabled,
+        COALESCE(ns.reminder_hours_before, 24) AS horas_antes,
+        ns.reminder_message
     FROM appointments a
     JOIN clients c ON a.client_id = c.id
-    JOIN users u   ON a.user_id = u.id
+    JOIN users u ON a.user_id = u.id
     LEFT JOIN notification_settings ns ON ns.user_id = a.user_id
-    WHERE a.id = ? AND a.email_token = ?
-");
-$stmt->execute([$id, $token]);
-$turno = $stmt->fetch(PDO::FETCH_ASSOC);
+    WHERE 
+        a.status IN ('pending', 'confirmed')
+        AND ns.reminder_enabled = 1
+        AND a.reminder_sent = 0
+        AND c.email IS NOT NULL
+        AND c.email <> ''
+";
 
-if (!$turno) {
-    die("Turno no encontrado o link inválido.");
-}
+$stmt = $pdo->query($sql);
+$turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Marcar como confirmado
-$upd = $pdo->prepare("UPDATE appointments SET status = 'confirmed' WHERE id = ?");
-$upd->execute([$id]);
+$ahora = new DateTime('now');
 
-// Notificar al profesional por email si corresponde
-if (!empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
-    $msgPro = str_replace(
-        ['{paciente}', '{fecha}', '{hora}'],
-        [
-            $turno['paciente_nombre'],
-            date('d/m/Y', strtotime($turno['date'])),
-            substr($turno['time'], 0, 5)
-        ],
-        $turno['professional_message']
-    );
+foreach ($turnos as $t) {
 
-    @mail($turno['profesional_email'], "Turno confirmado por el paciente", $msgPro);
-}
+    $fechaHoraTurno = new DateTime($t['date'] . ' ' . $t['time']);
+    $diffMin = ($fechaHoraTurno->getTimestamp() - $ahora->getTimestamp()) / 60;
 
-// Notificar al profesional por WhatsApp si corresponde
-if (!empty($turno['notify_professional_whatsapp'])) {
+    // MODO PRUEBA: enviar recordatorio si el turno es dentro de los próximos 5 minutos
+    if ($diffMin <= 5 && $diffMin >= 0) {
 
-    // Normalizar teléfono del profesional
-    $telefonoPro = preg_replace('/\D/', '', $turno['profesional_telefono'] ?? '');
+        // Generar token si no existe
+        if (empty($t['email_token'])) {
+            $token = generate_token(32);
+            $upd = $pdo->prepare("UPDATE appointments SET email_token = ? WHERE id = ?");
+            $upd->execute([$token, $t['id']]);
+        } else {
+            $token = $t['email_token'];
+        }
 
-    if (!empty($telefonoPro)) {
+        $id = $t['id'];
+        $pacienteNombre = $t['paciente_nombre'];
+        $pacienteEmail  = $t['paciente_email'];
+        $profesional    = $t['profesional_nombre'];
+        $fecha          = (new DateTime($t['date']))->format('d/m/Y');
+        $hora           = substr($t['time'], 0, 5);
 
-        // Mensaje al profesional (si querés usar el mismo que el email)
-        $msgProWhats = str_replace(
-            ['{paciente}', '{fecha}', '{hora}'],
-            [
-                $turno['paciente_nombre'],
-                date('d/m/Y', strtotime($turno['date'])),
-                substr($turno['time'], 0, 5)
-            ],
-            $turno['professional_message']
-        );
+        // Mensaje base
+        if (!empty($t['reminder_message'])) {
+            $mensaje = str_replace(
+                ['{nombre}', '{fecha}', '{hora}', '{profesional}'],
+                [$pacienteNombre, $fecha, $hora, $profesional],
+                $t['reminder_message']
+            );
+        } else {
+            $mensaje = "Hola $pacienteNombre, te recordamos tu turno el $fecha a las $hora con $profesional.";
+        }
 
-        // Enviar WhatsApp usando tu API
-        $url = "https://api.callmebot.com/whatsapp.php?phone={$telefonoPro}&text=" . urlencode($msgProWhats);
+        // Links de confirmación / cancelación
+        $confirmUrl = $BASE_URL . "/turno-confirmar-email.php?id={$id}&token={$token}";
+        $cancelUrl  = $BASE_URL . "/turno-cancelar-email.php?id={$id}&token={$token}";
 
-        @file_get_contents($url);
+        $body = "
+Hola {$pacienteNombre},<br><br>
+
+{$mensaje}<br><br>
+
+Por favor confirmá tu asistencia:<br><br>
+
+<a href='{$confirmUrl}'>✔ Confirmar turno</a><br>
+<a href='{$cancelUrl}'>✖ Cancelar turno</a><br><br>
+
+Gracias.
+";
+
+        // -----------------------------
+        // ENVIAR EMAIL (PHPMailer)
+        // -----------------------------
+        enviarEmail($pacienteEmail, "Recordatorio de turno", $body);
+
+        // Marcar recordatorio como enviado
+        $upd2 = $pdo->prepare("UPDATE appointments SET reminder_sent = 1 WHERE id = ?");
+        $upd2->execute([$id]);
     }
 }
-// Pantalla simple de confirmación
-?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Turno confirmado</title>
-    <style>
-        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background:#f1f5f9; padding:40px; }
-        .card { max-width:480px; margin:40px auto; background:white; padding:30px; border-radius:16px; box-shadow:0 10px 30px rgba(15,23,42,0.12); }
-        h1 { font-size:24px; margin-bottom:10px; color:#0f172a; }
-        p { color:#475569; margin-bottom:8px; }
-    </style>
-</head>
-<body>
-<div class="card">
-    <h1>Turno confirmado</h1>
-    <p>Tu turno fue confirmado correctamente.</p>
-    <p><strong>Profesional:</strong> <?= h($turno['profesional_nombre']) ?></p>
-    <p><strong>Fecha:</strong> <?= date('d/m/Y', strtotime($turno['date'])) ?></p>
-    <p><strong>Hora:</strong> <?= substr($turno['time'], 0, 5) ?> hs</p>
-</div>
-</body>
-</html>
+
+echo "OK";

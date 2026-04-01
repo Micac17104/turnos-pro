@@ -4,20 +4,15 @@ session_start();
 
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
+require __DIR__ . '/../auth/mailer.php'; // ← USAMOS EL MAILER BUENO
 
-// Verificar login del paciente
-if (!isset($_SESSION['paciente_id'])) {
-    http_response_code(403);
-    echo json_encode(["status" => "error", "message" => "NO_AUTH"]);
-    exit;
-}
+header('Content-Type: application/json');
 
-$paciente_id = $_SESSION['paciente_id'];
-$turno_id = $_GET['id'] ?? null;
+$paciente_id = $_SESSION['paciente_id'] ?? null;
+$turno_id    = $_POST['id'] ?? null;
 
-if (!$turno_id) {
-    http_response_code(400);
-    echo json_encode(["status" => "error", "message" => "NO_ID"]);
+if (!$paciente_id || !$turno_id) {
+    echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
     exit;
 }
 
@@ -25,7 +20,7 @@ if (!$turno_id) {
 $stmt = $pdo->prepare("
     SELECT 
         a.*,
-        u.name AS profesional_nombre,
+        u.name AS profesional,
         u.email AS profesional_email,
         u.phone AS profesional_telefono,
         ns.notify_professional_email,
@@ -40,17 +35,16 @@ $stmt->execute([$turno_id, $paciente_id]);
 $turno = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$turno) {
-    http_response_code(404);
-    echo json_encode(["status" => "error", "message" => "NOT_FOUND"]);
+    echo json_encode(['status' => 'error', 'message' => 'Turno no encontrado']);
     exit;
 }
 
 // Cancelar turno
-$stmt = $pdo->prepare("UPDATE appointments SET status = 'cancelled' WHERE id = ?");
+$stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
 
 // -----------------------------
-// EMAIL AL PROFESIONAL
+// EMAIL AL PROFESIONAL (PHPMailer)
 // -----------------------------
 if (!empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
 
@@ -64,7 +58,7 @@ if (!empty($turno['notify_professional_email']) && !empty($turno['professional_m
         $turno['professional_message']
     );
 
-    @mail($turno['profesional_email'], "Turno cancelado por el paciente", $msgPro);
+    enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
 }
 
 // -----------------------------
@@ -91,4 +85,5 @@ if (!empty($turno['notify_professional_whatsapp'])) {
     }
 }
 
-echo json_encode(["status" => "ok"]);
+echo json_encode(['status' => 'ok']);
+exit;

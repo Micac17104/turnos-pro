@@ -4,15 +4,22 @@ session_start();
 
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
+require __DIR__ . '/../auth/mailer.php';   // ← USAMOS EL MAILER BUENO
 
-$pro_id = $_POST['user_id'] ?? null;
-$date   = $_POST['fecha'] ?? null;
-$time   = $_POST['hora'] ?? null;
+$pro_id    = $_POST['user_id'] ?? null;
+$date      = $_POST['fecha'] ?? null;
+$time      = $_POST['hora'] ?? null;
+$name      = trim($_POST['nombre'] ?? '');
+$email     = trim($_POST['email'] ?? '');
+$phone     = trim($_POST['telefono'] ?? '');
+$center_id = $_POST['center_id'] ?? null;
 
-$paciente_id = $_SESSION['paciente_id'] ?? null;
+if (!$pro_id || !$date || !$time || !$name || !$email) {
+    die("Datos incompletos.");
+}
 
-// Obtener profesional
-$stmt = $pdo->prepare("SELECT id, name, email, profession, parent_center_id FROM users WHERE id = ?");
+// Profesional
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$pro_id]);
 $pro = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -20,88 +27,31 @@ if (!$pro) {
     die("Profesional no encontrado.");
 }
 
-$center_id = $pro['parent_center_id'] ?: null;
+// Buscar o crear paciente
+$paciente_id = $_SESSION['paciente_id'] ?? null;
 
-// -----------------------------
-// PACIENTE NO LOGUEADO
-// -----------------------------
-if (!$paciente_id) {
-
-    $name  = trim($_POST['nombre'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $phone = trim($_POST['telefono'] ?? '');
-    $dni   = trim($_POST['dni'] ?? '');
-
-    if (!$pro_id || !$date || !$time || !$name || !$email) {
-        die("Datos incompletos.");
-    }
-
-    // Buscar paciente por email
-    $stmt = $pdo->prepare("SELECT * FROM clients WHERE email = ?");
-    $stmt->execute([$email]);
-    $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$paciente) {
-
-        // Crear paciente nuevo
-        $stmt = $pdo->prepare("
-            INSERT INTO clients (name, email, phone, dni, center_id)
-            VALUES (?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([$name, $email, $phone, $dni, $center_id]);
-
-        $paciente_id = $pdo->lastInsertId();
-        $_SESSION['paciente_id'] = $paciente_id;
-        $_SESSION['paciente_nombre'] = $name;
-
-    } else {
-
-        $paciente_id = $paciente['id'];
-
-        // Actualizar DNI si estaba vacío
-        if (empty($paciente['dni']) && !empty($dni)) {
-            $stmt = $pdo->prepare("UPDATE clients SET dni = ? WHERE id = ?");
-            $stmt->execute([$dni, $paciente_id]);
-        }
-
-        $name  = $paciente['name'];
-        $email = $paciente['email'];
-        $phone = $paciente['phone'];
-        $dni   = $paciente['dni'] ?? $dni;
-
-        $_SESSION['paciente_nombre'] = $name;
-    }
-
-// -----------------------------
-// PACIENTE LOGUEADO
-// -----------------------------
-} else {
-
-    $stmt = $pdo->prepare("SELECT name, email, phone, dni, center_id FROM clients WHERE id = ?");
+if ($paciente_id) {
+    $stmt = $pdo->prepare("SELECT * FROM clients WHERE id = ?");
     $stmt->execute([$paciente_id]);
     $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$paciente) {
-        die("Paciente no encontrado.");
-    }
-
-    if (empty($paciente['center_id']) && !empty($center_id)) {
-        $stmt = $pdo->prepare("UPDATE clients SET center_id = ? WHERE id = ?");
-        $stmt->execute([$center_id, $paciente_id]);
-        $paciente['center_id'] = $center_id;
-    }
-
-    $name  = $paciente['name'];
-    $email = $paciente['email'];
-    $phone = $paciente['phone'];
-    $dni   = $paciente['dni'] ?? null;
-
-    $_SESSION['paciente_nombre'] = $name;
+} else {
+    $stmt = $pdo->prepare("SELECT * FROM clients WHERE email = ? AND center_id = ?");
+    $stmt->execute([$email, $center_id]);
+    $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// -----------------------------
-// VERIFICAR QUE EL TURNO SIGA LIBRE
-// -----------------------------
+if (!$paciente) {
+    $stmt = $pdo->prepare("
+        INSERT INTO clients (name, email, phone, center_id)
+        VALUES (?, ?, ?, ?)
+    ");
+    $stmt->execute([$name, $email, $phone, $center_id]);
+    $paciente_id = $pdo->lastInsertId();
+} else {
+    $paciente_id = $paciente['id'];
+}
+
+// Verificar turno libre
 $stmt = $pdo->prepare("
     SELECT id FROM appointments
     WHERE user_id = ? AND date = ? AND time = ? AND status IN ('confirmed','pending')
@@ -112,26 +62,23 @@ if ($stmt->fetch()) {
     die("El turno ya fue tomado. Volvé atrás y elegí otro horario.");
 }
 
-// -----------------------------
-// CREAR TURNO
-// -----------------------------
+// Crear turno
 $stmt = $pdo->prepare("
-    INSERT INTO appointments (user_id, center_id, client_id, date, time, dni, status, reminder_sent)
-    VALUES (?, ?, ?, ?, ?, ?, 'confirmed', 0)
+    INSERT INTO appointments (user_id, center_id, client_id, date, time, status, reminder_sent)
+    VALUES (?, ?, ?, ?, ?, 'confirmed', 0)
 ");
-$stmt->execute([$pro_id, $center_id, $paciente_id, $date, $time, $dni]);
+$stmt->execute([$pro_id, $center_id, $paciente_id, $date, $time]);
 
 $turno_id = $pdo->lastInsertId();
 
-// -----------------------------
-// NOTIFICACIONES
-// -----------------------------
+// Config notificaciones
 $stmt = $pdo->prepare("SELECT * FROM notification_settings WHERE user_id = ?");
 $stmt->execute([$pro_id]);
 $config = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
 $telefono_normalizado = preg_replace('/\D/', '', $phone);
 
+// Mensaje al paciente
 if (!empty($config['confirm_message'])) {
     $mensaje_final = str_replace(
         ['{nombre}', '{fecha}', '{hora}', '{profesional}'],
@@ -142,22 +89,28 @@ if (!empty($config['confirm_message'])) {
     $mensaje_final = "Hola $name, tu turno con {$pro['name']} fue confirmado para el $date a las $time.";
 }
 
+// -----------------------------
+// EMAIL AL PACIENTE (PHPMailer)
+// -----------------------------
 if (!empty($config['email_enabled'])) {
-    @mail($email, "Confirmación de turno", $mensaje_final);
+    enviarEmail($email, "Confirmación de turno", nl2br($mensaje_final));
 }
 
+// -----------------------------
+// EMAIL AL PROFESIONAL (PHPMailer)
+// -----------------------------
 if (!empty($config['notify_professional_email']) && !empty($config['professional_message'])) {
+
     $msg_pro = str_replace(
         ['{paciente}', '{fecha}', '{hora}'],
         [$name, $date, $time],
         $config['professional_message']
     );
-    @mail($pro['email'], "Nuevo turno reservado", $msg_pro);
+
+    enviarEmail($pro['email'], "Nuevo turno reservado", nl2br($msg_pro));
 }
 
-// -----------------------------
-// GUARDAR DATOS PARA PANTALLA DE GRACIAS
-// -----------------------------
+// Guardar datos para pantalla de gracias
 $_SESSION['last_booking'] = [
     'pro_name' => $pro['name'],
     'date'     => $date,
@@ -167,8 +120,6 @@ $_SESSION['last_booking'] = [
     'mensaje_final' => $mensaje_final
 ];
 
-// -----------------------------
-// REDIRIGIR
-// -----------------------------
+// Redirigir
 header("Location: gracias.php");
 exit;

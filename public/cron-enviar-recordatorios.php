@@ -1,19 +1,17 @@
 <?php
-// /cron/enviar-recordatorios.php
+// /public/cron-enviar-recordatorios.php
 
 session_save_path(__DIR__ . '/../sessions');
 session_start();
 
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
+require __DIR__ . '/../auth/mailer.php'; // ← USAMOS EL MAILER BUENO
 
 // CONFIGURACIÓN
-$BASE_URL = 'https://www.turnosaura.com'; // ⚠️ CAMBIAR por tu dominio real
+$BASE_URL = 'https://www.turnosaura.com';
 
-// Buscamos turnos próximos con recordatorio habilitado
-// Regla: faltan aproximadamente X horas (config del profesional o 24 por defecto)
-// y aún no se envió el recordatorio (reminder_sent = 0)
-
+// Buscar turnos próximos con recordatorio habilitado
 $sql = "
     SELECT 
         a.id,
@@ -36,7 +34,7 @@ $sql = "
     LEFT JOIN notification_settings ns ON ns.user_id = a.user_id
     WHERE 
         a.status IN ('pending', 'confirmed')
-        AND (ns.reminder_enabled = 1)
+        AND ns.reminder_enabled = 1
         AND a.reminder_sent = 0
         AND c.email IS NOT NULL
         AND c.email <> ''
@@ -48,12 +46,12 @@ $turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $ahora = new DateTime('now');
 
 foreach ($turnos as $t) {
-    $fechaHoraTurno = new DateTime($t['date'] . ' ' . $t['time']);
 
+    $fechaHoraTurno = new DateTime($t['date'] . ' ' . $t['time']);
     $diffMin = ($fechaHoraTurno->getTimestamp() - $ahora->getTimestamp()) / 60;
 
-// MODO PRUEBA: enviar recordatorio si el turno es dentro de los próximos 5 minutos
-if ($diffMin <= 5 && $diffMin >= 0) {
+    // MODO PRUEBA: enviar recordatorio si el turno es dentro de los próximos 5 minutos
+    if ($diffMin <= 5 && $diffMin >= 0) {
 
         // Generar token si no existe
         if (empty($t['email_token'])) {
@@ -87,20 +85,22 @@ if ($diffMin <= 5 && $diffMin >= 0) {
         $cancelUrl  = $BASE_URL . "/turno-cancelar-email.php?id={$id}&token={$token}";
 
         $body = "
-Hola {$pacienteNombre},
+Hola {$pacienteNombre},<br><br>
 
-{$mensaje}
+{$mensaje}<br><br>
 
-Por favor confirmá tu asistencia:
+Por favor confirmá tu asistencia:<br><br>
 
-Confirmar turno: {$confirmUrl}
-Cancelar turno: {$cancelUrl}
+<a href='{$confirmUrl}'>✔ Confirmar turno</a><br>
+<a href='{$cancelUrl}'>✖ Cancelar turno</a><br><br>
 
 Gracias.
 ";
 
-        // Enviar email (podés reemplazar @mail por tu PHPMailer si querés)
-        @mail($pacienteEmail, "Recordatorio de turno", $body);
+        // -----------------------------
+        // ENVIAR EMAIL (PHPMailer)
+        // -----------------------------
+        enviarEmail($pacienteEmail, "Recordatorio de turno", $body);
 
         // Marcar recordatorio como enviado
         $upd2 = $pdo->prepare("UPDATE appointments SET reminder_sent = 1 WHERE id = ?");
