@@ -28,35 +28,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$email]);
     $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($paciente && password_verify($password, $paciente['password'])) {
+    if ($paciente) {
 
-        // Si el paciente tiene user_id = 0, verificar si el profesional ya lo cargó
-        if ($paciente['user_id'] == 0) {
+        // ⚠️ FIX: si no tiene contraseña, no se puede verificar
+        if (empty($paciente['password'])) {
+            $mensaje = "Tu cuenta aún no tiene contraseña. Si sos paciente cargado por un profesional, creá tu cuenta desde el enlace que te enviaron.";
 
-            $stmt2 = $pdo->prepare("
-                SELECT * FROM clients 
-                WHERE email = ? AND user_id != 0
-            ");
-            $stmt2->execute([$email]);
-            $clienteProfesional = $stmt2->fetch(PDO::FETCH_ASSOC);
+        // Contraseña incorrecta
+        } elseif (!password_verify($password, $paciente['password'])) {
+            $mensaje = "Email o contraseña incorrectos.";
 
-            if ($clienteProfesional) {
+        // LOGIN OK
+        } else {
 
-                // Vincular cuenta del paciente al registro del profesional
-                $_SESSION['paciente_id'] = $clienteProfesional['id'];
-                $_SESSION['paciente_nombre'] = $clienteProfesional['name'];
+            // Si el paciente tiene user_id = 0, verificar si el profesional ya lo cargó
+            if ($paciente['user_id'] == 0) {
 
-                header("Location: paciente-dashboard.php");
-                exit;
+                $stmt2 = $pdo->prepare("
+                    SELECT * FROM clients 
+                    WHERE email = ? AND user_id != 0
+                ");
+                $stmt2->execute([$email]);
+                $clienteProfesional = $stmt2->fetch(PDO::FETCH_ASSOC);
+
+                if ($clienteProfesional) {
+                    $_SESSION['paciente_id'] = $clienteProfesional['id'];
+                    $_SESSION['paciente_nombre'] = $clienteProfesional['name'];
+
+                    header("Location: paciente-dashboard.php");
+                    exit;
+                }
             }
+
+            // Login normal
+            $_SESSION['paciente_id'] = $paciente['id'];
+            $_SESSION['paciente_nombre'] = $paciente['name'];
+
+            header("Location: paciente-dashboard.php");
+            exit;
         }
-
-        // Si ya estaba vinculado o no existe registro del profesional
-        $_SESSION['paciente_id'] = $paciente['id'];
-        $_SESSION['paciente_nombre'] = $paciente['name'];
-
-        header("Location: paciente-dashboard.php");
-        exit;
 
     } else {
         $mensaje = "Email o contraseña incorrectos.";
