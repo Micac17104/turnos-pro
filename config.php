@@ -1,6 +1,5 @@
 <?php
-echo "CONFIG REAL EJECUTADO";
-exit;
+
 
 putenv("GMAIL_APP_PASSWORD=qwom wmrp ckhz jmqt");
 
