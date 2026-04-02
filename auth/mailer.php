@@ -1,4 +1,6 @@
 <?php
+echo "MAILER CARGA CONFIG DESDE: " . realpath(__DIR__ . '/../config.php');
+exit;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
