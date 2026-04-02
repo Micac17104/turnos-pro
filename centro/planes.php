@@ -12,8 +12,8 @@ if (!$user_id) {
 // Autenticación del centro
 require __DIR__ . '/includes/auth.php';
 
-// Layout general (ESTOS ESTÁN FUERA DE /centro/)
-require __DIR__ . '/../includes/header.php';
+// Layout general (header y footer están en /pro/includes/)
+require __DIR__ . '/../pro/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';
 ?>
 
@@ -58,4 +58,4 @@ require __DIR__ . '/includes/sidebar.php';
     </div>
 </main>
 
-<?php require __DIR__ . '/../includes/footer.php'; ?>
+<?php require __DIR__ . '/../pro/includes/footer.php'; ?>
