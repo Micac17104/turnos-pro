@@ -13,6 +13,7 @@ function enviarEmail($to, $subject, $body) {
     $mail->SMTPDebug = 2;
     
 
+
     try {
         $mail->isSMTP();
         $mail->Host = 'smtp.sendgrid.net';
