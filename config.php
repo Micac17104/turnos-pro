@@ -1,4 +1,9 @@
 <?php
+echo "CONFIG VERSION: " . __FILE__;
+echo "<br>";
+echo "LINEA PUTENV: ";
+echo file_get_contents(__FILE__, false, null, 0, 200);
+exit;
 
 
 // ===============================
