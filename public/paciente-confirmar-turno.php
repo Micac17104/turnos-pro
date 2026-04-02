@@ -18,7 +18,7 @@ if (!$user_id || !$fecha || !$hora) {
     exit;
 }
 
-// Profesional
+// OJO: acá incluimos parent_center_id
 $stmt = $pdo->prepare("SELECT id, name, profession, parent_center_id FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $pro = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -29,7 +29,6 @@ if (!$pro) {
     exit;
 }
 
-// Si el paciente está logueado, traemos sus datos
 $paciente = null;
 
 if ($paciente_id) {
@@ -74,7 +73,10 @@ if ($paciente_id) {
         <input type="hidden" name="user_id" value="<?= $user_id ?>">
         <input type="hidden" name="fecha" value="<?= $fecha ?>">
         <input type="hidden" name="hora" value="<?= $hora ?>">
-        <input type="hidden" name="center_id" value="<?= $pro['parent_center_id'] ?>">
+
+        <?php if (!empty($pro['parent_center_id'])): ?>
+            <input type="hidden" name="center_id" value="<?= (int)$pro['parent_center_id'] ?>">
+        <?php endif; ?>
 
         <?php if ($paciente): ?>
             <input type="hidden" name="nombre" value="<?= h($paciente['name']) ?>">

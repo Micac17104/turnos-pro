@@ -12,7 +12,8 @@ $time      = $_POST['hora'] ?? null;
 $name      = trim($_POST['nombre'] ?? '');
 $email     = trim($_POST['email'] ?? '');
 $phone     = trim($_POST['telefono'] ?? '');
-$center_id = $_POST['center_id'] ?? null;
+$center_id = !empty($_POST['center_id']) ? (int)$_POST['center_id'] : null;
+
 
 if (!$pro_id || !$date || !$time || !$name || !$email) {
     die("Datos incompletos.");

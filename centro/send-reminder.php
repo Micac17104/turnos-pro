@@ -1,12 +1,17 @@
 <?php
 require __DIR__ . '/../auth/mailer.php';
 
-$email = $_POST['email'];
-$body = $_POST['body'];
+$email = $_POST['email'] ?? null;
+$body  = $_POST['body'] ?? null;
+
+if (!$email || !$body) {
+    header("Location: centro-recordatorios.php?error=1");
+    exit;
+}
 
 if (enviarEmail($email, "Recordatorio de turno", $body)) {
-    header("Location: recordatorio.php?ok=1");
+    header("Location: centro-recordatorios.php?ok=1");
 } else {
-    header("Location: recordatorio.php?error=1");
+    header("Location: centro-recordatorios.php?error=1");
 }
 exit;
