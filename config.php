@@ -1,6 +1,8 @@
 <?php
-echo "CONFIG CARGADO DESDE: " . realpath(__DIR__ . '/../config.php');
+echo "DIR ACTUAL: " . __DIR__ . "<br>";
+echo "INTENTANDO CARGAR: " . realpath(__DIR__ . '/../config.php') . "<br>";
 exit;
+
 
 // ===============================
 // Cargar App Password de Gmail

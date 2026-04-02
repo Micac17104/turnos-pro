@@ -1,5 +1,10 @@
 <?php
 session_start();
+
+echo "DIR ACTUAL: " . __DIR__ . "<br>";
+echo "INTENTANDO CARGAR: " . realpath(__DIR__ . '/../config.php') . "<br>";
+exit;
+
 require '../config.php';
 require __DIR__ . '/../pro/includes/db.php';
 
