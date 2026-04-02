@@ -33,11 +33,13 @@
     Recordatorios
 </a>
 
-<a href="/centro/suscribirse-centro.php?plan=1" class="btn btn-primary">Plan 1 profesional ($8000)</a>
-<a href="/centro/suscribirse-centro.php?plan=2" class="btn btn-primary">Plan 2 profesionales ($13000)</a>
-<a href="/centro/suscribirse-centro.php?plan=3" class="btn btn-primary">Plan 3 profesionales ($18000)</a>
-<a href="/centro/suscribirse-centro.php?plan=4" class="btn btn-primary">Plan 4 profesionales ($23000)</a>
-<a href="/centro/suscribirse-centro.php?plan=5" class="btn btn-primary">Plan 5 profesionales ($28000)</a>
+<li>
+    <a href="/planes/index.php">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>Planes</span>
+    </a>
+</li>
+
 
 <a href="/cancelar-suscripcion.php"
    onclick="return confirm('¿Seguro que querés cancelar tu suscripción? Perderás acceso al panel.');"

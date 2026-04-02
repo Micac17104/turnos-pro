@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
+require __DIR__ . '/../auth/mailer.php'; // ← IMPORTANTE
 
 // Turnos de mañana
 $stmt = $pdo->prepare("
@@ -10,6 +11,7 @@ $stmt = $pdo->prepare("
         a.time,
         c.name AS paciente,
         c.phone AS paciente_phone,
+        c.email AS paciente_email,
         u.name AS profesional
     FROM appointments a
     JOIN clients c ON c.id = a.client_id
@@ -34,6 +36,7 @@ body{margin:0;font-family:Arial;background:#f1f5f9;}
 table{width:100%;border-collapse:collapse;font-size:14px;}
 th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 .btn-wsp{padding:6px 10px;background:#25D366;color:white;border-radius:8px;text-decoration:none;font-size:13px;}
+.btn-email{padding:6px 10px;background:#0ea5e9;color:white;border-radius:8px;text-decoration:none;font-size:13px;border:none;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -69,20 +72,42 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                     substr($t['time'],0,5) . " con {$t['profesional']}."
                 );
                 $phone = preg_replace('/\D/', '', $t['paciente_phone']);
+
+                // Email body
+                $emailBody = "
+                    <h2>Recordatorio de turno</h2>
+                    <p>Hola {$t['paciente']}, te recordamos tu turno mañana a las 
+                    <strong>" . substr($t['time'],0,5) . "</strong> con 
+                    <strong>{$t['profesional']}</strong>.</p>
+                ";
             ?>
             <tr>
                 <td><?= substr($t['time'],0,5) ?></td>
                 <td><?= htmlspecialchars($t['paciente']) ?></td>
                 <td><?= htmlspecialchars($t['profesional']) ?></td>
                 <td>
+
+                    <!-- WhatsApp -->
                     <?php if ($phone): ?>
                         <a class="btn-wsp" target="_blank"
                            href="https://wa.me/<?= $phone ?>?text=<?= $msg ?>">
-                           Enviar WhatsApp
+                           WhatsApp
                         </a>
                     <?php else: ?>
                         <span style="color:#b91c1c;">Sin teléfono</span>
                     <?php endif; ?>
+
+                    <!-- Email -->
+                    <?php if (!empty($t['paciente_email'])): ?>
+                        <form method="POST" action="send-reminder.php" style="display:inline;">
+                            <input type="hidden" name="email" value="<?= $t['paciente_email'] ?>">
+                            <input type="hidden" name="body" value="<?= htmlspecialchars($emailBody) ?>">
+                            <button class="btn-email">Email</button>
+                        </form>
+                    <?php else: ?>
+                        <span style="color:#b91c1c; margin-left:8px;">Sin email</span>
+                    <?php endif; ?>
+
                 </td>
             </tr>
             <?php endforeach; ?>
