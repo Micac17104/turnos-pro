@@ -10,7 +10,7 @@ require __DIR__ . '/PHPMailer/src/SMTP.php';
 function enviarEmail($to, $subject, $body) {
     $mail = new PHPMailer(true);
 
-    $mail->SMTPDebug = 0; 
+    $mail->SMTPDebug = 0;
 
     try {
         $mail->isSMTP();
@@ -20,8 +20,8 @@ function enviarEmail($to, $subject, $body) {
         // SendGrid SIEMPRE usa "apikey" como usuario
         $mail->Username = 'apikey';
 
-        // Acá va tu API KEY (sin comillas extras, tal cual)
-        $mail->Password = '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';
+        // La API KEY ahora viene de una variable de entorno
+        $mail->Password = getenv('SENDGRID_API_KEY');
 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
@@ -40,5 +40,4 @@ function enviarEmail($to, $subject, $body) {
         return false;
     }
 }
-
 
