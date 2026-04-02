@@ -10,7 +10,7 @@ require __DIR__ . '/PHPMailer/src/SMTP.php';
 function enviarEmail($to, $subject, $body) {
     $mail = new PHPMailer(true);
 
-    $mail->SMTPDebug = 0; // poner 2 si querés ver el log
+    $mail->SMTPDebug = 2; // poner 2 si querés ver el log
 
     try {
         $mail->isSMTP();
