@@ -54,6 +54,19 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 
 <div class="main">
 
+<?php if (isset($_GET['sent'])): ?>
+    <div style="background:#d1fae5;color:#065f46;padding:12px;border-radius:8px;margin-bottom:16px;">
+        ✔ El email fue enviado correctamente.
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_GET['error'])): ?>
+    <div style="background:#fee2e2;color:#991b1b;padding:12px;border-radius:8px;margin-bottom:16px;">
+        ✖ No se pudo enviar el email.
+    </div>
+<?php endif; ?>
+
+
     <div class="card">
         <h2>Recordatorios de mañana</h2>
 

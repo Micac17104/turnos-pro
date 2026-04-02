@@ -10,7 +10,7 @@ if (!$email || !$body) {
 }
 
 if (enviarEmail($email, "Recordatorio de turno", $body)) {
-    header("Location: centro-recordatorios.php?ok=1");
+    header("Location: centro-recordatorios.php?sent=1");
 } else {
     header("Location: centro-recordatorios.php?error=1");
 }
