@@ -10,9 +10,10 @@ if (!$user_id) {
 }
 
 require __DIR__ . '/includes/auth.php';
-require __DIR__ . '/includes/header.php';
+require __DIR__ . '/../includes/header.php';
 require __DIR__ . '/includes/sidebar.php';
 ?>
+
 
 <main class="flex-1 p-8">
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Planes para centros</h1>
