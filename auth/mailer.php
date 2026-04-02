@@ -18,7 +18,8 @@ function enviarEmail($to, $subject, $body) {
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'turnospro2@gmail.com';
-        $mail->Password   = getenv('GMAIL_APP_PASSWORD');
+       $mail->Password   = getenv('GMAIL_APP_PASSWORD') ?: ($_ENV['GMAIL_APP_PASSWORD'] ?? null);
+
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
