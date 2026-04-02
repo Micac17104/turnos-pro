@@ -1,4 +1,7 @@
 <?php
+echo "CONFIG CARGADO DESDE: " . realpath(__DIR__ . '/../config.php');
+exit;
+
 // ===============================
 // Cargar App Password de Gmail
 // ===============================
@@ -24,4 +27,3 @@ try {
 } catch (PDOException $e) {
     die("Error de conexión: " . $e->getMessage());
 }
-
