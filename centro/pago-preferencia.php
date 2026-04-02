@@ -36,14 +36,13 @@ if (!isset($_GET['plan'])) {
     die("Plan inválido");
 }
 
-$plan = (int) $_GET['plan'];
+$plan = $_GET['plan'];
 
+// PLANES DEL CENTRO (COINCIDEN CON TU UI)
 $planes = [
-    1 => 8000,
-    2 => 13000,
-    3 => 18000,
-    4 => 23000,
-    5 => 28000,
+    "basico"  => 8000,
+    "pro"     => 15000,
+    "premium" => 25000
 ];
 
 if (!isset($planes[$plan])) {
@@ -56,6 +55,7 @@ SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da1
 
 $baseUrl = "https://www.turnosaura.com";
 
+// Cancelar suscripción anterior si existe
 if (!empty($user['mp_preapproval_id'])) {
     try {
         $old = Preapproval::find_by_id($user['mp_preapproval_id']);
