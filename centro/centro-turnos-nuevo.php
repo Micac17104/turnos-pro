@@ -23,6 +23,7 @@ $stmt = $pdo->prepare("
     WHERE center_id = ?
     ORDER BY name
 ");
+
 $stmt->execute([$center_id]);
 $pacientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -72,14 +73,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
 
-        $stmt = $pdo->prepare("
-            INSERT INTO appointments (user_id, client_id, date, time, status, center_id)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ");
+    $stmt = $pdo->prepare("
+    INSERT INTO appointments (user_id, client_id, date, time, status, center_id)
+    VALUES (?, ?, ?, ?, ?, ?)
+");
+$stmt->execute([$prof_id, $client_id, $date, $time, $status, $center_id]);
 
-        $stmt->execute([$prof_id, $client_id, $date, $time, $status, $center_id]);
+// --------------------------------------
+// ENVIAR EMAIL AL PACIENTE
+// --------------------------------------
+$stmt = $pdo->prepare("SELECT name, email FROM clients WHERE id = ?");
+$stmt->execute([$client_id]);
+$paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $success = "Turno creado correctamente.";
+if ($paciente && !empty($paciente['email'])) {
+
+    require __DIR__ . '/../auth/mailer.php'; // mailer correcto
+
+    $asunto = "Nuevo turno asignado - TurnosAura";
+
+    $mensaje = "
+        Hola {$paciente['name']},<br><br>
+        Se te asignó un turno en el centro:<br><br>
+        <strong>Fecha:</strong> " . date('d/m/Y', strtotime($date)) . "<br>
+        <strong>Hora:</strong> " . substr($time, 0, 5) . " hs<br><br>
+        Gracias por usar TurnosAura.
+    ";
+
+    enviarEmail($paciente['email'], $asunto, $mensaje);
+}
+
+$success = "Turno creado correctamente.";
+
     }
 }
 ?>

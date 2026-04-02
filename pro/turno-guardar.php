@@ -72,7 +72,6 @@ if ($turno_id) {
     ");
     $stmt->execute([$client_id, $date, $time, $turno_id]);
 
-    // Redirección corregida
     redirect('agenda.php?edit=1');
 }
 
@@ -82,6 +81,35 @@ $stmt = $pdo->prepare("
     VALUES (?, ?, ?, ?)
 ");
 $stmt->execute([$user_id, $client_id, $date, $time]);
+
+// --------------------------------------
+// ENVIAR EMAIL AL PACIENTE (si tiene email)
+// --------------------------------------
+if (!empty($client_id)) {
+
+    // Obtener datos del paciente
+    $stmt = $pdo->prepare("SELECT name, email FROM clients WHERE id = ?");
+    $stmt->execute([$client_id]);
+    $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($paciente && !empty($paciente['email'])) {
+
+        // USAR EL MAILER QUE FUNCIONA
+        require __DIR__ . '/../auth/mailer.php';
+
+        $asunto = "Nuevo turno asignado - TurnosAura";
+
+        $mensaje = "
+            Hola {$paciente['name']},<br><br>
+            Tu profesional te asignó un turno:<br><br>
+            <strong>Fecha:</strong> " . date('d/m/Y', strtotime($date)) . "<br>
+            <strong>Hora:</strong> " . substr($time, 0, 5) . " hs<br><br>
+            Gracias por usar TurnosAura.
+        ";
+
+        enviarEmail($paciente['email'], $asunto, $mensaje);
+    }
+}
 
 // Redirección corregida
 redirect('agenda.php?ok=1');

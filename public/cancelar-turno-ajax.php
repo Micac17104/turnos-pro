@@ -44,9 +44,15 @@ $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
 
 // -----------------------------
-// EMAIL AL PROFESIONAL (PHPMailer)
 // -----------------------------
-if (!empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
+// EMAIL AL PROFESIONAL (individual o centro)
+// -----------------------------
+
+// Detectar si es profesional del centro
+$isCentro = !empty($turno['parent_center_id']);
+
+// Caso 1: Profesional individual (usa notification_settings)
+if (!$isCentro && !empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
 
     $msgPro = str_replace(
         ['{paciente}', '{fecha}', '{hora}'],
@@ -60,6 +66,25 @@ if (!empty($turno['notify_professional_email']) && !empty($turno['professional_m
 
     enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
 }
+
+// Caso 2: Profesional del centro (SIEMPRE enviar email)
+if ($isCentro) {
+
+    $paciente = $_SESSION['paciente_nombre'] ?? 'Paciente';
+    $fecha = date('d/m/Y', strtotime($turno['date']));
+    $hora = substr($turno['time'], 0, 5);
+
+    $msgCentro = "
+        Hola {$turno['profesional']},<br><br>
+        El paciente <strong>{$paciente}</strong> canceló su turno:<br><br>
+        <strong>Fecha:</strong> {$fecha}<br>
+        <strong>Hora:</strong> {$hora}<br><br>
+        TurnosAura
+    ";
+
+    enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", $msgCentro);
+}
+
 
 // -----------------------------
 // WHATSAPP AL PROFESIONAL

@@ -34,11 +34,12 @@
 </a>
 
 <li>
-    <a href="/planes/index.php">
+    <a href="planes.php">
         <i class="fa-solid fa-layer-group"></i>
         <span>Planes</span>
     </a>
 </li>
+
 
 
 <a href="/cancelar-suscripcion.php"

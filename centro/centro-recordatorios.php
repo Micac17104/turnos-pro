@@ -100,10 +100,12 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                     <!-- Email -->
                     <?php if (!empty($t['paciente_email'])): ?>
                         <form method="POST" action="send-reminder.php" style="display:inline;">
-                            <input type="hidden" name="email" value="<?= $t['paciente_email'] ?>">
-                            <input type="hidden" name="body" value="<?= htmlspecialchars($emailBody) ?>">
-                            <button class="btn-email">Email</button>
-                        </form>
+    <input type="hidden" name="email" value="<?= $t['paciente_email'] ?>">
+    <input type="hidden" name="body" value="<?= htmlspecialchars($emailBody) ?>">
+    <button class="btn-email">Email</button>
+</form>
+
+
                     <?php else: ?>
                         <span style="color:#b91c1c; margin-left:8px;">Sin email</span>
                     <?php endif; ?>
