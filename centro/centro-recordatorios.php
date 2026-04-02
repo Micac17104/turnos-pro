@@ -1,9 +1,8 @@
 <?php
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
-require __DIR__ . '/../auth/mailer.php'; // ← IMPORTANTE
+require __DIR__ . '/../auth/mailer.php';
 
-// Turnos de mañana
 $stmt = $pdo->prepare("
     SELECT 
         a.id,
@@ -73,7 +72,6 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                 );
                 $phone = preg_replace('/\D/', '', $t['paciente_phone']);
 
-                // Email body
                 $emailBody = "
                     <h2>Recordatorio de turno</h2>
                     <p>Hola {$t['paciente']}, te recordamos tu turno mañana a las 
@@ -87,7 +85,6 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                 <td><?= htmlspecialchars($t['profesional']) ?></td>
                 <td>
 
-                    <!-- WhatsApp -->
                     <?php if ($phone): ?>
                         <a class="btn-wsp" target="_blank"
                            href="https://wa.me/<?= $phone ?>?text=<?= $msg ?>">
@@ -97,17 +94,12 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                         <span style="color:#b91c1c;">Sin teléfono</span>
                     <?php endif; ?>
 
-                    <!-- Email -->
                     <?php if (!empty($t['paciente_email'])): ?>
-                       <form method="POST" action="send-reminder.php" style="display:inline;">
-
-    <input type="hidden" name="email" value="<?= $t['paciente_email'] ?>">
-    <input type="hidden" name="body" value="<?= htmlspecialchars($emailBody) ?>">
-    <button class="btn-email">Email</button>
-</form>
-
-
-
+                        <form method="POST" action="send-reminder.php" style="display:inline;">
+                            <input type="hidden" name="email" value="<?= $t['paciente_email'] ?>">
+                            <input type="hidden" name="body" value="<?= htmlspecialchars($emailBody) ?>">
+                            <button class="btn-email">Email</button>
+                        </form>
                     <?php else: ?>
                         <span style="color:#b91c1c; margin-left:8px;">Sin email</span>
                     <?php endif; ?>

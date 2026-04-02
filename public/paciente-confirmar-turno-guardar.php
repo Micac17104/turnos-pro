@@ -27,6 +27,9 @@ if (!$pro) {
     die("Profesional no encontrado.");
 }
 
+// Detectar si pertenece a un centro
+$isCentro = !empty($pro['parent_center_id']);
+
 // Buscar o crear paciente
 $paciente_id = $_SESSION['paciente_id'] ?? null;
 
@@ -90,16 +93,25 @@ if (!empty($config['confirm_message'])) {
 }
 
 // -----------------------------
-// EMAIL AL PACIENTE (PHPMailer)
+// EMAIL AL PACIENTE
 // -----------------------------
-if (!empty($config['email_enabled'])) {
+
+// Profesional individual → respeta configuraciones
+if (!$isCentro && !empty($config['email_enabled'])) {
+    enviarEmail($email, "Confirmación de turno", nl2br($mensaje_final));
+}
+
+// Profesional del centro → SIEMPRE enviar email
+if ($isCentro) {
     enviarEmail($email, "Confirmación de turno", nl2br($mensaje_final));
 }
 
 // -----------------------------
-// EMAIL AL PROFESIONAL (PHPMailer)
+// EMAIL AL PROFESIONAL
 // -----------------------------
-if (!empty($config['notify_professional_email']) && !empty($config['professional_message'])) {
+
+// Profesional individual → respeta configuraciones
+if (!$isCentro && !empty($config['notify_professional_email']) && !empty($config['professional_message'])) {
 
     $msg_pro = str_replace(
         ['{paciente}', '{fecha}', '{hora}'],
@@ -108,6 +120,20 @@ if (!empty($config['notify_professional_email']) && !empty($config['professional
     );
 
     enviarEmail($pro['email'], "Nuevo turno reservado", nl2br($msg_pro));
+}
+
+// Profesional del centro → SIEMPRE enviar email
+if ($isCentro) {
+
+    $msgCentro = "
+        Hola {$pro['name']},<br><br>
+        El paciente <strong>{$name}</strong> reservó un turno:<br><br>
+        <strong>Fecha:</strong> $date<br>
+        <strong>Hora:</strong> $time<br><br>
+        TurnosAura
+    ";
+
+    enviarEmail($pro['email'], "Nuevo turno reservado", $msgCentro);
 }
 
 // Guardar datos para pantalla de gracias
