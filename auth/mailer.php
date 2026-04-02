@@ -10,32 +10,23 @@ require __DIR__ . '/PHPMailer/src/SMTP.php';
 function enviarEmail($to, $subject, $body) {
     $mail = new PHPMailer(true);
 
-    $mail->SMTPDebug = 2;
-    
-
+    $mail->SMTPDebug = 0; // poner 2 si querés ver el log
 
     try {
         $mail->isSMTP();
-        $mail->Host = 'smtp.sendgrid.net';
-        $mail->SMTPAuth = true;
-
-        // SendGrid SIEMPRE usa "apikey" como usuario
-        $mail->Username = 'apikey';
-
-        // La API KEY viene de variable de entorno
-        $mail->Password = getenv('SENDGRID_API_KEY');
-
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'turnospro2@gmail.com';
+        $mail->Password   = getenv('GMAIL_APP_PASSWORD');
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
+        $mail->Port       = 587;
 
-        // TU EMAIL REAL
         $mail->setFrom('turnospro2@gmail.com', 'TurnosPro');
-
         $mail->addAddress($to);
 
         $mail->isHTML(true);
         $mail->Subject = $subject;
-        $mail->Body = $body;
+        $mail->Body    = $body;
 
         $mail->send();
         return true;
@@ -45,4 +36,3 @@ function enviarEmail($to, $subject, $body) {
         return false;
     }
 }
-
