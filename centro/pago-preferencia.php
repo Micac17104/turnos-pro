@@ -38,24 +38,22 @@ if (!isset($_GET['plan'])) {
 
 $plan = $_GET['plan'];
 
-// PLANES DEL CENTRO (COINCIDEN CON TU UI)
-$planes = [
+$precios = [
     "basico"  => 8000,
     "pro"     => 15000,
     "premium" => 25000
 ];
 
-if (!isset($planes[$plan])) {
+if (!isset($precios[$plan])) {
     die("Plan no encontrado");
 }
 
-$precio = (float)$planes[$plan];
+$precio = (float)$precios[$plan];
 
 SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
 
 $baseUrl = "https://www.turnosaura.com";
 
-// Cancelar suscripción anterior si existe
 if (!empty($user['mp_preapproval_id'])) {
     try {
         $old = Preapproval::find_by_id($user['mp_preapproval_id']);
@@ -74,7 +72,7 @@ if (!empty($user['mp_preapproval_id'])) {
 try {
 
     $preapproval = new Preapproval();
-    $preapproval->payer_email = $user['email'];
+    $preapproval->payer_email = $user['email']; // SIN VALIDACIÓN EXTRA
     $preapproval->back_url = $baseUrl . "/centro/centro-dashboard.php";
     $preapproval->reason = "Suscripción mensual centro - Plan $plan";
     $preapproval->external_reference = (string)$user_id;

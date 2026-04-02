@@ -3,16 +3,23 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+/* ---------------------------------------------------------
+   1) Validación de sesión ANTES de enviar cualquier HTML
+--------------------------------------------------------- */
 $user_id = $_SESSION['user_id'] ?? null;
 if (!$user_id) {
     header("Location: /auth/login.php");
     exit;
 }
 
-// Autenticación del centro
+/* ---------------------------------------------------------
+   2) Autenticación del centro
+--------------------------------------------------------- */
 require __DIR__ . '/includes/auth.php';
 
-// Layout general (header y footer están en /pro/includes/)
+/* ---------------------------------------------------------
+   3) Cargar layout (header y sidebar del profesional)
+--------------------------------------------------------- */
 require __DIR__ . '/../pro/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';
 ?>
