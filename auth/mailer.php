@@ -10,19 +10,24 @@ require __DIR__ . '/PHPMailer/src/SMTP.php';
 function enviarEmail($to, $subject, $body) {
     $mail = new PHPMailer(true);
 
-    $mail->SMTPDebug = 0; // no mostrar nada en pantalla
+    $mail->SMTPDebug = 0;
 
     try {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
 
-        // 🔒 Recuperar contraseña de entorno
+        // 1) Intentar variable de entorno (funciona en tu PC)
         $password = getenv('GMAIL_APP_PASSWORD');
 
-        // ❗ Si no existe, NO llamar a PHPMailer → evitar warnings
+        // 2) Si no existe (servidor), cargar secret.php
         if (!$password || trim($password) === '') {
-            error_log("GMAIL_APP_PASSWORD no está definida");
+            $password = include __DIR__ . '/secret.php';
+        }
+
+        // 3) Si sigue sin contraseña → no enviar
+        if (!$password || trim($password) === '') {
+            error_log("No hay contraseña SMTP disponible");
             return false;
         }
 
