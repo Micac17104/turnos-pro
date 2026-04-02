@@ -1,4 +1,13 @@
 <?php
+// ===============================
+// Cargar App Password de Gmail
+// ===============================
+putenv("GMAIL_APP_PASSWORD=qwom wmrp ckhz jmqt");
+// Ejemplo: putenv("GMAIL_APP_PASSWORD=abcd efgh ijkl mnop");
+
+// ===============================
+// Conexión a Railway
+// ===============================
 $host = "mysql.railway.internal";
 $dbname = "railway";
 $user = "root";
