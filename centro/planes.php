@@ -1,4 +1,6 @@
-<?php require __DIR__ . '/../includes/auth.php'; ?>
+<?php 
+require __DIR__ . '/includes/auth.php';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,7 +10,7 @@
 </head>
 <body>
 
-<?php include __DIR__ . '/../includes/sidebar.php'; ?>
+<?php include __DIR__ . '/includes/sidebar.php'; ?>
 
 <div style="margin-left:260px; padding:24px;">
     <h2>Elegí tu plan</h2>

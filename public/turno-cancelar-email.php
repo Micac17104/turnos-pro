@@ -4,7 +4,7 @@ session_start();
 
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
-require __DIR__ . '/../auth/mailer.php'; // ← USAMOS EL MAILER BUENO
+require __DIR__ . '/../auth/mailer.php';
 
 $turno_id = $_GET['id'] ?? null;
 $token    = $_GET['token'] ?? null;
@@ -13,23 +13,20 @@ if (!$turno_id || !$token) {
     die("Datos incompletos.");
 }
 
-// Obtener turno + profesional + notificaciones
 $stmt = $pdo->prepare("
     SELECT 
         a.*,
-        c.name AS paciente_nombre,
-        c.email AS paciente_email,
-        u.name AS profesional_nombre,
+        u.name AS profesional,
         u.email AS profesional_email,
         u.phone AS profesional_telefono,
+        u.parent_center_id,
         ns.notify_professional_email,
         ns.notify_professional_whatsapp,
         ns.professional_message
     FROM appointments a
-    JOIN clients c ON a.client_id = c.id
     JOIN users u ON a.user_id = u.id
     LEFT JOIN notification_settings ns ON ns.user_id = a.user_id
-    WHERE a.id = ? AND a.email_token = ?
+    WHERE a.id = ? AND a.client_id = ?
 ");
 $stmt->execute([$turno_id, $token]);
 $turno = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -38,33 +35,25 @@ if (!$turno) {
     die("Token inválido o turno no encontrado.");
 }
 
-// Si ya estaba cancelado, mostrar mensaje
 if ($turno['status'] === 'cancelled') {
     echo "<h2>Este turno ya estaba cancelado.</h2>";
     exit;
 }
 
-// Cancelar turno
 $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
 
-// -----------------------------
-// -----------------------------
-// EMAIL AL PROFESIONAL (individual o centro)
-// -----------------------------
-
 $isCentro = !empty($turno['parent_center_id']);
+$paciente = $_SESSION['paciente_nombre'] ?? 'Paciente';
+$fecha = date('d/m/Y', strtotime($turno['date']));
+$hora = substr($turno['time'], 0, 5);
 
 // Profesional individual
 if (!$isCentro && !empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
 
     $msgPro = str_replace(
         ['{paciente}', '{fecha}', '{hora}'],
-        [
-            $turno['paciente_nombre'],
-            date('d/m/Y', strtotime($turno['date'])),
-            substr($turno['time'], 0, 5)
-        ],
+        [$paciente, $fecha, $hora],
         $turno['professional_message']
     );
 
@@ -73,10 +62,6 @@ if (!$isCentro && !empty($turno['notify_professional_email']) && !empty($turno['
 
 // Profesional del centro
 if ($isCentro) {
-
-    $paciente = $turno['paciente_nombre'];
-    $fecha = date('d/m/Y', strtotime($turno['date']));
-    $hora = substr($turno['time'], 0, 5);
 
     $msgCentro = "
         Hola {$turno['profesional']},<br><br>
@@ -88,32 +73,6 @@ if ($isCentro) {
 
     enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", $msgCentro);
 }
-
-
-// -----------------------------
-// WHATSAPP AL PROFESIONAL
-// -----------------------------
-if (!empty($turno['notify_professional_whatsapp'])) {
-
-    $telefonoPro = preg_replace('/\D/', '', $turno['profesional_telefono'] ?? '');
-
-    if (!empty($telefonoPro)) {
-
-        $msgProWhats = str_replace(
-            ['{paciente}', '{fecha}', '{hora}'],
-            [
-                $turno['paciente_nombre'],
-                date('d/m/Y', strtotime($turno['date'])),
-                substr($turno['time'], 0, 5)
-            ],
-            $turno['professional_message']
-        );
-
-        $url = "https://api.callmebot.com/whatsapp.php?phone={$telefonoPro}&text=" . urlencode($msgProWhats);
-        @file_get_contents($url);
-    }
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -138,7 +97,7 @@ if (!empty($turno['notify_professional_whatsapp'])) {
 
     <div class="p-4 bg-slate-50 border rounded-lg mb-6 text-left">
         <p class="text-sm text-slate-500">Profesional</p>
-        <p class="font-semibold text-slate-900"><?= htmlspecialchars($turno['profesional_nombre']) ?></p>
+        <p class="font-semibold text-slate-900"><?= htmlspecialchars($turno['profesional']) ?></p>
 
         <p class="text-sm text-slate-500 mt-4">Fecha</p>
         <p class="font-semibold text-slate-900"><?= date("d/m/Y", strtotime($turno['date'])) ?></p>

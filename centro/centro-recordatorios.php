@@ -106,6 +106,7 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 </form>
 
 
+
                     <?php else: ?>
                         <span style="color:#b91c1c; margin-left:8px;">Sin email</span>
                     <?php endif; ?>
