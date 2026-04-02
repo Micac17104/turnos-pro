@@ -20,11 +20,13 @@ $stmt = $pdo->prepare("
         u.email AS profesional_email,
         u.phone AS profesional_telefono,
         u.parent_center_id,
+        c.name AS paciente_nombre,
         ns.notify_professional_email,
         ns.notify_professional_whatsapp,
         ns.professional_message
     FROM appointments a
     JOIN users u ON a.user_id = u.id
+    JOIN clients c ON c.id = a.client_id
     LEFT JOIN notification_settings ns ON ns.user_id = a.user_id
     WHERE a.id = ? AND a.client_id = ?
 ");
@@ -44,7 +46,7 @@ $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
 
 $isCentro = !empty($turno['parent_center_id']);
-$paciente = $_SESSION['paciente_nombre'] ?? 'Paciente';
+$paciente = $turno['paciente_nombre'];
 $fecha = date('d/m/Y', strtotime($turno['date']));
 $hora = substr($turno['time'], 0, 5);
 

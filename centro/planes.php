@@ -1,38 +1,52 @@
-<?php 
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$user_id = $_SESSION['user_id'] ?? null;
+if (!$user_id) {
+    header("Location: /auth/login.php");
+    exit;
+}
+
 require __DIR__ . '/includes/auth.php';
+require __DIR__ . '/includes/header.php';
+require __DIR__ . '/includes/sidebar.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Planes</title>
-<link rel="stylesheet" href="../assets/style.css">
-</head>
-<body>
 
-<?php include __DIR__ . '/includes/sidebar.php'; ?>
+<main class="flex-1 p-8">
+    <h1 class="text-2xl font-semibold text-slate-900 mb-6">Planes para centros</h1>
 
-<div style="margin-left:260px; padding:24px;">
-    <h2>Elegí tu plan</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-    <div class="plan-card">
-        <h3>Básico</h3>
-        <p>Ideal para profesionales individuales.</p>
-        <a href="contratar.php?plan=basico" class="btn">Contratar</a>
+        <div class="bg-white shadow rounded-xl p-6 text-center border">
+            <h2 class="text-xl font-bold mb-2">Plan Básico</h2>
+            <p class="text-3xl font-semibold mb-4">$8.000</p>
+            <a href="pago-preferencia.php?plan=basico"
+               class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+               Contratar
+            </a>
+        </div>
+
+        <div class="bg-white shadow rounded-xl p-6 text-center border">
+            <h2 class="text-xl font-bold mb-2">Plan Pro</h2>
+            <p class="text-3xl font-semibold mb-4">$15.000</p>
+            <a href="pago-preferencia.php?plan=pro"
+               class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+               Contratar
+            </a>
+        </div>
+
+        <div class="bg-white shadow rounded-xl p-6 text-center border">
+            <h2 class="text-xl font-bold mb-2">Plan Premium</h2>
+            <p class="text-3xl font-semibold mb-4">$25.000</p>
+            <a href="pago-preferencia.php?plan=premium"
+               class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+               Contratar
+            </a>
+        </div>
+
     </div>
+</main>
 
-    <div class="plan-card">
-        <h3>Pro</h3>
-        <p>Para centros pequeños con varios profesionales.</p>
-        <a href="contratar.php?plan=pro" class="btn">Contratar</a>
-    </div>
-
-    <div class="plan-card">
-        <h3>Premium</h3>
-        <p>Para centros grandes con automatizaciones.</p>
-        <a href="contratar.php?plan=premium" class="btn">Contratar</a>
-    </div>
-</div>
-
-</body>
-</html>
+<?php require __DIR__ . '/includes/footer.php'; ?>
