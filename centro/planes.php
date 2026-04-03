@@ -1,4 +1,7 @@
 <?php
+echo "ID del centro logueado: " . $_SESSION['user_id'];
+exit;
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
