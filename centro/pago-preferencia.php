@@ -18,10 +18,11 @@ use MercadoPago\Preapproval;
 
 $user_id = $_SESSION['user_id'] ?? null;
 
-if (!$user_id || $_SESSION['account_type'] !== 'center') {
+if (!$user_id) {
     header("Location: /auth/login.php");
     exit;
 }
+
 
 $stmt = $pdo->prepare("SELECT email, mp_preapproval_id FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
@@ -36,7 +37,7 @@ if (!isset($_GET['plan'])) {
     die("Plan inválido");
 }
 
-$plan = (int) $_GET['plan'];
+$plan =  $_GET['plan'];
 
 $precios = [
     "basico"  => 8000,
