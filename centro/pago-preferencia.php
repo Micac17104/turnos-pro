@@ -23,7 +23,6 @@ if (!$user_id) {
     exit;
 }
 
-
 $stmt = $pdo->prepare("SELECT email, mp_preapproval_id FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,7 +36,7 @@ if (!isset($_GET['plan'])) {
     die("Plan inválido");
 }
 
-$plan =  $_GET['plan'];
+$plan = $_GET['plan'];
 
 $precios = [
     "basico"  => 8000,
@@ -73,7 +72,7 @@ if (!empty($user['mp_preapproval_id'])) {
 try {
 
     $preapproval = new Preapproval();
-    $preapproval->payer_email = $user['email']; // SIN VALIDACIÓN EXTRA
+    $preapproval->payer_email = $user['email'];
     $preapproval->back_url = $baseUrl . "/centro/centro-dashboard.php";
     $preapproval->reason = "Suscripción mensual centro - Plan $plan";
     $preapproval->external_reference = (string)$user_id;
@@ -109,8 +108,16 @@ try {
         exit;
 
     } else {
-        mp_log(["error_creating_subscription" => $preapproval]);
-        die("No se pudo crear la suscripción. Intentalo más tarde.");
+
+        mp_log([
+            "error_creating_subscription" => $preapproval,
+            "mp_error" => $preapproval->error ?? "NO ERROR FIELD"
+        ]);
+
+        echo "<pre>";
+        print_r($preapproval->error);
+        echo "</pre>";
+        exit;
     }
 
 } catch (Exception $e) {
@@ -118,3 +125,5 @@ try {
     mp_log(["exception" => $e->getMessage()]);
     die("Error al procesar la suscripción.");
 }
+
+?>
