@@ -22,12 +22,14 @@ require __DIR__ . '/includes/auth.php';
 --------------------------------------------------------- */
 require __DIR__ . '/../pro/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';
+
 ?>
 
 <main class="flex-1 p-8">
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Planes para centros</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
+
 
         <!-- Plan Básico -->
         <div class="bg-white shadow rounded-xl p-6 text-center border">
