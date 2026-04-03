@@ -74,7 +74,7 @@ try {
     $preapproval = new Preapproval();
     $preapproval->payer_email = $user['email'];
 
-    // 🔥 ESTA ES LA CLAVE: back_url válida y pública
+    // 🔥 back_url válida y pública
     $preapproval->back_url = $baseUrl . "/centro/suscripcion-exitosa.php";
 
     $preapproval->reason = "Suscripción mensual centro - Plan $plan";
@@ -87,7 +87,8 @@ try {
         "currency_id" => "ARS"
     ];
 
-    $preapproval->status = "authorized";
+    // ❌ ESTA LÍNEA ERA EL PROBLEMA — NO VA
+    // $preapproval->status = "authorized";
 
     mp_log(["request_sent" => $preapproval]);
 
