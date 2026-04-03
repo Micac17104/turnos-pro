@@ -1,7 +1,7 @@
 <?php
 
 function mp_log($data) {
-    $logFile = __DIR__ . "/mp-log.txt";
+    $logFile = __DIR__ . "/mp-log-centro.txt";
     $entry = "[" . date("Y-m-d H:i:s") . "] " . print_r($data, true) . "\n\n";
     file_put_contents($logFile, $entry, FILE_APPEND);
 }
@@ -18,7 +18,7 @@ use MercadoPago\Preapproval;
 
 $user_id = $_SESSION['user_id'] ?? null;
 
-if (!$user_id || $_SESSION['account_type'] !== 'professional') {
+if (!$user_id || $_SESSION['account_type'] !== 'center') {
     header("Location: /auth/login.php");
     exit;
 }
@@ -39,9 +39,9 @@ if (!isset($_GET['plan'])) {
 $plan = (int) $_GET['plan'];
 
 $precios = [
-    1 => 8000,
-    2 => 13000,
-    3 => 17000,
+    "basico"  => 8000,
+    "pro"     => 15000,
+    "premium" => 25000
 ];
 
 if (!isset($precios[$plan])) {
@@ -72,9 +72,9 @@ if (!empty($user['mp_preapproval_id'])) {
 try {
 
     $preapproval = new Preapproval();
-    $preapproval->payer_email = $user['email'];
-    $preapproval->back_url = $baseUrl . "/pro/dashboard.php";
-    $preapproval->reason = "Suscripción mensual profesional - Plan $plan";
+    $preapproval->payer_email = $user['email']; // SIN VALIDACIÓN EXTRA
+    $preapproval->back_url = $baseUrl . "/centro/centro-dashboard.php";
+    $preapproval->reason = "Suscripción mensual centro - Plan $plan";
     $preapproval->external_reference = (string)$user_id;
 
     $preapproval->auto_recurring = [
