@@ -3,8 +3,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-echo "ID del centro logueado: " . ($_SESSION['user_id'] ?? 'NO HAY SESSION');
-exit;
 
 
 /* ---------------------------------------------------------
