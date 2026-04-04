@@ -7,6 +7,11 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
 require __DIR__ . '/../auth/mailer.php'; // ← USAMOS EL MAILER BUENO
 
+function debug_log($msg) {
+    file_put_contents(__DIR__ . "/debug-cancel.txt", "[".date("Y-m-d H:i:s")."] ".$msg."\n", FILE_APPEND);
+}
+
+
 $paciente_id = $_SESSION['paciente_id'] ?? null;
 $turno_id    = $_GET['id'] ?? null;
 
@@ -69,6 +74,9 @@ if (!empty($turno['notify_professional_email']) && !empty($turno['professional_m
         [$paciente, $fecha, $hora],
         $turno['professional_message']
     );
+debug_log("Email del profesional: " . $turno['profesional_email']);
+debug_log("Mensaje profesional: " . ($turno['professional_message'] ?? 'NULL'));
+debug_log("Entrando al bloque de envío de email");
 
     enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
 }

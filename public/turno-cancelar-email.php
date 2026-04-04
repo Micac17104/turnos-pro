@@ -6,14 +6,23 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
 require __DIR__ . '/../auth/mailer.php';
 
+function debug_log($msg) {
+    file_put_contents(__DIR__ . "/debug-cancel.txt", "[".date("Y-m-d H:i:s")."] ".$msg."\n", FILE_APPEND);
+}
+
+debug_log("=== turno-cancelar-email.php ===");
+
 $turno_id = $_GET['id'] ?? null;
 $token    = $_GET['token'] ?? null;
 
+debug_log("Turno ID: " . var_export($turno_id, true));
+debug_log("Token: " . var_export($token, true));
+
 if (!$turno_id || !$token) {
+    debug_log("ERROR: datos incompletos");
     die("Datos incompletos.");
 }
 
-// 🔥 BUSCAR POR TOKEN REAL, NO POR client_id
 $stmt = $pdo->prepare("
     SELECT 
         a.*,
@@ -34,30 +43,36 @@ $stmt = $pdo->prepare("
 $stmt->execute([$turno_id, $token]);
 $turno = $stmt->fetch(PDO::FETCH_ASSOC);
 
+debug_log("Turno encontrado: " . json_encode($turno));
+
 if (!$turno) {
+    debug_log("ERROR: token inválido");
     die("Token inválido o turno no encontrado.");
 }
 
 if ($turno['status'] === 'cancelled') {
+    debug_log("Turno ya estaba cancelado");
     echo "<h2>Este turno ya estaba cancelado.</h2>";
     exit;
 }
 
-// Cancelar turno
 $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
+debug_log("Turno cancelado en DB");
 
-// Datos
 $paciente = $turno['paciente_nombre'] ?: 'Paciente';
 $fecha = date('d/m/Y', strtotime($turno['date']));
 $hora = substr($turno['time'], 0, 5);
 
 $isCentro = !empty($turno['parent_center_id']);
 
-// -----------------------------
-// EMAIL AL PROFESIONAL
-// -----------------------------
+debug_log("Es centro: " . ($isCentro ? "SI" : "NO"));
+debug_log("Email profesional: " . $turno['profesional_email']);
+debug_log("Mensaje profesional: " . var_export($turno['professional_message'], true));
+
 if ($isCentro) {
+
+    debug_log("Enviando email a profesional (centro)");
 
     $msgCentro = "
         Hola {$turno['profesional']},<br><br>
@@ -67,11 +82,14 @@ if ($isCentro) {
         TurnosAura
     ";
 
-    enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", $msgCentro);
+    $ok = enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", $msgCentro);
+    debug_log("Resultado enviarEmail: " . var_export($ok, true));
 
 } else {
 
     if (!empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
+
+        debug_log("Enviando email a profesional (individual)");
 
         $msgPro = str_replace(
             ['{paciente}', '{fecha}', '{hora}'],
@@ -79,48 +97,8 @@ if ($isCentro) {
             $turno['professional_message']
         );
 
-        enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
+        $ok = enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
+        debug_log("Resultado enviarEmail: " . var_export($ok, true));
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Turno cancelado</title>
-    <link rel="stylesheet" href="https://cdn.tailwindcss.com">
-</head>
-
-<body class="bg-slate-100 flex items-center justify-center min-h-screen">
-
-<div class="bg-white p-8 rounded-xl shadow border max-w-md text-center">
-
-    <h1 class="text-2xl font-bold text-slate-900 mb-4">
-        ✖ Turno cancelado
-    </h1>
-
-    <p class="text-slate-700 mb-6">
-        El turno fue cancelado correctamente.<br>
-        Gracias por avisar.
-    </p>
-
-    <div class="p-4 bg-slate-50 border rounded-lg mb-6 text-left">
-        <p class="text-sm text-slate-500">Profesional</p>
-        <p class="font-semibold text-slate-900"><?= htmlspecialchars($turno['profesional']) ?></p>
-
-        <p class="text-sm text-slate-500 mt-4">Fecha</p>
-        <p class="font-semibold text-slate-900"><?= date("d/m/Y", strtotime($turno['date'])) ?></p>
-
-        <p class="text-sm text-slate-500 mt-4">Hora</p>
-        <p class="font-semibold text-slate-900"><?= substr($turno['time'], 0, 5) ?> hs</p>
-    </div>
-
-    <a href="https://www.turnosaura.com"
-       class="block w-full py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition">
-        Volver al sitio
-    </a>
-
-</div>
-
-</body>
-</html>
