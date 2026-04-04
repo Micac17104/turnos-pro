@@ -13,7 +13,7 @@ if (!$turno_id || !$token) {
     die("Datos incompletos.");
 }
 
-// 🔥 NUEVO: buscar turno por token, NO por client_id
+// 🔥 BUSCAR POR TOKEN REAL, NO POR client_id
 $stmt = $pdo->prepare("
     SELECT 
         a.*,
@@ -83,3 +83,44 @@ if ($isCentro) {
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Turno cancelado</title>
+    <link rel="stylesheet" href="https://cdn.tailwindcss.com">
+</head>
+
+<body class="bg-slate-100 flex items-center justify-center min-h-screen">
+
+<div class="bg-white p-8 rounded-xl shadow border max-w-md text-center">
+
+    <h1 class="text-2xl font-bold text-slate-900 mb-4">
+        ✖ Turno cancelado
+    </h1>
+
+    <p class="text-slate-700 mb-6">
+        El turno fue cancelado correctamente.<br>
+        Gracias por avisar.
+    </p>
+
+    <div class="p-4 bg-slate-50 border rounded-lg mb-6 text-left">
+        <p class="text-sm text-slate-500">Profesional</p>
+        <p class="font-semibold text-slate-900"><?= htmlspecialchars($turno['profesional']) ?></p>
+
+        <p class="text-sm text-slate-500 mt-4">Fecha</p>
+        <p class="font-semibold text-slate-900"><?= date("d/m/Y", strtotime($turno['date'])) ?></p>
+
+        <p class="text-sm text-slate-500 mt-4">Hora</p>
+        <p class="font-semibold text-slate-900"><?= substr($turno['time'], 0, 5) ?> hs</p>
+    </div>
+
+    <a href="https://www.turnosaura.com"
+       class="block w-full py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition">
+        Volver al sitio
+    </a>
+
+</div>
+
+</body>
+</html>

@@ -7,7 +7,7 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
 require __DIR__ . '/../auth/mailer.php'; // ← USAMOS EL MAILER BUENO
 
-$paciente_id = $_SESSION['paciente_id'];
+$paciente_id = $_SESSION['paciente_id'] ?? null;
 $turno_id    = $_GET['id'] ?? null;
 
 if (!$turno_id) {
@@ -16,7 +16,7 @@ if (!$turno_id) {
     exit;
 }
 
-// Obtener turno + profesional + notificaciones
+// 🔥 NUEVO: obtener turno SIN exigir client_id
 $stmt = $pdo->prepare("
     SELECT 
         a.*,
@@ -26,13 +26,15 @@ $stmt = $pdo->prepare("
         u.phone AS profesional_telefono,
         ns.notify_professional_email,
         ns.notify_professional_whatsapp,
-        ns.professional_message
+        ns.professional_message,
+        c.name AS paciente_nombre
     FROM appointments a
     JOIN users u ON a.user_id = u.id
+    LEFT JOIN clients c ON c.id = a.client_id
     LEFT JOIN notification_settings ns ON ns.user_id = a.user_id
-    WHERE a.id = ? AND a.client_id = ?
+    WHERE a.id = ?
 ");
-$stmt->execute([$turno_id, $paciente_id]);
+$stmt->execute([$turno_id]);
 $turno = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$turno) {
@@ -41,22 +43,30 @@ if (!$turno) {
     exit;
 }
 
+// 🔥 NUEVO: validar que el turno pertenece al paciente SOLO si está logueado
+if ($paciente_id && $turno['client_id'] && $turno['client_id'] != $paciente_id) {
+    echo "<p class='text-red-600'>No tienes permiso para cancelar este turno.</p>";
+    echo "</main></div></body></html>";
+    exit;
+}
+
 // Cancelar turno
 $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
 
+// Datos del turno
+$paciente = $turno['paciente_nombre'] ?: ($_SESSION['paciente_nombre'] ?? 'Paciente');
+$fecha = date('d/m/Y', strtotime($turno['date']));
+$hora = substr($turno['time'], 0, 5);
+
 // -----------------------------
-// EMAIL AL PROFESIONAL (PHPMailer)
+// EMAIL AL PROFESIONAL
 // -----------------------------
 if (!empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
 
     $msgPro = str_replace(
         ['{paciente}', '{fecha}', '{hora}'],
-        [
-            $_SESSION['paciente_nombre'] ?? 'Paciente',
-            date('d/m/Y', strtotime($turno['date'])),
-            substr($turno['time'], 0, 5)
-        ],
+        [$paciente, $fecha, $hora],
         $turno['professional_message']
     );
 
@@ -74,11 +84,7 @@ if (!empty($turno['notify_professional_whatsapp'])) {
 
         $msgProWhats = str_replace(
             ['{paciente}', '{fecha}', '{hora}'],
-            [
-                $_SESSION['paciente_nombre'] ?? 'Paciente',
-                date('d/m/Y', strtotime($turno['date'])),
-                substr($turno['time'], 0, 5)
-            ],
+            [$paciente, $fecha, $hora],
             $turno['professional_message']
         );
 

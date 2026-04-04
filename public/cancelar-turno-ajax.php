@@ -11,11 +11,12 @@ header('Content-Type: application/json');
 $paciente_id = $_SESSION['paciente_id'] ?? null;
 $turno_id    = $_POST['id'] ?? null;
 
-if (!$paciente_id || !$turno_id) {
-    echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
+if (!$turno_id) {
+    echo json_encode(['status' => 'error', 'message' => 'ID de turno faltante']);
     exit;
 }
 
+// 🔥 NUEVO: obtener turno SIN exigir client_id
 $stmt = $pdo->prepare("
     SELECT 
         a.*,
@@ -29,11 +30,11 @@ $stmt = $pdo->prepare("
         ns.professional_message
     FROM appointments a
     JOIN users u ON a.user_id = u.id
-    JOIN clients c ON c.id = a.client_id
+    LEFT JOIN clients c ON c.id = a.client_id
     LEFT JOIN notification_settings ns ON ns.user_id = a.user_id
-    WHERE a.id = ? AND a.client_id = ?
+    WHERE a.id = ?
 ");
-$stmt->execute([$turno_id, $paciente_id]);
+$stmt->execute([$turno_id]);
 $turno = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$turno) {
@@ -41,30 +42,30 @@ if (!$turno) {
     exit;
 }
 
+// 🔥 NUEVO: validar que el turno pertenece al paciente SOLO si está logueado
+if ($paciente_id && $turno['client_id'] && $turno['client_id'] != $paciente_id) {
+    echo json_encode(['status' => 'error', 'message' => 'No tienes permiso para cancelar este turno']);
+    exit;
+}
+
+// Cancelar turno
 $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
 
-$isCentro = !empty($turno['parent_center_id']);
-$paciente = $turno['paciente_nombre'];
+// Datos del turno
+$paciente = $turno['paciente_nombre'] ?: ($_SESSION['paciente_nombre'] ?? 'Paciente');
 $fecha = date('d/m/Y', strtotime($turno['date']));
 $hora = substr($turno['time'], 0, 5);
 
-// Profesional individual
-if (!$isCentro && !empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
+$isCentro = !empty($turno['parent_center_id']);
 
-    $msgPro = str_replace(
-        ['{paciente}', '{fecha}', '{hora}'],
-        [$paciente, $fecha, $hora],
-        $turno['professional_message']
-    );
-
-    enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
-}
-
-// Profesional del centro
+// -----------------------------
+// EMAIL AL PROFESIONAL
+// -----------------------------
 if ($isCentro) {
 
-    $msgCentro = "
+    // Centro
+    $msg = "
         Hola {$turno['profesional']},<br><br>
         El paciente <strong>{$paciente}</strong> canceló su turno:<br><br>
         <strong>Fecha:</strong> {$fecha}<br>
@@ -72,7 +73,21 @@ if ($isCentro) {
         TurnosAura
     ";
 
-    enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", $msgCentro);
+    enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", $msg);
+
+} else {
+
+    // Profesional individual
+    if (!empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
+
+        $msgPro = str_replace(
+            ['{paciente}', '{fecha}', '{hora}'],
+            [$paciente, $fecha, $hora],
+            $turno['professional_message']
+        );
+
+        enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
+    }
 }
 
 echo json_encode(['status' => 'ok']);
