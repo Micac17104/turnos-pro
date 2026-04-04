@@ -6,11 +6,13 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
 require __DIR__ . '/../auth/mailer.php';
 
+
 function debug_log($msg) {
-    file_put_contents(__DIR__ . "/debug-cancel.txt", "[".date("Y-m-d H:i:s")."] ".$msg."\n", FILE_APPEND);
+    global $pdo;
+    $stmt = $pdo->prepare("INSERT INTO debug_logs (message) VALUES (?)");
+    $stmt->execute([$msg]);
 }
 
-debug_log("=== turno-cancelar-email.php ===");
 
 $turno_id = $_GET['id'] ?? null;
 $token    = $_GET['token'] ?? null;
