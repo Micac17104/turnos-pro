@@ -7,6 +7,9 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
 require __DIR__ . '/../auth/mailer.php'; // ← USAMOS EL MAILER BUENO
 
+die("ESTE ES EL ARCHIVO REAL");
+
+
 function debug_log($msg) {
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO debug_logs (message) VALUES (?)");

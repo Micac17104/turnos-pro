@@ -3,6 +3,7 @@ session_start();
 require __DIR__ . '/../../config.php';
 
 
+
 // Validar login del profesional
 if (!isset($_SESSION['user_id'])) {
     header("Location: /turnos-pro/index.php");
