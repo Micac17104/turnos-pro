@@ -14,12 +14,13 @@ function debug_log($msg) {
 
 header('Content-Type: application/json');
 
+debug_log("=== cancelar-turno-ajax.php INICIADO ===");
+
 $paciente_id = $_SESSION['paciente_id'] ?? null;
 $turno_id    = $_POST['id'] ?? null;
 
-debug_log("=== cancelar-turno-ajax.php ===");
 debug_log("Paciente ID: " . var_export($paciente_id, true));
-debug_log("Turno ID: " . var_export($turno_id, true));
+debug_log("Turno ID recibido: " . var_export($turno_id, true));
 
 if (!$turno_id) {
     debug_log("ERROR: turno_id faltante");
@@ -63,15 +64,15 @@ if ($paciente_id && $turno['client_id'] && $turno['client_id'] != $paciente_id) 
 
 $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
-debug_log("Turno cancelado en DB");
+debug_log("Turno cancelado en DB: " . $turno_id);
 
 $paciente = $turno['paciente_nombre'] ?: ($_SESSION['paciente_nombre'] ?? 'Paciente');
 $fecha = date('d/m/Y', strtotime($turno['date']));
 $hora = substr($turno['time'], 0, 5);
 
 $isCentro = !empty($turno['parent_center_id']);
-
 debug_log("Es centro: " . ($isCentro ? "SI" : "NO"));
+
 debug_log("Email profesional: " . $turno['profesional_email']);
 debug_log("Mensaje profesional: " . var_export($turno['professional_message'], true));
 

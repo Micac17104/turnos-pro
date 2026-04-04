@@ -6,19 +6,19 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
 require __DIR__ . '/../auth/mailer.php';
 
-
 function debug_log($msg) {
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO debug_logs (message) VALUES (?)");
     $stmt->execute([$msg]);
 }
 
+debug_log("=== turno-cancelar-email.php INICIADO ===");
 
 $turno_id = $_GET['id'] ?? null;
 $token    = $_GET['token'] ?? null;
 
-debug_log("Turno ID: " . var_export($turno_id, true));
-debug_log("Token: " . var_export($token, true));
+debug_log("Turno ID recibido: " . var_export($turno_id, true));
+debug_log("Token recibido: " . var_export($token, true));
 
 if (!$turno_id || !$token) {
     debug_log("ERROR: datos incompletos");
@@ -60,15 +60,15 @@ if ($turno['status'] === 'cancelled') {
 
 $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
-debug_log("Turno cancelado en DB");
+debug_log("Turno cancelado en DB: " . $turno_id);
 
 $paciente = $turno['paciente_nombre'] ?: 'Paciente';
 $fecha = date('d/m/Y', strtotime($turno['date']));
 $hora = substr($turno['time'], 0, 5);
 
 $isCentro = !empty($turno['parent_center_id']);
-
 debug_log("Es centro: " . ($isCentro ? "SI" : "NO"));
+
 debug_log("Email profesional: " . $turno['profesional_email']);
 debug_log("Mensaje profesional: " . var_export($turno['professional_message'], true));
 

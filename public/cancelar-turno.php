@@ -5,10 +5,7 @@ session_start();
 require __DIR__ . '/paciente-layout.php';
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
-require __DIR__ . '/../auth/mailer.php'; // ← USAMOS EL MAILER BUENO
-
-die("ESTE ES EL ARCHIVO REAL");
-
+require __DIR__ . '/../auth/mailer.php';
 
 function debug_log($msg) {
     global $pdo;
@@ -16,18 +13,20 @@ function debug_log($msg) {
     $stmt->execute([$msg]);
 }
 
-
+debug_log("=== cancelar-turno.php INICIADO ===");
 
 $paciente_id = $_SESSION['paciente_id'] ?? null;
 $turno_id    = $_GET['id'] ?? null;
 
+debug_log("Paciente ID: " . var_export($paciente_id, true));
+debug_log("Turno ID recibido: " . var_export($turno_id, true));
+
 if (!$turno_id) {
+    debug_log("ERROR: turno_id faltante");
     echo "<p class='text-red-600'>Turno no especificado.</p>";
-    echo "</main></div></body></html>";
     exit;
 }
 
-// 🔥 NUEVO: obtener turno SIN exigir client_id
 $stmt = $pdo->prepare("
     SELECT 
         a.*,
@@ -48,49 +47,48 @@ $stmt = $pdo->prepare("
 $stmt->execute([$turno_id]);
 $turno = $stmt->fetch(PDO::FETCH_ASSOC);
 
+debug_log("Turno encontrado: " . json_encode($turno));
+
 if (!$turno) {
+    debug_log("ERROR: turno no encontrado");
     echo "<p class='text-red-600'>No se encontró el turno.</p>";
-    echo "</main></div></body></html>";
     exit;
 }
 
-// 🔥 NUEVO: validar que el turno pertenece al paciente SOLO si está logueado
 if ($paciente_id && $turno['client_id'] && $turno['client_id'] != $paciente_id) {
+    debug_log("ERROR: paciente no autorizado");
     echo "<p class='text-red-600'>No tienes permiso para cancelar este turno.</p>";
-    echo "</main></div></body></html>";
     exit;
 }
 
-// Cancelar turno
 $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
+debug_log("Turno cancelado en DB: " . $turno_id);
 
-// Datos del turno
 $paciente = $turno['paciente_nombre'] ?: ($_SESSION['paciente_nombre'] ?? 'Paciente');
 $fecha = date('d/m/Y', strtotime($turno['date']));
 $hora = substr($turno['time'], 0, 5);
 
-// -----------------------------
-// EMAIL AL PROFESIONAL
-// -----------------------------
+debug_log("Email profesional: " . $turno['profesional_email']);
+debug_log("Mensaje profesional: " . var_export($turno['professional_message'], true));
+
 if (!empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
+
+    debug_log("Enviando email al profesional");
 
     $msgPro = str_replace(
         ['{paciente}', '{fecha}', '{hora}'],
         [$paciente, $fecha, $hora],
         $turno['professional_message']
     );
-debug_log("Email del profesional: " . $turno['profesional_email']);
-debug_log("Mensaje profesional: " . ($turno['professional_message'] ?? 'NULL'));
-debug_log("Entrando al bloque de envío de email");
 
-    enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
+    $ok = enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
+    debug_log("Resultado enviarEmail: " . var_export($ok, true));
 }
 
-// -----------------------------
-// WHATSAPP AL PROFESIONAL
-// -----------------------------
 if (!empty($turno['notify_professional_whatsapp'])) {
+
+    debug_log("Enviando WhatsApp");
 
     $telefonoPro = preg_replace('/\D/', '', $turno['profesional_telefono'] ?? '');
 
@@ -104,37 +102,8 @@ if (!empty($turno['notify_professional_whatsapp'])) {
 
         $url = "https://api.callmebot.com/whatsapp.php?phone={$telefonoPro}&text=" . urlencode($msgProWhats);
         @file_get_contents($url);
+
+        debug_log("WhatsApp enviado a: " . $telefonoPro);
     }
 }
-?>
-
-<h1 class="text-2xl font-bold text-slate-900 mb-6">Turno cancelado</h1>
-
-<div class="bg-white p-8 rounded-xl shadow border max-w-md">
-
-    <p class="text-slate-700 mb-4">
-        Tu turno fue cancelado correctamente.
-    </p>
-
-    <div class="p-4 bg-slate-50 border rounded-lg mb-6">
-        <p class="text-sm text-slate-500">Profesional</p>
-        <p class="font-semibold text-slate-900"><?= htmlspecialchars($turno['profesional']) ?></p>
-        <p class="text-sm text-slate-600"><?= htmlspecialchars($turno['profession']) ?></p>
-
-        <p class="text-sm text-slate-500 mt-4">Fecha original</p>
-        <p class="font-semibold text-slate-900"><?= date("d/m/Y", strtotime($turno['date'])) ?></p>
-
-        <p class="text-sm text-slate-500 mt-4">Hora original</p>
-        <p class="font-semibold text-slate-900"><?= substr($turno['time'], 0, 5) ?> hs</p>
-    </div>
-
-    <a href="paciente-dashboard.php"
-       class="block w-full text-center py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition">
-        Volver al panel
-    </a>
-
-</div>
-
-<?php
-echo "</main></div></body></html>";
 ?>
