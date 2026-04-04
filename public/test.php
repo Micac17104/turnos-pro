@@ -1,1 +1,2 @@
-<?php echo "FUNCIONA"; ?>
+<?php
+echo "ESTOY EN: " . __DIR__;
