@@ -5,13 +5,12 @@ $errors = [];
 
 if ($_POST) {
 
-    // Normalizar email
     $email = trim(strtolower($_POST['email'] ?? ''));
     $name  = trim($_POST['name'] ?? '');
+    $dni   = trim($_POST['dni'] ?? '');
     $password  = $_POST['password'] ?? '';
     $password2 = $_POST['password2'] ?? '';
 
-    // Validaciones
     if ($password !== $password2) {
         $errors[] = "Las contraseñas no coinciden.";
     }
@@ -20,11 +19,11 @@ if ($_POST) {
         $errors[] = "Email inválido.";
     }
 
-    if ($name === '') {
-        $errors[] = "El nombre del centro es obligatorio.";
+    if ($name === '' || $dni === '') {
+        $errors[] = "Completá todos los campos obligatorios.";
     }
 
-    // Validar email único
+    // Email único
     if (empty($errors)) {
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
@@ -33,18 +32,25 @@ if ($_POST) {
         }
     }
 
-    // Crear centro
+    // DNI único
+    if (empty($errors)) {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE dni = ?");
+        $stmt->execute([$dni]);
+        if ($stmt->fetch()) {
+            $errors[] = "Ese DNI ya está registrado.";
+        }
+    }
+
     if (empty($errors)) {
 
-        // SUSCRIPCIÓN: primer mes gratis
         $today = date('Y-m-d');
         $end   = date('Y-m-d', strtotime('+1 month'));
 
         // Crear usuario tipo centro
         $stmt = $pdo->prepare("
             INSERT INTO users 
-            (name, email, password, account_type, subscription_start, subscription_end, is_active, last_payment)
-            VALUES (?, ?, ?, 'center', ?, ?, 1, NULL)
+            (name, email, password, account_type, subscription_start, subscription_end, is_active, last_payment, dni)
+            VALUES (?, ?, ?, 'center', ?, ?, 1, NULL, ?)
         ");
 
         $stmt->execute([
@@ -52,7 +58,8 @@ if ($_POST) {
             $email,
             password_hash($password, PASSWORD_BCRYPT),
             $today,
-            $end
+            $end,
+            $dni
         ]);
 
         $center_id = $pdo->lastInsertId();
@@ -107,6 +114,14 @@ if ($_POST) {
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Nombre del centro</label>
                 <input name="name"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                       required>
+            </div>
+
+            <!-- DNI -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">DNI del responsable</label>
+                <input name="dni"
                        class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
             </div>

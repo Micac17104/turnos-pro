@@ -11,6 +11,7 @@ if ($_POST) {
     $profession = trim($_POST['profession'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     $city  = trim($_POST['city'] ?? '');
+    $dni   = trim($_POST['dni'] ?? '');
     $password  = $_POST['password'] ?? '';
     $password2 = $_POST['password2'] ?? '';
     $accepts_insurance = isset($_POST['accepts_insurance']) ? 1 : 0;
@@ -24,7 +25,7 @@ if ($_POST) {
         $errors[] = "Email inválido.";
     }
 
-    if ($name === '' || $profession === '' || $phone === '' || $city === '') {
+    if ($name === '' || $profession === '' || $phone === '' || $city === '' || $dni === '') {
         $errors[] = "Completá todos los campos obligatorios.";
     }
 
@@ -37,6 +38,15 @@ if ($_POST) {
         }
     }
 
+    // Validar DNI único
+    if (empty($errors)) {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE dni = ?");
+        $stmt->execute([$dni]);
+        if ($stmt->fetch()) {
+            $errors[] = "Ese DNI ya está registrado.";
+        }
+    }
+
     // Crear cuenta
     if (empty($errors)) {
 
@@ -46,8 +56,8 @@ if ($_POST) {
 
         $stmt = $pdo->prepare("
             INSERT INTO users 
-            (name, email, password, profession, phone, city, accepts_insurance, account_type, subscription_start, subscription_end, is_active, last_payment) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'professional', ?, ?, 1, NULL)
+            (name, email, password, profession, phone, city, accepts_insurance, account_type, subscription_start, subscription_end, is_active, last_payment, dni) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'professional', ?, ?, 1, NULL, ?)
         ");
 
         $stmt->execute([
@@ -59,7 +69,8 @@ if ($_POST) {
             $city,
             $accepts_insurance,
             $today,
-            $end
+            $end,
+            $dni
         ]);
 
         header("Location: login.php?registered=1");
@@ -120,6 +131,14 @@ if ($_POST) {
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Ciudad</label>
                 <input name="city"
+                       class="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                       required>
+            </div>
+
+            <!-- DNI -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">DNI</label>
+                <input name="dni"
                        class="w-full px-3 py-2 border border-slate-300 rounded-lg"
                        required>
             </div>

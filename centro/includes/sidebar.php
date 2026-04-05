@@ -65,6 +65,14 @@
     padding: 24px 16px;
     box-sizing: border-box;
 }
+
+/* OCULTAR SOLO EN CELULAR */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none !important;
+    }
+}
+
 .sidebar h2 {
     margin: 0 0 24px;
     font-size: 20px;
