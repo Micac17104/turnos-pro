@@ -23,12 +23,19 @@ if (!$user_id) {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT email, mp_preapproval_id FROM users WHERE id = ?");
+// Obtener datos del centro
+$stmt = $pdo->prepare("SELECT email, mp_preapproval_id, mp_subscription_status FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
     header("Location: /auth/login.php");
+    exit;
+}
+
+// 🚫 BLOQUEAR SI YA TIENE SUSCRIPCIÓN ACTIVA
+if (!empty($user['mp_preapproval_id']) && $user['mp_subscription_status'] === 'active') {
+    header("Location: /centro/suscripcion-activa.php");
     exit;
 }
 
@@ -54,6 +61,7 @@ SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da1
 
 $baseUrl = "https://www.turnosaura.com";
 
+// ❌ Cancelar suscripción anterior si existe
 if (!empty($user['mp_preapproval_id'])) {
     try {
         $old = Preapproval::find_by_id($user['mp_preapproval_id']);
@@ -74,9 +82,8 @@ try {
     $preapproval = new Preapproval();
     $preapproval->payer_email = $user['email'];
 
-    // 🔥 back_url válida y pública
+    // URL que recibe Mercado Pago al aprobar
     $preapproval->back_url = $baseUrl . "/centro/confirmar-centro.php";
-
 
     $preapproval->reason = "Suscripción mensual centro - Plan $plan";
     $preapproval->external_reference = (string)$user_id;
@@ -87,9 +94,6 @@ try {
         "transaction_amount" => $precio,
         "currency_id" => "ARS"
     ];
-
-    // ❌ ESTA LÍNEA ERA EL PROBLEMA — NO VA
-    // $preapproval->status = "authorized";
 
     mp_log(["request_sent" => $preapproval]);
 
@@ -102,6 +106,7 @@ try {
 
     if ($saved && isset($preapproval->id) && isset($preapproval->init_point)) {
 
+        // Guardar ID de suscripción
         $stmt2 = $pdo->prepare("
             UPDATE users
             SET mp_preapproval_id = ?, mp_subscription_status = 'active'

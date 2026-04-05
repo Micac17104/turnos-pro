@@ -4,7 +4,6 @@ session_start();
 
 require __DIR__ . '/../pro/includes/db.php';
 
-// Validar que el centro esté logueado
 $center_id = $_SESSION['user_id'] ?? null;
 
 if (!$center_id || ($_SESSION['account_type'] !== 'center' && $_SESSION['account_type'] !== 'secretary')) {
@@ -12,7 +11,6 @@ if (!$center_id || ($_SESSION['account_type'] !== 'center' && $_SESSION['account
     exit;
 }
 
-// Mercado Pago devuelve el preapproval_id en GET
 $preapproval_id = $_GET['preapproval_id'] ?? null;
 
 if (!$preapproval_id) {
@@ -21,7 +19,6 @@ if (!$preapproval_id) {
     exit;
 }
 
-// Guardar el preapproval_id sin validar email del pagador
 $stmt = $pdo->prepare("
     UPDATE users
     SET mp_preapproval_id = ?, mp_subscription_status = 'active'
@@ -29,6 +26,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$preapproval_id, $center_id]);
 
-// Redirigir al mensaje de éxito
 header("Location: /centro/suscripcion-exitosa.php");
 exit;

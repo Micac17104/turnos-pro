@@ -244,23 +244,17 @@ a:hover {
 }
 
 
-/* ===== FIX SIDEBAR MOBILE ===== */
+/* ===== OCULTAR SIDEBAR EN CELULAR ===== */
 @media (max-width: 768px) {
     .sidebar {
-        position: fixed;
-        left: -100%;
-        top: 0;
-        height: 100%;
-        width: 250px;
-        transition: left 0.3s ease;
-        z-index: 9999;
+        display: none !important;
     }
 
-    .sidebar.open {
-        left: 0;
-    }
-
-    .content {
+    .content,
+    .main-content,
+    .container {
         margin-left: 0 !important;
+        width: 100% !important;
     }
 }
+
