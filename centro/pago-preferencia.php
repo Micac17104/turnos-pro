@@ -75,7 +75,8 @@ try {
     $preapproval->payer_email = $user['email'];
 
     // 🔥 back_url válida y pública
-    $preapproval->back_url = $baseUrl . "/centro/suscripcion-exitosa.php";
+    $preapproval->back_url = $baseUrl . "/centro/confirmar-centro.php";
+
 
     $preapproval->reason = "Suscripción mensual centro - Plan $plan";
     $preapproval->external_reference = (string)$user_id;
