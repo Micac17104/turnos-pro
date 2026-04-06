@@ -35,7 +35,7 @@ if ($checkC->fetch()) {
 
 // Base query
 $query = "
-    SELECT a.id, a.time, a.status,
+    SELECT a.id, a.time, a.status, a.motivo,
            u.name AS profesional,
            c.name AS paciente,
            u.id AS profesional_id
@@ -153,7 +153,13 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
                 <span class="badge"><?= htmlspecialchars($t['status']) ?></span>
                 <br>
                 <strong>Paciente:</strong> <?= htmlspecialchars($t['paciente']) ?><br>
-                <strong>Profesional:</strong> <?= htmlspecialchars($t['profesional']) ?>
+                <strong>Profesional:</strong> <?= htmlspecialchars($t['profesional']) ?><br>
+
+                <?php if (!empty($t['motivo'])): ?>
+                    <small style="font-size:11px;opacity:0.9;">
+                        <strong>Motivo:</strong> <?= htmlspecialchars($t['motivo']) ?>
+                    </small>
+                <?php endif; ?>
             </div>
 
         <?php endforeach; ?>

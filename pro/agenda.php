@@ -321,6 +321,8 @@ require __DIR__ . '/includes/sidebar.php';
                 </p>
             <?php endif; ?>
 
+      
+
             <div class="space-y-3">
                 <?php foreach ($turnosDia as $t): ?>
 
@@ -336,8 +338,15 @@ require __DIR__ . '/includes/sidebar.php';
                             </p>
 
                             <p class="text-xs text-slate-600 mt-1">
-                                Estado: <?= etiquetaEstado($t['status']) ?>
-                            </p>
+    Estado: <?= etiquetaEstado($t['status']) ?>
+</p>
+
+<?php if (!empty($t['motivo'])): ?>
+    <p class="text-xs text-slate-600 mt-1">
+        <strong>Motivo:</strong> <?= nl2br(h($t['motivo'])) ?>
+    </p>
+<?php endif; ?>
+
                         </div>
 
                         <div class="flex flex-col items-end text-xs">
@@ -458,14 +467,21 @@ require __DIR__ . '/includes/sidebar.php';
                         <?php foreach ($turnosDiaSemana as $t): ?>
                             <?php $clase = claseTurnoEstado($t['status']); ?>
                             <div class="p-2 border rounded-lg flex justify-between items-center text-xs <?= $clase ?>">
-                                <div>
-                                    <p class="font-medium text-slate-900">
-                                        <?= substr($t['time'], 0, 5) ?> hs
-                                    </p>
-                                    <p class="text-slate-600 text-[11px]">
-                                        <?= h($t['paciente'] ?? 'Paciente sin registrar') ?>
-                                    </p>
-                                </div>
+    <div>
+        <p class="font-medium text-slate-900">
+            <?= substr($t['time'], 0, 5) ?> hs
+        </p>
+        <p class="text-slate-600 text-[11px]">
+            <?= h($t['paciente'] ?? 'Paciente sin registrar') ?>
+        </p>
+
+        <?php if (!empty($t['motivo'])): ?>
+            <p class="text-slate-500 text-[10px] mt-1">
+                <strong>Motivo:</strong> <?= h($t['motivo']) ?>
+            </p>
+        <?php endif; ?>
+    </div>
+
 
                                 <div class="flex flex-col items-end text-[11px]">
                                     <button
@@ -552,6 +568,12 @@ require __DIR__ . '/includes/sidebar.php';
                                 <span class="text-[11px]">
                                     <?= substr($t['time'], 0, 5) ?> — <?= h($t['paciente'] ?? 'Paciente sin registrar') ?>
                                 </span>
+                                <?php if (!empty($t['motivo'])): ?>
+    <span class="block text-[10px] text-slate-500 mt-1">
+        <?= h($t['motivo']) ?>
+    </span>
+<?php endif; ?>
+
                                 <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>"
                                    class="text-red-600 hover:underline text-[11px]">
                                     Cancelar
@@ -635,6 +657,14 @@ require __DIR__ . '/includes/sidebar.php';
                     <option value="confirmed">Confirmado</option>
                     <option value="cancelled">Cancelado</option>
                 </select>
+
+                <div>
+    <label class="block text-sm font-medium text-slate-700 mb-1">Motivo (opcional)</label>
+    <textarea name="motivo"
+              class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+              placeholder="Motivo del turno (opcional)"></textarea>
+</div>
+
 
                 <div class="flex justify-end gap-3">
                     <button type="button"

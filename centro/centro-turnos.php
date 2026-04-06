@@ -34,7 +34,7 @@ if ($check2->fetch()) {
 
 // Base query
 $query = "
-    SELECT a.id, a.date, a.time, a.status,
+    SELECT a.id, a.date, a.time, a.status, a.motivo,
            u.name AS profesional,
            c.name AS paciente
     FROM appointments a
@@ -160,6 +160,7 @@ select,input{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
                 <th>Hora</th>
                 <th>Profesional</th>
                 <th>Paciente</th>
+                <th>Motivo</th>
                 <th>Estado</th>
             </tr>
 
@@ -169,29 +170,38 @@ select,input{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
                 <td><?= htmlspecialchars(substr($t['time'], 0, 5)) ?></td>
                 <td><?= htmlspecialchars($t['profesional']) ?></td>
                 <td><?= htmlspecialchars($t['paciente']) ?></td>
+
+                <!-- MOTIVO -->
+                <td>
+                    <?php if (!empty($t['motivo'])): ?>
+                        <?= nl2br(htmlspecialchars($t['motivo'])) ?>
+                    <?php else: ?>
+                        <span style="color:#94a3b8;">—</span>
+                    <?php endif; ?>
+                </td>
+
                 <td>
                     <?php
-$s = $t['status'];
+                    $s = $t['status'];
 
-$class = $s==='confirmed'
-    ? 'badge-confirmed'
-    : ($s==='cancelled' ? 'badge-cancelled' : 'badge-pending');
+                    $class = $s==='confirmed'
+                        ? 'badge-confirmed'
+                        : ($s==='cancelled' ? 'badge-cancelled' : 'badge-pending');
 
-// Traducción
-$label = [
-    'confirmed' => 'Confirmado',
-    'pending'   => 'Pendiente',
-    'cancelled' => 'Cancelado'
-][$s] ?? $s;
-?>
+                    $label = [
+                        'confirmed' => 'Confirmado',
+                        'pending'   => 'Pendiente',
+                        'cancelled' => 'Cancelado'
+                    ][$s] ?? $s;
+                    ?>
 
-<span class="badge <?= $class ?>"><?= $label ?></span>
+                    <span class="badge <?= $class ?>"><?= $label ?></span>
                 </td>
             </tr>
             <?php endforeach; ?>
 
             <?php if (empty($turnos)): ?>
-            <tr><td colspan="5">No se encontraron turnos con los filtros seleccionados.</td></tr>
+            <tr><td colspan="6">No se encontraron turnos con los filtros seleccionados.</td></tr>
             <?php endif; ?>
         </table>
     </div>

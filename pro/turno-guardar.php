@@ -17,6 +17,8 @@ $client_id = $_POST['client_id'] ?? null;
 
 $date = require_param($_POST, 'date');
 $time = require_param($_POST, 'time');
+$motivo = trim($_POST['motivo'] ?? '');
+
 
 // Si estamos editando → validar que el turno exista
 if ($turno_id) {
@@ -77,10 +79,12 @@ if ($turno_id) {
 
 // SI ES NUEVO → INSERT
 $stmt = $pdo->prepare("
-    INSERT INTO appointments (user_id, client_id, date, time)
-    VALUES (?, ?, ?, ?)
+ INSERT INTO appointments (user_id, client_id, date, time, motivo)
+VALUES (?, ?, ?, ?, ?)
+
 ");
-$stmt->execute([$user_id, $client_id, $date, $time]);
+$stmt->execute([$user_id, $client_id, $date, $time, $motivo]);
+
 
 // --------------------------------------
 // ENVIAR EMAIL AL PACIENTE (si tiene email)

@@ -40,7 +40,7 @@ if ($checkC->fetch()) {
 
 // Base query
 $query = "
-    SELECT a.id, a.date, a.time, a.status,
+    SELECT a.id, a.date, a.time, a.status, a.motivo,
            u.name AS profesional,
            u.id AS profesional_id,
            c.name AS paciente
@@ -157,19 +157,21 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
                 <th>Hora</th>
                 <?php for ($d = 0; $d < 7; $d++): ?>
                     <?php $dia = date('Y-m-d', strtotime("+$d days", strtotime($lunes))); ?>
-                    <th><?php
-$dias = [
-    'Mon' => 'Lun',
-    'Tue' => 'Mar',
-    'Wed' => 'Mié',
-    'Thu' => 'Jue',
-    'Fri' => 'Vie',
-    'Sat' => 'Sáb',
-    'Sun' => 'Dom'
-];
-$diaSemana = $dias[date('D', strtotime($dia))];
-?>
-<?= $diaSemana . " " . date('d/m', strtotime($dia)) ?></th>
+                    <th>
+                        <?php
+                        $dias = [
+                            'Mon' => 'Lun',
+                            'Tue' => 'Mar',
+                            'Wed' => 'Mié',
+                            'Thu' => 'Jue',
+                            'Fri' => 'Vie',
+                            'Sat' => 'Sáb',
+                            'Sun' => 'Dom'
+                        ];
+                        $diaSemana = $dias[date('D', strtotime($dia))];
+                        ?>
+                        <?= $diaSemana . " " . date('d/m', strtotime($dia)) ?>
+                    </th>
                 <?php endfor; ?>
             </tr>
 
@@ -197,6 +199,13 @@ $diaSemana = $dias[date('D', strtotime($dia))];
                                 <div class="slot" style="background: <?= $color ?>;">
                                     <?= htmlspecialchars($t['paciente']) ?><br>
                                     <small><?= htmlspecialchars($t['profesional']) ?></small>
+
+                                    <?php if (!empty($t['motivo'])): ?>
+                                        <br>
+                                        <small style="font-size:10px;opacity:0.9;">
+                                            <?= htmlspecialchars($t['motivo']) ?>
+                                        </small>
+                                    <?php endif; ?>
                                 </div>
 
                             <?php endforeach; ?>

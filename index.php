@@ -20,7 +20,6 @@ if ($request === '') {
         <script src="https://cdn.tailwindcss.com"></script>
 
         <style>
-           
             .logo-img {
                 max-height: 42px;
             }
@@ -37,21 +36,101 @@ if ($request === '') {
                     margin: 0 auto;
                 }
             }
+
+            /* --- MENÚ HAMBURGUESA MODERNO --- */
+            .mobile-menu {
+                position: fixed;
+                top: 0;
+                right: -260px;
+                width: 260px;
+                height: 100vh;
+                background: white;
+                box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+                padding: 20px;
+                transition: right 0.3s ease;
+                z-index: 9999;
+            }
+
+            .mobile-menu.open {
+                right: 0;
+            }
+
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.45);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+                z-index: 9998;
+            }
+
+            .overlay.show {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            /* Botón hamburguesa animado */
+            .hamburger {
+                width: 28px;
+                height: 22px;
+                position: relative;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .hamburger span {
+                display: block;
+                height: 3px;
+                background: #0f172a;
+                border-radius: 3px;
+                transition: 0.3s;
+            }
+
+            .hamburger.active span:nth-child(1) {
+                transform: translateY(9px) rotate(45deg);
+            }
+
+            .hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.active span:nth-child(3) {
+                transform: translateY(-9px) rotate(-45deg);
+            }
         </style>
     </head>
 
     <body class="bg-slate-50">
 
+        <!-- OVERLAY -->
+        <div id="overlay" class="overlay"></div>
+
+        <!-- MENÚ LATERAL MOBILE -->
+        <div id="mobileMenu" class="mobile-menu">
+            <nav class="flex flex-col gap-4 text-slate-800 text-lg mt-6">
+                <a href="#inicio" class="hover:text-slate-900">Inicio</a>
+                <a href="#como-funciona" class="hover:text-slate-900">Cómo funciona</a>
+                <a href="#fotos" class="hover:text-slate-900">Fotos</a>
+                <a href="#testimonios" class="hover:text-slate-900">Testimonios</a>
+                <a href="auth/login.php" class="hover:text-slate-900">Ingresar</a>
+            </nav>
+        </div>
+
         <!-- MENÚ SUPERIOR -->
         <header class="w-full bg-white border-b border-slate-200 shadow-sm fixed top-0 left-0 z-50">
             <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-<!-- LOGO SOLO ÍCONO (recortado) -->
-<div class="flex items-center gap-3">
-    
-    <span class="text-xl font-semibold text-slate-900">TurnosAura</span>
-</div>
 
-                <!-- Menú -->
+                <div class="flex items-center gap-3">
+                    <span class="text-xl font-semibold text-slate-900">TurnosAura</span>
+                </div>
+
+                <!-- Menú Desktop -->
                 <nav class="hidden md:flex gap-8 text-slate-700 font-medium">
                     <a href="#inicio" class="hover:text-slate-900">Inicio</a>
                     <a href="#como-funciona" class="hover:text-slate-900">Cómo funciona</a>
@@ -59,6 +138,16 @@ if ($request === '') {
                     <a href="#testimonios" class="hover:text-slate-900">Testimonios</a>
                     <a href="auth/login.php" class="hover:text-slate-900">Ingresar</a>
                 </nav>
+
+                <!-- Botón hamburguesa Mobile -->
+                <div class="md:hidden">
+                    <div id="hamburgerBtn" class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+
             </div>
         </header>
 
@@ -113,27 +202,27 @@ if ($request === '') {
 
         </section>
 
-       <!-- SECCIÓN DE FOTOS / TOUR -->
-<section id="fotos" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-6 text-center">
+        <!-- SECCIÓN DE FOTOS -->
+        <section id="fotos" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-6 text-center">
 
-        <h2 class="text-3xl font-bold text-slate-900 mb-6">
-            Conocé cómo se ve por dentro
-        </h2>
+                <h2 class="text-3xl font-bold text-slate-900 mb-6">
+                    Conocé cómo se ve por dentro
+                </h2>
 
-        <p class="text-slate-600 max-w-2xl mx-auto mb-10">
-            Mirá un recorrido real del panel del profesional y del centro. Videos cortos, claros y modernos.
-        </p>
+                <p class="text-slate-600 max-w-2xl mx-auto mb-10">
+                    Mirá un recorrido real del panel del profesional y del centro. Videos cortos, claros y modernos.
+                </p>
 
-        <a href="/tour.php"
-           class="inline-block px-10 py-4 bg-slate-900 text-white rounded-xl text-lg font-semibold shadow-md hover:bg-slate-800 transition">
-            Ver recorrido del sistema →
-        </a>
+                <a href="/tour.php"
+                   class="inline-block px-10 py-4 bg-slate-900 text-white rounded-xl text-lg font-semibold shadow-md hover:bg-slate-800 transition">
+                    Ver recorrido del sistema →
+                </a>
 
-    </div>
-</section>
+            </div>
+        </section>
 
-                <!-- SECCIÓN: CÓMO FUNCIONA -->
+        <!-- CÓMO FUNCIONA -->
         <section id="como-funciona" class="py-16 lg:py-20 bg-white">
             <div class="max-w-6xl mx-auto px-6">
                 <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">
@@ -164,7 +253,7 @@ if ($request === '') {
             </div>
         </section>
 
-        <!-- SECCIÓN: TESTIMONIOS -->
+        <!-- TESTIMONIOS -->
         <section id="testimonios" class="py-16 lg:py-20 bg-slate-50">
             <div class="max-w-6xl mx-auto px-6">
                 <h2 class="text-3xl font-bold text-slate-900 text-center mb-12">
@@ -211,7 +300,8 @@ if ($request === '') {
                 Crear cuenta
             </a>
         </section>
-                <!-- FOOTER -->
+
+        <!-- FOOTER -->
         <footer class="bg-slate-900 text-slate-300 py-10 mt-20">
             <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between">
 
@@ -220,19 +310,35 @@ if ($request === '') {
                     <p class="text-slate-400">Gestión moderna de turnos para profesionales y centros.</p>
                 </div>
 
-             <div class="mt-6 md:mt-0">
-    <p class="text-slate-400">
-        © <?php echo date('Y'); ?> 
-        Creado por 
-        <a href="https://www.aura17web.com" 
-           target="_blank" 
-           class="text-slate-400 hover:text-slate-200 underline transition">
-            www.aura17web.com
-        </a>
-    </p>
-</div>
+                <div class="mt-6 md:mt-0">
+                    <p class="text-slate-400">
+                        © <?= date('Y') ?>
+                        Creado por 
+                        <a href="https://www.aura17web.com" 
+                           target="_blank" 
+                           class="text-slate-400 hover:text-slate-200 underline transition">
+                            www.aura17web.com
+                        </a>
+                    </p>
+                </div>
             </div>
         </footer>
+
+        <!-- SCRIPT DEL MENÚ -->
+        <script>
+            const hamburger = document.getElementById('hamburgerBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+
+            function toggleMenu() {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('open');
+                overlay.classList.toggle('show');
+            }
+
+            hamburger.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', toggleMenu);
+        </script>
 
     </body>
     </html>
@@ -255,5 +361,3 @@ if (file_exists($path)) {
     http_response_code(404);
     echo "Página no encontrada.";
 }
-
-

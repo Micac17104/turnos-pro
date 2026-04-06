@@ -104,6 +104,12 @@ if ($paciente_id) {
             </div>
         <?php endif; ?>
 
+        <div>
+    <label class="text-sm text-slate-600">Motivo de la consulta</label>
+    <textarea name="motivo" required class="w-full border rounded-lg p-2"></textarea>
+</div>
+
+
         <button class="w-full py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition">
             Confirmar turno
         </button>

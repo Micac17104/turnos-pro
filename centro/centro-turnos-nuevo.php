@@ -35,6 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $date = $_POST['date'] ?? '';
     $time = $_POST['time'] ?? '';
     $status = $_POST['status'] ?? 'pending';
+    $motivo = trim($_POST['motivo'] ?? '');
+
 
     if ($prof_id === '' || $client_id === '' || $date === '' || $time === '') {
         $errors[] = "Todos los campos son obligatorios.";
@@ -74,10 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
 
     $stmt = $pdo->prepare("
-    INSERT INTO appointments (user_id, client_id, date, time, status, center_id)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO appointments (user_id, client_id, date, time, status, center_id, motivo)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
 ");
-$stmt->execute([$prof_id, $client_id, $date, $time, $status, $center_id]);
+$stmt->execute([$prof_id, $client_id, $date, $time, $status, $center_id, $motivo]);
+
+    
 
 // --------------------------------------
 // ENVIAR EMAIL AL PACIENTE
@@ -172,6 +176,9 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
             <option value="confirmed">Confirmado</option>
             <option value="cancelled">Cancelado</option>
         </select>
+
+        <label>Motivo (opcional)</label>
+<textarea name="motivo" style="width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #cbd5e1;"></textarea>
 
         <button>Crear turno</button>
     </form>

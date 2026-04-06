@@ -13,7 +13,7 @@ if (isset($_SESSION['paciente_id'])) {
 $user_id = $_GET['user_id'] ?? null;
 $fecha = $_GET['fecha'] ?? null;
 $hora = $_GET['hora'] ?? null;
-$center_id = $_GET['center_id'] ?? null; // ← AGREGADO
+$center_id = $_GET['center_id'] ?? null;
 
 if (!$user_id || !$fecha || !$hora) {
     die("Datos incompletos.");
@@ -39,13 +39,18 @@ if (!$pro) {
         .container { max-width:500px; margin:40px auto; background:white; padding:25px; border-radius:14px; }
         h2 { color:#0f172a; font-weight:700; margin-bottom:20px; }
 
-        input {
+        input, textarea {
             width:100%;
             padding:12px;
             margin-bottom:15px;
             border-radius:10px;
             border:1px solid #cbd5e1;
             font-size:16px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
         }
 
         .btn-primary {
@@ -78,12 +83,15 @@ if (!$pro) {
         <input type="hidden" name="user_id" value="<?= $user_id ?>">
         <input type="hidden" name="fecha" value="<?= $fecha ?>">
         <input type="hidden" name="hora" value="<?= $hora ?>">
-        <input type="hidden" name="center_id" value="<?= htmlspecialchars($center_id) ?>"> <!-- ← AGREGADO -->
+        <input type="hidden" name="center_id" value="<?= htmlspecialchars($center_id) ?>">
 
         <!-- Datos del paciente -->
         <input type="text" name="nombre" placeholder="Tu nombre" required>
         <input type="text" name="telefono" placeholder="Teléfono" required>
         <input type="email" name="email" placeholder="Email" required>
+
+        <!-- MOTIVO OBLIGATORIO -->
+        <textarea name="motivo" placeholder="Motivo de la consulta (obligatorio)" required></textarea>
 
         <button class="btn-primary">Confirmar turno</button>
     </form>

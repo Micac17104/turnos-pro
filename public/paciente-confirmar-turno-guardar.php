@@ -13,6 +13,8 @@ $name      = trim($_POST['nombre'] ?? '');
 $email     = trim($_POST['email'] ?? '');
 $phone     = trim($_POST['telefono'] ?? '');
 $center_id = !empty($_POST['center_id']) ? (int)$_POST['center_id'] : null;
+$motivo = trim($_POST['motivo'] ?? '');
+
 
 
 if (!$pro_id || !$date || !$time || !$name || !$email) {
@@ -68,10 +70,12 @@ if ($stmt->fetch()) {
 
 // Crear turno
 $stmt = $pdo->prepare("
-    INSERT INTO appointments (user_id, center_id, client_id, date, time, status, reminder_sent)
-    VALUES (?, ?, ?, ?, ?, 'confirmed', 0)
+  INSERT INTO appointments (user_id, center_id, client_id, date, time, motivo, status, reminder_sent)
+VALUES (?, ?, ?, ?, ?, ?, 'confirmed', 0)
+
 ");
-$stmt->execute([$pro_id, $center_id, $paciente_id, $date, $time]);
+$stmt->execute([$pro_id, $center_id, $paciente_id, $date, $time, $motivo]);
+
 
 $turno_id = $pdo->lastInsertId();
 
