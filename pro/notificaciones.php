@@ -171,3 +171,4 @@ require __DIR__ . '/includes/sidebar.php';
 </main>
 
 <?php require __DIR__ . '/includes/footer.php'; ?>
+
