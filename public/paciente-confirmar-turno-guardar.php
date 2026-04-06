@@ -1,156 +1,173 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
-session_start();
+// /pro/agenda.php
 
-require __DIR__ . '/../config.php';
-require __DIR__ . '/../pro/includes/helpers.php';
-require __DIR__ . '/../auth/mailer.php';   // ← USAMOS EL MAILER BUENO
-
-$pro_id    = $_POST['user_id'] ?? null;
-$date      = $_POST['fecha'] ?? null;
-$time      = $_POST['hora'] ?? null;
-$name      = trim($_POST['nombre'] ?? '');
-$email     = trim($_POST['email'] ?? '');
-$phone     = trim($_POST['telefono'] ?? '');
-$center_id = !empty($_POST['center_id']) ? (int)$_POST['center_id'] : null;
-$motivo = trim($_POST['motivo'] ?? '');
-
-
-
-if (!$pro_id || !$date || !$time || !$name || !$email) {
-    die("Datos incompletos.");
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
+// -----------------------------------
 
-// Profesional
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$pro_id]);
-$pro = $stmt->fetch(PDO::FETCH_ASSOC);
+require __DIR__ . '/includes/auth.php';
+require __DIR__ . '/includes/db.php';
+require __DIR__ . '/includes/helpers.php';
 
-if (!$pro) {
-    die("Profesional no encontrado.");
-}
+$page_title = 'Notificaciones';
+$current    = 'notificaciones';
 
-// Detectar si pertenece a un centro
-$isCentro = !empty($pro['parent_center_id']);
-
-// Buscar o crear paciente
-$paciente_id = $_SESSION['paciente_id'] ?? null;
-
-if ($paciente_id) {
-    $stmt = $pdo->prepare("SELECT * FROM clients WHERE id = ?");
-    $stmt->execute([$paciente_id]);
-    $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
-} else {
-    $stmt = $pdo->prepare("SELECT * FROM clients WHERE email = ? AND center_id = ?");
-    $stmt->execute([$email, $center_id]);
-    $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-if (!$paciente) {
-    $stmt = $pdo->prepare("
-        INSERT INTO clients (name, email, phone, center_id)
-        VALUES (?, ?, ?, ?)
-    ");
-    $stmt->execute([$name, $email, $phone, $center_id]);
-    $paciente_id = $pdo->lastInsertId();
-} else {
-    $paciente_id = $paciente['id'];
-}
-
-// Verificar turno libre
+// Obtener configuración actual
 $stmt = $pdo->prepare("
-    SELECT id FROM appointments
-    WHERE user_id = ? AND date = ? AND time = ? AND status IN ('confirmed','pending')
+    SELECT *
+    FROM notification_settings
+    WHERE user_id = ?
 ");
-$stmt->execute([$pro_id, $date, $time]);
+$stmt->execute([$user_id]);
+$settings = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($stmt->fetch()) {
-    die("El turno ya fue tomado. Volvé atrás y elegí otro horario.");
+// Si no existe, crear configuración por defecto
+if (!$settings) {
+    $stmt = $pdo->prepare("INSERT INTO notification_settings (user_id) VALUES (?)");
+    $stmt->execute([$user_id]);
+
+    $stmt = $pdo->prepare("SELECT * FROM notification_settings WHERE user_id = ?");
+    $stmt->execute([$user_id]);
+    $settings = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Crear turno
-$stmt = $pdo->prepare("
-  INSERT INTO appointments (user_id, center_id, client_id, date, time, motivo, status, reminder_sent)
-VALUES (?, ?, ?, ?, ?, ?, 'confirmed', 0)
-
-");
-$stmt->execute([$pro_id, $center_id, $paciente_id, $date, $time, $motivo]);
-
-
-$turno_id = $pdo->lastInsertId();
-
-// Config notificaciones
-$stmt = $pdo->prepare("SELECT * FROM notification_settings WHERE user_id = ?");
-$stmt->execute([$pro_id]);
-$config = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-
-$telefono_normalizado = preg_replace('/\D/', '', $phone);
-
-// Mensaje al paciente
-if (!empty($config['confirm_message'])) {
-    $mensaje_final = str_replace(
-        ['{nombre}', '{fecha}', '{hora}', '{profesional}'],
-        [$name, $date, $time, $pro['name']],
-        $config['confirm_message']
-    );
-} else {
-    $mensaje_final = "Hola $name, tu turno con {$pro['name']} fue confirmado para el $date a las $time.";
-}
-
-// -----------------------------
-// EMAIL AL PACIENTE
-// -----------------------------
-
-// Profesional individual → respeta configuraciones
-if (!$isCentro && !empty($config['email_enabled'])) {
-    enviarEmail($email, "Confirmación de turno", nl2br($mensaje_final));
-}
-
-// Profesional del centro → SIEMPRE enviar email
-if ($isCentro) {
-    enviarEmail($email, "Confirmación de turno", nl2br($mensaje_final));
-}
-
-// -----------------------------
-// EMAIL AL PROFESIONAL
-// -----------------------------
-
-// Profesional individual → respeta configuraciones
-if (!$isCentro && !empty($config['notify_professional_email']) && !empty($config['professional_message'])) {
-
-    $msg_pro = str_replace(
-        ['{paciente}', '{fecha}', '{hora}'],
-        [$name, $date, $time],
-        $config['professional_message']
-    );
-
-    enviarEmail($pro['email'], "Nuevo turno reservado", nl2br($msg_pro));
-}
-
-// Profesional del centro → SIEMPRE enviar email
-if ($isCentro) {
-
-    $msgCentro = "
-        Hola {$pro['name']},<br><br>
-        El paciente <strong>{$name}</strong> reservó un turno:<br><br>
-        <strong>Fecha:</strong> $date<br>
-        <strong>Hora:</strong> $time<br><br>
-        TurnosAura
-    ";
-
-    enviarEmail($pro['email'], "Nuevo turno reservado", $msgCentro);
-}
-
-// Guardar datos para pantalla de gracias
-$_SESSION['last_booking'] = [
-    'pro_name' => $pro['name'],
-    'date'     => $date,
-    'time'     => $time,
-    'whatsapp_enabled' => !empty($config['whatsapp_enabled']),
-    'telefono_normalizado' => $telefono_normalizado,
-    'mensaje_final' => $mensaje_final
+// Normalizar claves faltantes
+$defaults = [
+    'whatsapp_enabled' => 0,
+    'email_enabled' => 0,
+    'confirm_message' => '',
+    'reminder_enabled' => 0,
+    'reminder_hours_before' => 24,
+    'reminder_message' => '',
+    'notify_professional_whatsapp' => 0,
+    'notify_professional_email' => 0,
+    'professional_message' => ''
 ];
 
-// Redirigir
-header("Location: gracias.php");
-exit;
+$settings = array_merge($defaults, $settings ?: []);
+
+require __DIR__ . '/includes/header.php';
+require __DIR__ . '/includes/sidebar.php';
+?>
+
+<main class="flex-1 p-8">
+
+    <h1 class="text-2xl font-semibold text-slate-900 mb-6">Notificaciones</h1>
+
+    <form method="post" action="notificaciones-guardar.php"
+          class="space-y-10">
+
+        <!-- NOTIFICACIONES AL PACIENTE -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Notificaciones al paciente</h2>
+
+            <div class="space-y-4">
+
+                <!-- WhatsApp -->
+                <label class="flex items-center gap-3">
+                    <input type="checkbox" name="whatsapp_enabled"
+                           <?= $settings['whatsapp_enabled'] ? 'checked' : '' ?>
+                           class="w-4 h-4">
+                    <span class="text-sm text-slate-700">Enviar WhatsApp de confirmación</span>
+                </label>
+
+                <!-- Email -->
+                <label class="flex items-center gap-3">
+                    <input type="checkbox" name="email_enabled"
+                           <?= $settings['email_enabled'] ? 'checked' : '' ?>
+                           class="w-4 h-4">
+                    <span class="text-sm text-slate-700">Enviar email de confirmación</span>
+                </label>
+
+                <!-- Mensaje de confirmación -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Mensaje de confirmación
+                    </label>
+                    <textarea name="confirm_message" rows="3"
+                              class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"><?= h($settings['confirm_message']) ?></textarea>
+                </div>
+
+                <!-- Recordatorio -->
+                <label class="flex items-center gap-3">
+                    <input type="checkbox" name="reminder_enabled"
+                           <?= $settings['reminder_enabled'] ? 'checked' : '' ?>
+                           class="w-4 h-4">
+                    <span class="text-sm text-slate-700">Enviar recordatorio antes del turno</span>
+                </label>
+
+                <!-- Horas antes -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Horas antes del turno
+                    </label>
+                    <input type="number" name="reminder_hours_before"
+                           value="<?= h($settings['reminder_hours_before']) ?>"
+                           class="w-full max-w-xs px-3 py-2 rounded-lg border border-slate-300 text-sm">
+                </div>
+
+                <!-- Mensaje de recordatorio -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Mensaje de recordatorio
+                    </label>
+                    <textarea name="reminder_message" rows="3"
+                              class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"><?= h($settings['reminder_message']) ?></textarea>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- NOTIFICACIONES AL PROFESIONAL -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Notificaciones al profesional</h2>
+
+            <div class="space-y-4">
+
+                <!-- WhatsApp -->
+                <label class="flex items-center gap-3">
+                    <input type="checkbox" name="notify_professional_whatsapp"
+                           <?= $settings['notify_professional_whatsapp'] ? 'checked' : '' ?>
+                           class="w-4 h-4">
+                    <span class="text-sm text-slate-700">Notificar por WhatsApp cuando se reserva un turno</span>
+                </label>
+
+                <!-- Email -->
+                <label class="flex items-center gap-3">
+                    <input type="checkbox" name="notify_professional_email"
+                           <?= $settings['notify_professional_email'] ? 'checked' : '' ?>
+                           class="w-4 h-4">
+                    <span class="text-sm text-slate-700">Notificar por email cuando se reserva un turno</span>
+                </label>
+
+                <!-- Mensaje al profesional -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Mensaje al profesional
+                    </label>
+                    <textarea name="professional_message" rows="3"
+                              class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"><?= h($settings['professional_message']) ?></textarea>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- BOTONES -->
+        <div class="flex justify-end gap-3">
+            <a href="agenda.php"
+               class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm hover:bg-slate-300">
+                Cancelar
+            </a>
+
+            <button type="submit"
+                    class="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800">
+                Guardar cambios
+            </button>
+        </div>
+
+    </form>
+
+</main>
+
+<?php require __DIR__ . '/includes/footer.php'; ?>

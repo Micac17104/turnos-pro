@@ -42,7 +42,7 @@ $defaults = [
     'reminder_message' => '',
     'notify_professional_whatsapp' => 0,
     'notify_professional_email' => 0,
-    'professional_message' => ''
+    'professional_message' => '' // ← ESTE ES SOLO PARA CANCELACIONES
 ];
 
 $settings = array_merge($defaults, $settings ?: []);
@@ -141,10 +141,10 @@ require __DIR__ . '/includes/sidebar.php';
                     <span class="text-sm text-slate-700">Notificar por email cuando se reserva un turno</span>
                 </label>
 
-                <!-- Mensaje al profesional -->
+                <!-- Mensaje al profesional (SOLO CANCELACIONES) -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">
-                        Mensaje al profesional
+                        Mensaje al profesional (solo para cancelaciones)
                     </label>
                     <textarea name="professional_message" rows="3"
                               class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"><?= h($settings['professional_message']) ?></textarea>
