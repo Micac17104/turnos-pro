@@ -4,6 +4,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Ocultar warnings de la librería de Mercado Pago (pero mostrar errores reales)
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
+
 require __DIR__ . '/pro/includes/db.php';
 require '/app/vendor/autoload.php';
 
@@ -44,7 +47,23 @@ try {
     ");
     $stmt2->execute([$user_id]);
 
-    echo "Suscripción cancelada correctamente.";
+    echo "
+<div style='
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    border-radius: 12px;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    color: #166534;
+'>
+    <h2 style='margin-bottom: 10px;'>Suscripción cancelada</h2>
+    <p>Tu suscripción fue cancelada correctamente.</p>
+</div>
+";
+
 
 } catch (Exception $e) {
     die("Error al cancelar: " . $e->getMessage());
