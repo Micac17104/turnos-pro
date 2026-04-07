@@ -8,6 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';
+require __DIR__ . '/includes/auth-profesional.php';
+
 
 $page_title = 'Mi perfil';
 $current    = 'perfil';

@@ -3,6 +3,8 @@ session_start();
 
 require '../config.php';
 require __DIR__ . '/../pro/includes/db.php';
+require __DIR__ . '/includes/auth-centro.php';
+
 
 $center_id = $_SESSION['user_id'] ?? null;
 if (!$center_id) {
