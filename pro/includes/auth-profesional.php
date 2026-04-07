@@ -1,5 +1,9 @@
 <?php
-session_start();
+// Asegurar que no haya doble sesión
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require __DIR__ . '/db.php';
 
 $user_id = $_SESSION['user_id'] ?? null;
@@ -9,9 +13,11 @@ if (!$user_id) {
     exit;
 }
 
+// Páginas permitidas sin suscripción activa
 $allowed = [
     'planes.php',
-    'suscribirse-profesional.php',
+    'pago-preferencia-sus.php',
+    'suscripcion-vencida.php',
     'pago-exitoso.php',
     'pago-fallido.php',
     'pago-pendiente.php'
@@ -32,7 +38,9 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $today = date('Y-m-d');
 
+// Bloqueo por suscripción inactiva, vencida o suspendida
 if (
+    !$user ||
     $user['mp_subscription_status'] !== 'active' ||
     $user['subscription_end'] < $today ||
     $user['is_active'] == 0
