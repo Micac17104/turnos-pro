@@ -2,11 +2,22 @@
 require __DIR__ . '/auth-admin.php';
 require __DIR__ . '/../pro/includes/db.php';
 
-// Consultas
-$total_users = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-$total_prof = $pdo->query("SELECT COUNT(*) FROM users WHERE account_type='professional'")->fetchColumn();
-$total_centros = $pdo->query("SELECT COUNT(*) FROM users WHERE account_type='center'")->fetchColumn();
-$total_activos = $pdo->query("SELECT COUNT(*) FROM users WHERE is_active=1")->fetchColumn();
+// Métricas principales
+$total_users      = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$total_prof       = $pdo->query("SELECT COUNT(*) FROM users WHERE account_type='professional'")->fetchColumn();
+$total_centros    = $pdo->query("SELECT COUNT(*) FROM users WHERE account_type='center'")->fetchColumn();
+$total_activos    = $pdo->query("SELECT COUNT(*) FROM users WHERE is_active=1")->fetchColumn();
+
+// Nuevas métricas
+$total_vencidos   = $pdo->query("SELECT COUNT(*) FROM users WHERE subscription_end < CURDATE() AND subscription_end IS NOT NULL")->fetchColumn();
+$total_cancelados = $pdo->query("SELECT COUNT(*) FROM users WHERE mp_subscription_status='inactive'")->fetchColumn();
+
+// Ingresos estimados últimos 30 días (si querés después lo afinamos)
+$ingresos_30 = $pdo->query("
+    SELECT COUNT(*) * 8000 AS total
+    FROM users
+    WHERE last_payment >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+")->fetchColumn();
 ?>
 
 <?php include __DIR__ . '/includes/header.php'; ?>
@@ -36,6 +47,21 @@ $total_activos = $pdo->query("SELECT COUNT(*) FROM users WHERE is_active=1")->fe
         <div class="bg-white p-6 rounded-xl shadow border">
             <h3 class="text-sm text-slate-500">Activos</h3>
             <div class="text-3xl font-bold text-emerald-600"><?= $total_activos ?></div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="text-sm text-slate-500">Vencidos</h3>
+            <div class="text-3xl font-bold text-orange-600"><?= $total_vencidos ?></div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="text-sm text-slate-500">Cancelados</h3>
+            <div class="text-3xl font-bold text-red-600"><?= $total_cancelados ?></div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="text-sm text-slate-500">Ingresos últimos 30 días</h3>
+            <div class="text-3xl font-bold">$<?= number_format($ingresos_30, 0, ',', '.') ?></div>
         </div>
 
     </div>

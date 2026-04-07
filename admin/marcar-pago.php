@@ -17,27 +17,39 @@ if (!$user) {
     die("Usuario no encontrado");
 }
 
-// Si subscription_end es NULL o vacío, usar hoy
-$subscription_end = $user['subscription_end'] ?: date('Y-m-d');
+$today = date('Y-m-d');
+$start_date = $user['subscription_end'] ?: $today;
 
-$start = strtotime($subscription_end);
-$today = strtotime(date('Y-m-d'));
+$start_ts = strtotime($start_date);
+$today_ts = strtotime($today);
 
-// Calcular nueva fecha
-if ($start > $today) {
-    $new_end = date('Y-m-d', strtotime($subscription_end . ' +1 month'));
+// Si la fecha actual es mayor, reiniciamos desde hoy
+if ($start_ts > $today_ts) {
+    $new_end = date('Y-m-d', strtotime($start_date . ' +30 days'));
 } else {
-    $new_end = date('Y-m-d', strtotime('+1 month'));
+    $new_end = date('Y-m-d', strtotime('+30 days'));
 }
 
-// Actualizar
+// Actualizar suscripción
 $stmt2 = $pdo->prepare("
     UPDATE users
-    SET subscription_end = ?, is_active = 1, last_payment = CURDATE()
+    SET 
+        is_active = 1,
+        mp_subscription_status = 'active',
+        subscription_start = ?,
+        subscription_end = ?,
+        last_payment = CURDATE()
     WHERE id = ?
 ");
 
-$stmt2->execute([$new_end, $id]);
+$log = $pdo->prepare("
+    INSERT INTO subscription_logs (user_id, action, details)
+    VALUES (?, 'admin_mark_paid', 'Pago registrado manualmente por el administrador')
+");
+$log->execute([$id]);
+
+
+$stmt2->execute([$today, $new_end, $id]);
 
 header("Location: pagos.php?ok=1");
 exit;
