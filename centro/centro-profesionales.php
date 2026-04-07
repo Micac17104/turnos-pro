@@ -1,7 +1,8 @@
 <?php
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
-require __DIR__ . '/includes/auth-centro.php';
+require __DIR__ . '/../pro/includes/auth-centro.php';
+
 
 
 // Obtener profesionales del centro
