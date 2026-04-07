@@ -18,11 +18,9 @@ $stmt = $pdo->prepare("
         a.*,
         u.name AS profesional,
         u.email AS profesional_email,
-        u.phone AS profesional_telefono,
         u.parent_center_id,
         c.name AS paciente_nombre,
         ns.notify_professional_email,
-        ns.notify_professional_whatsapp,
         ns.professional_message
     FROM appointments a
     JOIN users u ON a.user_id = u.id
@@ -51,31 +49,17 @@ $hora = substr($turno['time'], 0, 5);
 
 $isCentro = !empty($turno['parent_center_id']);
 
-if ($isCentro) {
+$msgPro = "
+    Hola {$turno['profesional']},<br><br>
+    El paciente <strong>{$paciente}</strong> canceló su turno:<br><br>
+    <strong>Fecha:</strong> {$fecha}<br>
+    <strong>Hora:</strong> {$hora}<br><br>
+    TurnosAura
+";
 
-    $msgCentro = "
-        Hola {$turno['profesional']},<br><br>
-        El paciente <strong>{$paciente}</strong> canceló su turno:<br><br>
-        <strong>Fecha:</strong> {$fecha}<br>
-        <strong>Hora:</strong> {$hora}<br><br>
-        TurnosAura
-    ";
-
-    enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", $msgCentro);
-
-} else {
-
-    if (!empty($turno['notify_professional_email']) && !empty($turno['professional_message'])) {
-
-        $msgPro = str_replace(
-            ['{paciente}', '{fecha}', '{hora}'],
-            [$paciente, $fecha, $hora],
-            $turno['professional_message']
-        );
-
-        enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", nl2br($msgPro));
-    }
+if (!empty($turno['notify_professional_email'])) {
+    enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", $msgPro);
 }
 
-echo "<h2>Turno cancelado correctamente.</h2>";
-echo "<a href='/public/panel.php'>Volver al panel</a>";
+echo "<h2>Tu turno fue cancelado correctamente.</h2>";
+echo "<a href='/'>Volver al inicio</a>";

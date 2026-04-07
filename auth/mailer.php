@@ -10,6 +10,11 @@ require __DIR__ . '/PHPMailer/src/SMTP.php';
 function enviarEmail($to, $subject, $body) {
     $mail = new PHPMailer(true);
 
+    $mail->CharSet = 'UTF-8';
+    $mail->Encoding = 'base64';
+    
+
+
     $mail->SMTPDebug = 0;
 
     try {

@@ -50,8 +50,10 @@ foreach ($turnos as $t) {
     $fechaHoraTurno = new DateTime($t['date'] . ' ' . $t['time']);
     $diffMin = ($fechaHoraTurno->getTimestamp() - $ahora->getTimestamp()) / 60;
 
-    // MODO PRUEBA: enviar recordatorio si el turno es dentro de los próximos 5 minutos
-    if ($diffMin <= 5 && $diffMin >= 0) {
+  $minAntes = $t['horas_antes'] * 60;
+
+if ($diffMin <= $minAntes && $diffMin >= $minAntes - 5) {
+
 
         // Generar token si no existe
         if (empty($t['email_token'])) {
