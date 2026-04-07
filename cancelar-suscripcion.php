@@ -40,12 +40,14 @@ try {
 
     // Actualizar base
     $stmt2 = $pdo->prepare("
-        UPDATE users
-        SET mp_preapproval_id = NULL,
-            mp_subscription_status = 'inactive'
-        WHERE id = ?
-    ");
-    $stmt2->execute([$user_id]);
+    UPDATE users
+    SET mp_preapproval_id = NULL,
+        mp_subscription_status = 'inactive',
+        is_active = 0
+    WHERE id = ?
+");
+$stmt2->execute([$user_id]);
+
 
     echo "
 <div style='

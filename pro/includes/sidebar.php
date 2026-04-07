@@ -49,10 +49,16 @@
            class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'perfil' ? 'bg-slate-100 font-semibold' : '' ?>">
             Perfil
         </a>
-
+<?php if ($user['mp_subscription_status'] !== 'active'): ?>
     <a href="/pro/suscribirse-profesional.php" class="btn btn-primary">
-    Suscribirme al plan profesional
-</a>
+        Suscribirme al plan profesional
+    </a>
+<?php else: ?>
+    <p class="text-green-600 font-semibold mt-2">
+        Ya tenés una suscripción activa.
+    </p>
+<?php endif; ?>
+
 
       <a href="/cancelar-suscripcion.php"
    onclick="return confirm('¿Seguro que querés cancelar tu suscripción? Perderás acceso al panel.');"

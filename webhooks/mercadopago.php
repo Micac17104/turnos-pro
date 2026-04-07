@@ -85,16 +85,17 @@ if ($data["type"] === "preapproval" && $data["action"] === "updated") {
     // Si la suscripción fue cancelada desde Mercado Pago
     if ($preapproval->status === "cancelled") {
 
-        $stmt3 = $pdo->prepare("
-            UPDATE users
-            SET 
-                is_active = 0,
-                mp_subscription_status = 'cancelled'
-            WHERE id = ?
-        ");
+    $stmt3 = $pdo->prepare("
+        UPDATE users
+        SET 
+            is_active = 0,
+            mp_subscription_status = 'inactive'
+        WHERE id = ?
+    ");
 
-        $stmt3->execute([$user_id]);
-    }
+    $stmt3->execute([$user_id]);
+}
+
 
     http_response_code(200);
     exit;
