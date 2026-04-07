@@ -81,4 +81,5 @@ if (!empty($turno['notify_professional_whatsapp'])) {
 }
 
 echo "<h2 class='text-green-600 text-xl font-bold mb-4'>Turno cancelado correctamente</h2>";
-echo "<a href='/public/panel.php' class='text-blue-600 underline'>Volver al panel</a>";
+echo "<a href='/public/paciente-dashboard.php' class='text-blue-600 underline'>Volver al panel</a>";
+
