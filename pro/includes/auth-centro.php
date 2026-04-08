@@ -31,7 +31,7 @@ if ($user['account_type'] !== 'center') {
 
 // Si la suscripción está vencida → redirigir igual que profesional
 if ($user['is_active'] != 1) {
-    header("Location: /pro/suscripcion-vencida.php");
+    header("Location: /centro/suscripcion-vencida.php");
     exit;
 }
 ?>

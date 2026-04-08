@@ -20,7 +20,7 @@ $is_prof = $user['account_type'] === 'professional';
             Suscribirme al plan profesional
         </a>
     <?php else: ?>
-        <a href="LINK_DEL_PLAN_DEL_CENTRO" class="btn btn-primary">
+        <a href="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=" . $plan_id;  class="btn btn-primary">
             Suscribirme al plan del centro
         </a>
     <?php endif; ?>
@@ -28,3 +28,5 @@ $is_prof = $user['account_type'] === 'professional';
 <?php else: ?>
     <p>Ya tenés una suscripción activa.</p>
 <?php endif; ?>
+
+
