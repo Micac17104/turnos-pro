@@ -3,6 +3,7 @@ require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
+$center_id = $_SESSION['user_id'];
 
 
 // Fecha base (cualquier día dentro de la semana)

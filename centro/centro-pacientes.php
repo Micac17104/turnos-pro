@@ -4,6 +4,7 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
 
+$center_id = $_SESSION['user_id'];
 
 $search = trim($_GET['search'] ?? '');
 
