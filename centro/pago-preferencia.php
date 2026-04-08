@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ERROR | E_PARSE);
+
 
 function mp_log($data) {
     $logFile = __DIR__ . "/mp-log-centro.txt";
