@@ -83,8 +83,9 @@ if ($diffMin <= $minAntes && $diffMin >= $minAntes - 5) {
         }
 
         // Links de confirmación / cancelación
-        $confirmUrl = $BASE_URL . "/turno-confirmar-email.php?id={$id}&token={$token}";
-        $cancelUrl  = $BASE_URL . "/turno-cancelar-email.php?id={$id}&token={$token}";
+        $confirmUrl = $BASE_URL . "/public/turno-confirmar-email.php?id={$id}&token={$token}";
+$cancelUrl  = $BASE_URL . "/public/turno-cancelar-email.php?id={$id}&token={$token}";
+
 
         $body = "
 Hola {$pacienteNombre},<br><br>
