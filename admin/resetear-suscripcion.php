@@ -5,11 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require __DIR__ . '/../pro/includes/db.php';
 
-// Solo admin puede usar esto
-if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
-    die("Acceso denegado");
-}
-
 $user_id = $_POST['user_id'] ?? null;
 
 if (!$user_id) {
@@ -28,5 +23,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$user_id]);
 
-header("Location: /admin/editar-usuario.php?id=" . $user_id . "&reset=ok");
+header("Location: /admin/usuarios.php?reset=ok");
 exit;
