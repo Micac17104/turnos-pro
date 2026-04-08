@@ -4,7 +4,7 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../auth/mailer.php';
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
-
+$center_id = $_SESSION['user_id'];
 
 $stmt = $pdo->prepare("
     SELECT 
