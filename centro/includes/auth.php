@@ -3,32 +3,41 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['user_id']) || 
-   !in_array($_SESSION['account_type'], ['center', 'secretary'])) {
+require __DIR__ . '/../../pro/includes/db.php';
 
+// Si no está logueado, afuera
+if (!isset($_SESSION['user_id'])) {
     header("Location: /auth/login.php");
     exit;
 }
 
-// RUTA CORRECTA A LA DB
-require __DIR__ . '/../../pro/includes/db.php';
-
-$center_id = $_SESSION['user_id'];
-
-$stmt = $pdo->prepare("SELECT is_active, subscription_end FROM users WHERE id = ?");
-$stmt->execute([$center_id]);
+// Traer datos del usuario
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Si no existe el usuario, afuera
 if (!$user) {
     session_destroy();
     header("Location: /auth/login.php");
     exit;
 }
 
-$today = strtotime(date('Y-m-d'));
-$end   = strtotime($user['subscription_end']);
-
-if ($end < $today || $user['is_active'] == 0) {
-    header("Location: /centro/planes.php?expired=1");
+// Si no es centro, afuera
+if ($user['account_type'] !== 'center') {
+    header("Location: /auth/login.php");
     exit;
 }
+
+/* ---------------------------
+   FIX: evitar warnings de strtotime()
+--------------------------- */
+
+$vence = !empty($user['subscription_end']) ? strtotime($user['subscription_end']) : 0;
+
+// Si la suscripción está vencida → redirigir a la pantalla del centro
+if ($user['is_active'] != 1 || $vence < time()) {
+    header("Location: /centro/suscripcion-vencida.php");
+    exit;
+}
+?>
