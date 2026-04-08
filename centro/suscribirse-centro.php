@@ -17,11 +17,11 @@ if (!isset($_GET['plan'])) {
 $plan = (int) $_GET['plan'];
 
 $plan_ids = [
-    1 => "7f1ce42b25614fbf82a8de0cd86634d7",
-    2 => "c72a2d4ced534679a0c48f8bb84cd732",
-    3 => "03243356a81d4ba3b38ccfcc8f44c7d8",
-    4 => "e1ae4c66754c4f698861d36232bf4d75",
-    5 => "e5926fccaa294ee28b91f0b7dcae5814"
+    1 => "7f1ce42b25614fbf82a8de0cd86634d7", // 1 profesional
+    2 => "c72a2d4ced534679a0c48f8bb84cd732", // 2 profesionales
+    3 => "03243356a81d4ba3b38ccfcc8f44c7d8", // 3 profesionales
+    4 => "e1ae4c66754c4f698861d36232bf4d75", // 4 profesionales
+    5 => "e5926fccaa294ee28b91f0b7dcae5814"  // 5 profesionales
 ];
 
 if (!isset($plan_ids[$plan])) {
