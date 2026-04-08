@@ -1,14 +1,10 @@
 <?php
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Ocultar warnings de la librería de Mercado Pago (pero mostrar errores reales)
-error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
-
 require __DIR__ . '/pro/includes/db.php';
-require '/app/vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 use MercadoPago\SDK;
 use MercadoPago\Preapproval;
@@ -16,10 +12,11 @@ use MercadoPago\Preapproval;
 $user_id = $_SESSION['user_id'] ?? null;
 
 if (!$user_id) {
-    die("No estás logueado.");
+    header("Location: /auth/login.php");
+    exit;
 }
 
-$stmt = $pdo->prepare("SELECT mp_preapproval_id FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT mp_preapproval_id, account_type FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -27,46 +24,35 @@ if (!$user || empty($user['mp_preapproval_id'])) {
     die("No tenés una suscripción activa.");
 }
 
-// TOKEN DE PRODUCCIÓN
-SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da125884-745664297");
+$preapproval_id = $user['mp_preapproval_id'];
+
+SDK::setAccessToken("APP_USR-XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
 try {
-    $preapproval = Preapproval::find_by_id($user['mp_preapproval_id']);
+    $pre = Preapproval::find_by_id($preapproval_id);
 
-    if ($preapproval && isset($preapproval->status) && $preapproval->status !== "cancelled") {
-        $preapproval->status = "cancelled";
-        $preapproval->update();
+    if ($pre && $pre->status !== "cancelled") {
+        $pre->status = "cancelled";
+        $pre->update();
     }
 
-    // Actualizar base
-    $stmt2 = $pdo->prepare("
+} catch (Exception $e) {
+    // si querés loguear, lo hacés acá
+}
+
+$stmt2 = $pdo->prepare("
     UPDATE users
-    SET mp_preapproval_id = NULL,
+    SET 
+        mp_preapproval_id = NULL,
         mp_subscription_status = 'inactive',
         is_active = 0
     WHERE id = ?
 ");
 $stmt2->execute([$user_id]);
 
-
-    echo "
-<div style='
-    max-width: 400px;
-    margin: 40px auto;
-    padding: 20px;
-    border-radius: 12px;
-    background: #f0fdf4;
-    border: 1px solid #86efac;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    color: #166534;
-'>
-    <h2 style='margin-bottom: 10px;'>Suscripción cancelada</h2>
-    <p>Tu suscripción fue cancelada correctamente.</p>
-</div>
-";
-
-
-} catch (Exception $e) {
-    die("Error al cancelar: " . $e->getMessage());
+if ($user['account_type'] === 'center') {
+    header("Location: /centro/suscripcion-vencida.php");
+} else {
+    header("Location: /pro/suscripcion-vencida.php");
 }
+exit;

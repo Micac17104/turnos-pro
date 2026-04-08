@@ -10,9 +10,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require __DIR__ . '/../pro/includes/db.php';
+require __DIR__ . '/includes/db.php';
 require __DIR__ . '/../vendor/autoload.php';
-
 
 use MercadoPago\SDK;
 use MercadoPago\Preapproval;
@@ -53,26 +52,22 @@ SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da1
 
 $baseUrl = "https://www.turnosaura.com";
 
+// cancelar suscripción anterior si existe
 if (!empty($user['mp_preapproval_id'])) {
     try {
         $old = Preapproval::find_by_id($user['mp_preapproval_id']);
-        mp_log(["cancel_previous" => $old]);
-
-        if ($old && isset($old->status) && $old->status !== "cancelled") {
+        if ($old && $old->status !== "cancelled") {
             $old->status = "cancelled";
             $old->update();
         }
-
-    } catch (Exception $e) {
-        mp_log(["cancel_error" => $e->getMessage()]);
-    }
+    } catch (Exception $e) {}
 }
 
 try {
 
     $preapproval = new Preapproval();
     $preapproval->payer_email = $user['email'];
-    $preapproval->back_url = $baseUrl . "/pro/dashboard.php";
+    $preapproval->back_url = $baseUrl . "/pro/pago-exitoso-sus.php";
     $preapproval->reason = "Suscripción mensual profesional - Plan $plan";
     $preapproval->external_reference = (string)$user_id;
 
@@ -83,36 +78,33 @@ try {
         "currency_id" => "ARS"
     ];
 
-    $preapproval->status = "authorized";
-
-    mp_log(["request_sent" => $preapproval]);
-
     $saved = $preapproval->save();
-
-    mp_log([
-        "save_result" => $saved,
-        "response" => $preapproval
-    ]);
 
     if ($saved && isset($preapproval->id) && isset($preapproval->init_point)) {
 
+        // ACTIVAR AL TOQUE
+        $today = date('Y-m-d');
+        $end = date('Y-m-d', strtotime('+1 month'));
+
         $stmt2 = $pdo->prepare("
             UPDATE users
-            SET mp_preapproval_id = ?, mp_subscription_status = 'active'
+            SET 
+                mp_preapproval_id = ?,
+                mp_subscription_status = 'active',
+                is_active = 1,
+                subscription_start = ?,
+                subscription_end = ?
             WHERE id = ?
         ");
-        $stmt2->execute([$preapproval->id, $user_id]);
+        $stmt2->execute([$preapproval->id, $today, $end, $user_id]);
 
         header("Location: " . $preapproval->init_point);
         exit;
 
     } else {
-        mp_log(["error_creating_subscription" => $preapproval]);
         die("No se pudo crear la suscripción. Intentalo más tarde.");
     }
 
 } catch (Exception $e) {
-
-    mp_log(["exception" => $e->getMessage()]);
     die("Error al procesar la suscripción.");
 }

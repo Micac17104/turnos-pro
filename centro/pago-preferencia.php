@@ -18,26 +18,14 @@ use MercadoPago\Preapproval;
 
 $user_id = $_SESSION['user_id'] ?? null;
 
-if (!$user_id) {
+if (!$user_id || $_SESSION['account_type'] !== 'center') {
     header("Location: /auth/login.php");
     exit;
 }
 
-// Obtener datos del centro
-$stmt = $pdo->prepare("SELECT email, mp_preapproval_id, mp_subscription_status FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT email, mp_preapproval_id FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$user) {
-    header("Location: /auth/login.php");
-    exit;
-}
-
-// 🚫 BLOQUEAR SI YA TIENE SUSCRIPCIÓN ACTIVA
-if (!empty($user['mp_preapproval_id']) && $user['mp_subscription_status'] === 'active') {
-    header("Location: /centro/suscripcion-activa.php");
-    exit;
-}
 
 if (!isset($_GET['plan'])) {
     die("Plan inválido");
@@ -61,30 +49,22 @@ SDK::setAccessToken("APP_USR-2199782378550930-031211-bfa15acd1e956caebb1a5640da1
 
 $baseUrl = "https://www.turnosaura.com";
 
-// ❌ Cancelar suscripción anterior si existe
+// cancelar suscripción anterior si existe
 if (!empty($user['mp_preapproval_id'])) {
     try {
         $old = Preapproval::find_by_id($user['mp_preapproval_id']);
-        mp_log(["cancel_previous" => $old]);
-
-        if ($old && isset($old->status) && $old->status !== "cancelled") {
+        if ($old && $old->status !== "cancelled") {
             $old->status = "cancelled";
             $old->update();
         }
-
-    } catch (Exception $e) {
-        mp_log(["cancel_error" => $e->getMessage()]);
-    }
+    } catch (Exception $e) {}
 }
 
 try {
 
     $preapproval = new Preapproval();
     $preapproval->payer_email = $user['email'];
-
-    // URL que recibe Mercado Pago al aprobar
     $preapproval->back_url = $baseUrl . "/centro/confirmar-centro.php";
-
     $preapproval->reason = "Suscripción mensual centro - Plan $plan";
     $preapproval->external_reference = (string)$user_id;
 
@@ -95,45 +75,33 @@ try {
         "currency_id" => "ARS"
     ];
 
-    mp_log(["request_sent" => $preapproval]);
-
     $saved = $preapproval->save();
-
-    mp_log([
-        "save_result" => $saved,
-        "response" => $preapproval
-    ]);
 
     if ($saved && isset($preapproval->id) && isset($preapproval->init_point)) {
 
-        // Guardar ID de suscripción
+        // ACTIVAR AL TOQUE
+        $today = date('Y-m-d');
+        $end = date('Y-m-d', strtotime('+1 month'));
+
         $stmt2 = $pdo->prepare("
             UPDATE users
-            SET mp_preapproval_id = ?, mp_subscription_status = 'active'
+            SET 
+                mp_preapproval_id = ?,
+                mp_subscription_status = 'active',
+                is_active = 1,
+                subscription_start = ?,
+                subscription_end = ?
             WHERE id = ?
         ");
-        $stmt2->execute([$preapproval->id, $user_id]);
+        $stmt2->execute([$preapproval->id, $today, $end, $user_id]);
 
         header("Location: " . $preapproval->init_point);
         exit;
 
     } else {
-
-        mp_log([
-            "error_creating_subscription" => $preapproval,
-            "mp_error" => $preapproval->error ?? "NO ERROR FIELD"
-        ]);
-
-        echo "<pre>";
-        print_r($preapproval->error);
-        echo "</pre>";
-        exit;
+        die("No se pudo crear la suscripción. Intentalo más tarde.");
     }
 
 } catch (Exception $e) {
-
-    mp_log(["exception" => $e->getMessage()]);
     die("Error al procesar la suscripción.");
 }
-
-?>
