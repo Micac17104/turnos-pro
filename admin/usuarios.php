@@ -34,9 +34,18 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td class="p-3"><?= $u['email'] ?></td>
                     <td class="p-3"><?= ucfirst($u['account_type']) ?></td>
                     <td class="p-3">
-                        <?= $u['is_active'] ? '<span class="text-emerald-600">Activo</span>' : '<span class="text-red-600">Suspendido</span>' ?>
-                    </td>
-                </tr>
+    <?= $u['is_active'] ? '<span class="text-emerald-600">Activo</span>' : '<span class="text-red-600">Suspendido</span>' ?>
+
+    <!-- Botón Resetear Suscripción -->
+    <form action="/admin/resetear-suscripcion.php" method="POST" style="display:inline-block; margin-left:10px;"
+          onsubmit="return confirm('¿Seguro que querés resetear la suscripción de este usuario?');">
+        <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+        <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded text-sm">
+            Resetear
+        </button>
+    </form>
+</td>
+
             <?php endforeach; ?>
         </tbody>
     </table>
