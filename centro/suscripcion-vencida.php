@@ -23,7 +23,7 @@ if (!isset($_SESSION['user_id'])) {
     <h1 style="color: #b91c1c;">Tu suscripción está vencida</h1>
     <p>Para seguir usando el panel, necesitás renovar tu suscripción.</p>
 
-    <a href="/centro/pago-preferencia.php" 
+    <a href="/centro/planes.php" 
        style="display:inline-block; padding:12px 20px; background:#2563eb; color:white; border-radius:6px; text-decoration:none;">
         Renovar suscripción
     </a>
