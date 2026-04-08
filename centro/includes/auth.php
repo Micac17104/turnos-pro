@@ -35,8 +35,21 @@ if ($user['account_type'] !== 'center') {
 
 $vence = !empty($user['subscription_end']) ? strtotime($user['subscription_end']) : 0;
 
-// Si la suscripción está vencida → redirigir a la pantalla del centro
-if ($user['is_active'] != 1 || $vence < time()) {
+/* ---------------------------------------------------------
+   PERMITIR ESTAS PÁGINAS AUNQUE LA SUSCRIPCIÓN ESTÉ VENCIDA
+--------------------------------------------------------- */
+$allowed_pages = [
+    '/centro/suscripcion-vencida.php',
+    '/centro/planes.php',
+    '/centro/pago-preferencia.php'
+];
+
+$current_page = $_SERVER['PHP_SELF'];
+
+/* ---------------------------------------------------------
+   SI ESTÁ VENCIDO Y NO ESTÁ EN LAS PÁGINAS PERMITIDAS → REDIRIGE
+--------------------------------------------------------- */
+if (($user['is_active'] != 1 || $vence < time()) && !in_array($current_page, $allowed_pages)) {
     header("Location: /centro/suscripcion-vencida.php");
     exit;
 }
