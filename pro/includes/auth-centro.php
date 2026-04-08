@@ -29,8 +29,14 @@ if ($user['account_type'] !== 'center') {
     exit;
 }
 
-// Si la suscripción está vencida → marcar bandera pero NO redirigir
-if ($user['is_active'] != 1) {
+/* ---------------------------
+   FIX: evitar warnings de strtotime()
+   --------------------------- */
+
+$vence = !empty($user['subscription_end']) ? strtotime($user['subscription_end']) : 0;
+
+// Si la suscripción está vencida o no existe → marcar bandera
+if ($user['is_active'] != 1 || $vence < time()) {
     $_SESSION['suscripcion_vencida'] = true;
 } else {
     unset($_SESSION['suscripcion_vencida']);
