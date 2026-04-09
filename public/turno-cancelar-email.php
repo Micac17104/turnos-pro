@@ -63,3 +63,4 @@ if (!empty($turno['notify_professional_email'])) {
 
 echo "<h2>Tu turno fue cancelado correctamente.</h2>";
 echo "<a href='/'>Volver al inicio</a>";
+

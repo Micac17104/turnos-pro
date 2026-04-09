@@ -4,7 +4,7 @@ session_start();
 
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/helpers.php';
-require __DIR__ . '/../auth/mailer.php';   // ← USAMOS EL MAILER BUENO
+require __DIR__ . '/../auth/mailer.php';   // Mailer correcto
 
 $pro_id    = $_POST['user_id'] ?? null;
 $date      = $_POST['fecha'] ?? null;
@@ -65,12 +65,27 @@ if ($stmt->fetch()) {
     die("El turno ya fue tomado. Volvé atrás y elegí otro horario.");
 }
 
-// Crear turno
+// 🔥 GENERAR TOKENS
+$confirm_token = bin2hex(random_bytes(16));
+$cancel_token  = bin2hex(random_bytes(16));
+
+// 🔥 CREAR TURNO COMO PENDING
 $stmt = $pdo->prepare("
-    INSERT INTO appointments (user_id, center_id, client_id, date, time, motivo, status, reminder_sent)
-    VALUES (?, ?, ?, ?, ?, ?, 'confirmed', 0)
+    INSERT INTO appointments 
+        (user_id, center_id, client_id, date, time, motivo, status, reminder_sent, confirm_token, cancel_token)
+    VALUES 
+        (?, ?, ?, ?, ?, ?, 'pending', 0, ?, ?)
 ");
-$stmt->execute([$pro_id, $center_id, $paciente_id, $date, $time, $motivo]);
+$stmt->execute([
+    $pro_id,
+    $center_id,
+    $paciente_id,
+    $date,
+    $time,
+    $motivo,
+    $confirm_token,
+    $cancel_token
+]);
 
 $turno_id = $pdo->lastInsertId();
 
@@ -81,34 +96,33 @@ $config = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
 $telefono_normalizado = preg_replace('/\D/', '', $phone);
 
-// Mensaje al paciente
-if (!empty($config['confirm_message'])) {
-    $mensaje_final = str_replace(
-        ['{nombre}', '{fecha}', '{hora}', '{profesional}'],
-        [$name, $date, $time, $pro['name']],
-        $config['confirm_message']
-    );
-} else {
-    $mensaje_final = "Hola $name, tu turno con {$pro['name']} fue confirmado para el $date a las $time.";
-}
-
 // -----------------------------
-// EMAIL AL PACIENTE
+// EMAIL AL PACIENTE (CON LINKS)
 // -----------------------------
 
-if (!$isCentro && !empty($config['email_enabled'])) {
-    enviarEmail($email, "Confirmación de turno", nl2br($mensaje_final));
-}
+$confirm_link = "https://www.turnosaura.com/turno-confirmar-email.php?id=$turno_id&token=$confirm_token";
+$cancel_link  = "https://www.turnosaura.com/turno-cancelar-email.php?id=$turno_id&token=$cancel_token";
 
-if ($isCentro) {
-    enviarEmail($email, "Confirmación de turno", nl2br($mensaje_final));
-}
+$mensaje_final = "
+    Hola $name,<br><br>
+    Tu turno con <strong>{$pro['name']}</strong> fue registrado para el <strong>$date</strong> a las <strong>$time</strong>.<br><br>
+
+    Para continuar, elegí una opción:<br><br>
+
+    👉 <a href='$confirm_link'>Confirmar turno</a><br>
+    ❌ <a href='$cancel_link'>Cancelar turno</a><br><br>
+
+    Si no realizás ninguna acción, el turno quedará pendiente.<br><br>
+    TurnosAura
+";
+
+enviarEmail($email, "Confirmación de turno", $mensaje_final);
 
 // -----------------------------
-// EMAIL AL PROFESIONAL (CORREGIDO)
+// EMAIL AL PROFESIONAL
 // -----------------------------
 
-if (!$isCentro && !empty($config['notify_professional_email'])) {
+if (!empty($config['notify_professional_email'])) {
 
     $msg_pro = "
         Hola {$pro['name']},<br><br>
@@ -119,20 +133,6 @@ if (!$isCentro && !empty($config['notify_professional_email'])) {
     ";
 
     enviarEmail($pro['email'], "Nuevo turno reservado", $msg_pro);
-}
-
-// Profesional del centro → SIEMPRE enviar email
-if ($isCentro) {
-
-    $msgCentro = "
-        Hola {$pro['name']},<br><br>
-        El paciente <strong>{$name}</strong> reservó un turno:<br><br>
-        <strong>Fecha:</strong> $date<br>
-        <strong>Hora:</strong> $time<br><br>
-        TurnosAura
-    ";
-
-    enviarEmail($pro['email'], "Nuevo turno reservado", $msgCentro);
 }
 
 // Guardar datos para pantalla de gracias

@@ -25,7 +25,7 @@ $stmt = $pdo->prepare("
     JOIN users u ON a.user_id = u.id
     LEFT JOIN clients c ON c.id = a.client_id
     LEFT JOIN notification_settings ns ON ns.user_id = a.user_id
-    WHERE a.id = ? AND a.email_token = ?
+    WHERE a.id = ? AND a.confirm_token = ?
 ");
 $stmt->execute([$turno_id, $token]);
 $turno = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -39,7 +39,6 @@ if ($turno['status'] === 'confirmed') {
     exit;
 }
 
-// Confirmar turno
 $stmt = $pdo->prepare("UPDATE appointments SET status='confirmed' WHERE id=?");
 $stmt->execute([$turno_id]);
 
@@ -49,7 +48,6 @@ $hora = substr($turno['time'], 0, 5);
 
 $isCentro = !empty($turno['parent_center_id']);
 
-// Notificar al profesional
 if (!empty($turno['notify_professional_email'])) {
 
     $msgPro = "
