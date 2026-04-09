@@ -24,7 +24,7 @@ require __DIR__ . '/includes/sidebar.php';
             <h2 class="text-xl font-bold mb-2">Plan 1 profesional</h2>
             <p class="text-3xl font-semibold mb-4">$8.000</p>
 
-            <a href="suscribirse-centro.php?plan=1"
+            <a href="/centro/suscribirse-centro.php?plan=1"
                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                Contratar
             </a>
@@ -35,7 +35,7 @@ require __DIR__ . '/includes/sidebar.php';
             <h2 class="text-xl font-bold mb-2">Plan 2 profesionales</h2>
             <p class="text-3xl font-semibold mb-4">$13.000</p>
 
-            <a href="suscribirse-centro.php?plan=2"
+            <a href="/centro/suscribirse-centro.php?plan=2"
                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                Contratar
             </a>
@@ -46,7 +46,7 @@ require __DIR__ . '/includes/sidebar.php';
             <h2 class="text-xl font-bold mb-2">Plan 3 profesionales</h2>
             <p class="text-3xl font-semibold mb-4">$18.000</p>
 
-            <a href="suscribirse-centro.php?plan=3"
+            <a href="/centro/suscribirse-centro.php?plan=3"
                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                Contratar
             </a>
@@ -57,7 +57,7 @@ require __DIR__ . '/includes/sidebar.php';
             <h2 class="text-xl font-bold mb-2">Plan 4 profesionales</h2>
             <p class="text-3xl font-semibold mb-4">$23.000</p>
 
-            <a href="suscribirse-centro.php?plan=4"
+            <a href="/centro/suscribirse-centro.php?plan=4"
                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                Contratar
             </a>
@@ -68,7 +68,7 @@ require __DIR__ . '/includes/sidebar.php';
             <h2 class="text-xl font-bold mb-2">Plan 5 profesionales</h2>
             <p class="text-3xl font-semibold mb-4">$28.000</p>
 
-            <a href="suscribirse-centro.php?plan=5"
+            <a href="/centro/suscribirse-centro.php?plan=5"
                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                Contratar
             </a>
