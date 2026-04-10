@@ -10,9 +10,9 @@ if (!$user_id) {
 }
 
 require __DIR__ . '/includes/auth.php';
-require __DIR__ . 'pro/includes/header.php';
-
+require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';
+
 ?>
 
 <main class="flex-1 p-8">
