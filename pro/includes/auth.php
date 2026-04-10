@@ -33,6 +33,7 @@ if ($account_type !== 'professional') {
 */
 $allowed_pages = [
     'planes.php',
+    'suscribirse-pro.php',
     'pago-preferencia-sus.php',
     'pago-exitoso-sus.php',
     'pago-fallido-sus.php',
