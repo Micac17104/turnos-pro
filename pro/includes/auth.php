@@ -68,9 +68,10 @@ if (!$user) {
 |--------------------------------------------------------------------------
 */
 $today = strtotime(date('Y-m-d'));
-$end   = strtotime($user['subscription_end']);
+$end = $user['subscription_end'] ? strtotime($user['subscription_end']) : 0;
 
 if ($end < $today || $user['is_active'] == 0) {
     header("Location: /pro/planes.php?expired=1");
     exit;
 }
+
