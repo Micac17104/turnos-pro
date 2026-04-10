@@ -37,10 +37,13 @@ $allowed_pages = [
     'suscripcion-vencida.php',
     'planes.php',
     'pago-preferencia.php',
-    'suscribirse-centro.php'
+    'suscribirse-centro.php',
+    'pago-exitoso-sus.php',
+    'pago-fallido-sus.php',
+    'pago-pendiente-sus.php'
 ];
 
-// NOMBRE REAL DEL ARCHIVO (SOLUCIÓN DEFINITIVA)
+// NOMBRE REAL DEL ARCHIVO (ESTO ES LO QUE TE FALTABA)
 $current_page = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
 // Si está vencido y no está en las permitidas → redirige
