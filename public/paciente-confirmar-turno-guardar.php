@@ -100,8 +100,9 @@ $telefono_normalizado = preg_replace('/\D/', '', $phone);
 // EMAIL AL PACIENTE (CON LINKS)
 // -----------------------------
 
-$confirm_link = "https://www.turnosaura.com/turno-confirmar-email.php?id=$turno_id&token=$confirm_token";
-$cancel_link  = "https://www.turnosaura.com/turno-cancelar-email.php?id=$turno_id&token=$cancel_token";
+$confirm_link = "https://www.turnosaura.com/public/turno-confirmar-email.php?id=$turno_id&token=$confirm_token";
+$cancel_link  = "https://www.turnosaura.com/public/turno-cancelar-email.php?id=$turno_id&token=$cancel_token";
+
 
 $mensaje_final = "
     Hola $name,<br><br>

@@ -3,6 +3,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+if (!isset($_SESSION['user']) || !is_array($_SESSION['user'])) {
+    header("Location: /auth/logout.php");
+    exit;
+}
+
+$user = $_SESSION['user'];
+$user_id = $user['id'];
+
+
 /*
 |--------------------------------------------------------------------------
 | 1) Permitir acceso a páginas de pago aunque la cuenta esté inactiva
