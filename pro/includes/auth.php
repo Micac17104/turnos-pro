@@ -30,10 +30,17 @@ if ($account_type !== 'professional') {
 |--------------------------------------------------------------------------
 | 3) Permitir acceso a páginas de pago aunque la cuenta esté inactiva
 |--------------------------------------------------------------------------
+|
+| IMPORTANTE:
+| Agregamos "suscribirse-pro.php" porque tu botón apunta a:
+| /pro/suscribirse-pro.php?plan=1
+|
+| basename() devuelve SOLO "suscribirse-pro.php"
+|--------------------------------------------------------------------------
 */
 $allowed_pages = [
     'planes.php',
-    'suscribirse-pro.php',
+    'suscribirse-pro.php',   // ← ESTA ES LA CLAVE
     'pago-preferencia-sus.php',
     'pago-exitoso-sus.php',
     'pago-fallido-sus.php',
@@ -43,7 +50,7 @@ $allowed_pages = [
 $current_page = basename($_SERVER['PHP_SELF']);
 
 if (in_array($current_page, $allowed_pages)) {
-    return;
+    return; // permitir acceso sin restricciones
 }
 
 require __DIR__ . '/../includes/db.php';
@@ -75,4 +82,3 @@ if ($end < $today || $user['is_active'] == 0) {
     header("Location: /pro/planes.php?expired=1");
     exit;
 }
-
