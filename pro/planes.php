@@ -33,7 +33,8 @@ $precio = 8000;
                 $<?= number_format($precio, 0, ',', '.') ?>
             </p>
 
-            <a href="/pro/suscribirse-pro.php?plan=1"
+            <a href="/pro/suscribirse-profesional.php?plan=1"
+
                class="btn bg-blue-600 text-white px-4 py-2 rounded">
                Pagar con MercadoPago
             </a>
