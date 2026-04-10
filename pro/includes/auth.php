@@ -71,3 +71,4 @@ if ($end < $today || $user['is_active'] == 0) {
     header("Location: /pro/planes.php?expired=1");
     exit;
 }
+
