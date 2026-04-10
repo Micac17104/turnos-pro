@@ -3,17 +3,32 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['user']) || !is_array($_SESSION['user'])) {
-    header("Location: /auth/logout.php");
+/*
+|--------------------------------------------------------------------------
+| 1) Validar que la sesión exista
+|--------------------------------------------------------------------------
+*/
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['account_type'])) {
+    header("Location: /auth/login.php");
     exit;
 }
 
-$user = $_SESSION['user'];
-$user_id = $user['id'];
+$user_id = $_SESSION['user_id'];
+$account_type = $_SESSION['account_type'];
 
 /*
 |--------------------------------------------------------------------------
-| 1) Permitir acceso a páginas de pago aunque la cuenta esté inactiva
+| 2) Solo profesionales pueden acceder al panel /pro
+|--------------------------------------------------------------------------
+*/
+if ($account_type !== 'professional') {
+    header("Location: /auth/login.php");
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
+| 3) Permitir acceso a páginas de pago aunque la cuenta esté inactiva
 |--------------------------------------------------------------------------
 */
 $allowed_pages = [
@@ -30,23 +45,11 @@ if (in_array($current_page, $allowed_pages)) {
     return;
 }
 
-/*
-|--------------------------------------------------------------------------
-| 2) Solo profesionales pueden acceder al panel
-|--------------------------------------------------------------------------
-*/
-if (!isset($_SESSION['user']['id']) || $_SESSION['user']['account_type'] !== 'professional') {
-    header("Location: /auth/login.php");
-    exit;
-}
-
 require __DIR__ . '/../includes/db.php';
 
-$user_id = $_SESSION['user']['id'];
-
 /*
 |--------------------------------------------------------------------------
-| 3) Obtener datos del usuario
+| 4) Obtener datos del usuario
 |--------------------------------------------------------------------------
 */
 $stmt = $pdo->prepare("SELECT is_active, subscription_end FROM users WHERE id = ?");
@@ -61,7 +64,7 @@ if (!$user) {
 
 /*
 |--------------------------------------------------------------------------
-| 4) Validar suscripción
+| 5) Validar suscripción
 |--------------------------------------------------------------------------
 */
 $today = strtotime(date('Y-m-d'));
@@ -71,4 +74,3 @@ if ($end < $today || $user['is_active'] == 0) {
     header("Location: /pro/planes.php?expired=1");
     exit;
 }
-
