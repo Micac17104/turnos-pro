@@ -41,7 +41,8 @@ $vence = !empty($user['subscription_end']) ? strtotime($user['subscription_end']
 $allowed_pages = [
     '/centro/suscripcion-vencida.php',
     '/centro/planes.php',
-    '/centro/pago-preferencia.php'
+    '/centro/pago-preferencia.php',
+    '/centro/suscribirse-centro.php'
 ];
 
 $current_page = $_SERVER['PHP_SELF'];
