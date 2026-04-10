@@ -40,8 +40,8 @@ $allowed_pages = [
     'suscribirse-centro.php'
 ];
 
-// Nombre del archivo actual
-$current_page = basename($_SERVER['PHP_SELF']);
+// NOMBRE REAL DEL ARCHIVO (SOLUCIÓN DEFINITIVA)
+$current_page = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
 // Si está vencido y no está en las permitidas → redirige
 if (($user['is_active'] != 1 || $vence < time()) && !in_array($current_page, $allowed_pages)) {
