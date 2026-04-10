@@ -29,27 +29,21 @@ if ($user['account_type'] !== 'center') {
     exit;
 }
 
-/* ---------------------------
-   FIX: evitar warnings de strtotime()
---------------------------- */
-
+// Fecha de vencimiento
 $vence = !empty($user['subscription_end']) ? strtotime($user['subscription_end']) : 0;
 
-/* ---------------------------------------------------------
-   PERMITIR ESTAS PÁGINAS AUNQUE LA SUSCRIPCIÓN ESTÉ VENCIDA
---------------------------------------------------------- */
+// Páginas permitidas
 $allowed_pages = [
-    '/centro/suscripcion-vencida.php',
-    '/centro/planes.php',
-    '/centro/pago-preferencia.php',
-    '/centro/suscribirse-centro.php'
+    'suscripcion-vencida.php',
+    'planes.php',
+    'pago-preferencia.php',
+    'suscribirse-centro.php'
 ];
 
-$current_page = $_SERVER['PHP_SELF'];
+// Nombre del archivo actual
+$current_page = basename($_SERVER['PHP_SELF']);
 
-/* ---------------------------------------------------------
-   SI ESTÁ VENCIDO Y NO ESTÁ EN LAS PÁGINAS PERMITIDAS → REDIRIGE
---------------------------------------------------------- */
+// Si está vencido y no está en las permitidas → redirige
 if (($user['is_active'] != 1 || $vence < time()) && !in_array($current_page, $allowed_pages)) {
     header("Location: /centro/suscripcion-vencida.php");
     exit;
