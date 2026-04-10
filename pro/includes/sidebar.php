@@ -1,5 +1,20 @@
 <?php
-// /pro/includes/sidebar.php
+// Asegurar sesión
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Cargar DB
+require __DIR__ . '/../includes/db.php';
+
+// Cargar datos del usuario logueado
+$user = null;
+
+if (isset($_SESSION['user_id'])) {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+}
 ?>
 
 <aside class="w-64 bg-white border-r border-slate-200 min-h-screen p-6">
@@ -49,22 +64,23 @@
            class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'perfil' ? 'bg-slate-100 font-semibold' : '' ?>">
             Perfil
         </a>
-<?php if ($user['mp_subscription_status'] !== 'active'): ?>
-    <a href="/pro/suscribirse-profesional.php" class="btn btn-primary">
-        Suscribirme al plan profesional
-    </a>
-<?php else: ?>
-    <p class="text-green-600 font-semibold mt-2">
-        Ya tenés una suscripción activa.
-    </p>
-<?php endif; ?>
 
+        <?php if (!$user || $user['mp_subscription_status'] !== 'active'): ?>
+            <a href="/pro/suscribirse-profesional.php"
+               class="block px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-lg">
+                Suscribirme al plan profesional
+            </a>
+        <?php else: ?>
+            <p class="text-green-600 font-semibold mt-2">
+                Ya tenés una suscripción activa.
+            </p>
+        <?php endif; ?>
 
-      <a href="/cancelar-suscripcion.php"
-   onclick="return confirm('¿Seguro que querés cancelar tu suscripción? Perderás acceso al panel.');"
-   class="block px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg">
-   Cancelar suscripción
-</a>
+        <a href="/cancelar-suscripcion.php"
+           onclick="return confirm('¿Seguro que querés cancelar tu suscripción? Perderás acceso al panel.');"
+           class="block px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg">
+            Cancelar suscripción
+        </a>
 
         <a href="/auth/logout.php"
            class="block px-4 py-2 rounded-lg hover:bg-red-100 text-red-600">
