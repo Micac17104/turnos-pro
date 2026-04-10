@@ -11,7 +11,6 @@ if (!isset($_SESSION['user']) || !is_array($_SESSION['user'])) {
 $user = $_SESSION['user'];
 $user_id = $user['id'];
 
-
 /*
 |--------------------------------------------------------------------------
 | 1) Permitir acceso a páginas de pago aunque la cuenta esté inactiva
@@ -28,7 +27,7 @@ $allowed_pages = [
 $current_page = basename($_SERVER['PHP_SELF']);
 
 if (in_array($current_page, $allowed_pages)) {
-    return; // permitir acceso sin restricciones
+    return;
 }
 
 /*
@@ -36,14 +35,14 @@ if (in_array($current_page, $allowed_pages)) {
 | 2) Solo profesionales pueden acceder al panel
 |--------------------------------------------------------------------------
 */
-if (!isset($_SESSION['user_id']) || $_SESSION['account_type'] !== 'professional') {
+if (!isset($_SESSION['user']['id']) || $_SESSION['user']['account_type'] !== 'professional') {
     header("Location: /auth/login.php");
     exit;
 }
 
 require __DIR__ . '/../includes/db.php';
 
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user']['id'];
 
 /*
 |--------------------------------------------------------------------------
