@@ -40,12 +40,15 @@ if ($account_type !== 'professional') {
 */
 $allowed_pages = [
     'planes.php',
-    'suscribirse-pro.php',   // ← ESTA ES LA CLAVE
+    'suscribirse-pro.php',
+    'suscribirse-profesional.php',
+    'suscribirse-centro.php',   // ← AGREGADO
     'pago-preferencia-sus.php',
     'pago-exitoso-sus.php',
     'pago-fallido-sus.php',
     'pago-pendiente-sus.php'
 ];
+
 
 $current_page = basename($_SERVER['PHP_SELF']);
 
