@@ -1,8 +1,9 @@
 <?php
 // /centro/suscribirse-centro.php
 
-session_save_path(__DIR__ . '/../sessions');
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require __DIR__ . '/../pro/includes/db.php';
 require __DIR__ . '/../vendor/autoload.php';
