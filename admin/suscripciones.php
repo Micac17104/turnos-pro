@@ -139,20 +139,41 @@ include __DIR__ . '/includes/sidebar.php';
                     <td class="p-3"><?= $u['last_payment'] ?: '-' ?></td>
 
                     <td class="p-3">
-                        <a href="marcar-pago.php?id=<?= $u['id'] ?>"
-                           class="bg-emerald-600 text-white px-3 py-1 rounded hover:bg-emerald-700">
-                           Marcar pago
-                        </a>
+                        <div class="flex flex-wrap gap-2">
 
-                        <a href="exportar-suscripciones.php" class="bg-blue-600 text-white px-4 py-2 rounded">
-    Exportar CSV
-</a>
+                            <a href="marcar-pago.php?id=<?= $u['id'] ?>"
+                               class="px-3 py-1 text-sm bg-emerald-600 text-white rounded hover:bg-emerald-700">
+                               Marcar pago
+                            </a>
 
+                            <a href="admin_acciones.php?action=activar&id=<?= $u['id'] ?>"
+                               class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700">
+                               Activar
+                            </a>
+
+                            <a href="admin_acciones.php?action=desactivar&id=<?= $u['id'] ?>"
+                               class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700">
+                               Desactivar
+                            </a>
+
+                            <a href="admin_acciones.php?action=sumar_mes&id=<?= $u['id'] ?>"
+                               class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
+                               +1 mes
+                            </a>
+
+                        </div>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
+
+    <div class="mt-4">
+        <a href="exportar-suscripciones.php"
+           class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Exportar CSV
+        </a>
+    </div>
 
 </div>
 
