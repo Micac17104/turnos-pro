@@ -4,6 +4,12 @@ require __DIR__ . '/../config.php';
 require __DIR__ . '/../auth/mailer.php';
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
+// 🚨 BLOQUEO DE SUSCRIPCIÓN (middleware)
+require __DIR__ . '/includes/check_subscription.php';
+?>
+
+
+
 $center_id = $_SESSION['user_id'];
 
 $stmt = $pdo->prepare("
