@@ -20,9 +20,9 @@ require __DIR__ . '/includes/sidebar.php';
 
     <div class="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
 
-        <!-- Plan 1 profesional -->
+        <!-- Plan 1 -->
         <div class="bg-white shadow rounded-xl p-6 text-center border">
-            <h2 class="text-xl font-bold mb-2">Plan 1 profesional</h2>
+            <h2 class="text-xl font-bold mb-2">Plan 1</h2>
             <p class="text-3xl font-semibold mb-4">$8.000</p>
 
             <a href="/centro/suscribirse-centro.php?plan=1"
@@ -31,9 +31,9 @@ require __DIR__ . '/includes/sidebar.php';
             </a>
         </div>
 
-        <!-- Plan 2 profesionales -->
+        <!-- Plan 2 -->
         <div class="bg-white shadow rounded-xl p-6 text-center border">
-            <h2 class="text-xl font-bold mb-2">Plan 2 profesionales</h2>
+            <h2 class="text-xl font-bold mb-2">Plan 2</h2>
             <p class="text-3xl font-semibold mb-4">$13.000</p>
 
             <a href="/centro/suscribirse-centro.php?plan=2"
@@ -42,9 +42,9 @@ require __DIR__ . '/includes/sidebar.php';
             </a>
         </div>
 
-        <!-- Plan 3 profesionales -->
+        <!-- Plan 3 -->
         <div class="bg-white shadow rounded-xl p-6 text-center border">
-            <h2 class="text-xl font-bold mb-2">Plan 3 profesionales</h2>
+            <h2 class="text-xl font-bold mb-2">Plan 3</h2>
             <p class="text-3xl font-semibold mb-4">$18.000</p>
 
             <a href="/centro/suscribirse-centro.php?plan=3"
@@ -53,9 +53,9 @@ require __DIR__ . '/includes/sidebar.php';
             </a>
         </div>
 
-        <!-- Plan 4 profesionales -->
+        <!-- Plan 4 -->
         <div class="bg-white shadow rounded-xl p-6 text-center border">
-            <h2 class="text-xl font-bold mb-2">Plan 4 profesionales</h2>
+            <h2 class="text-xl font-bold mb-2">Plan 4</h2>
             <p class="text-3xl font-semibold mb-4">$23.000</p>
 
             <a href="/centro/suscribirse-centro.php?plan=4"
@@ -64,9 +64,9 @@ require __DIR__ . '/includes/sidebar.php';
             </a>
         </div>
 
-        <!-- Plan 5 profesionales -->
+        <!-- Plan 5 -->
         <div class="bg-white shadow rounded-xl p-6 text-center border">
-            <h2 class="text-xl font-bold mb-2">Plan 5 profesionales</h2>
+            <h2 class="text-xl font-bold mb-2">Plan 5</h2>
             <p class="text-3xl font-semibold mb-4">$28.000</p>
 
             <a href="/centro/suscribirse-centro.php?plan=5"
