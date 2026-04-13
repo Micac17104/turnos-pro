@@ -1,66 +1,64 @@
 <?php
+session_save_path(__DIR__ . '/../sessions');
+session_start();
+
 require __DIR__ . '/../pro/includes/db.php';
 require __DIR__ . '/../vendor/autoload.php';
 
 use MercadoPago\SDK;
-use MercadoPago\Preapproval;
 use MercadoPago\Payment;
+use MercadoPago\Preapproval;
 
-// 🔥 PONÉ ACÁ TU ACCESS TOKEN NUEVO
 SDK::setAccessToken("APP_USR-2199782378550930-041311-34b2c0ffa4f9d11ea7bf9a45982b8bdf-745664297");
 
-// LOG RAW
+// Leer JSON crudo
 $raw = file_get_contents("php://input");
-file_put_contents(__DIR__ . "/log.txt", date("Y-m-d H:i:s") . " RAW: $raw\n", FILE_APPEND);
+file_put_contents("log.txt", "RAW: $raw\n", FILE_APPEND);
 
 $data = json_decode($raw, true);
 
-// Detectar tipo real
-$tipo = $data["type"] ?? $data["topic"] ?? null;
+if (!$data) {
+    file_put_contents("log.txt", "ERROR: JSON inválido\n", FILE_APPEND);
+    http_response_code(200);
+    exit;
+}
 
-// -----------------------------
-// 🔥 EVENTO DE PAGO (payment)
-// -----------------------------
+$tipo = $data["type"] ?? null;
+file_put_contents("log.txt", "EVENTO RECIBIDO: $tipo\n", FILE_APPEND);
+
+/* ============================================================
+   1) EVENTO DE PAGO REAL (payment.approved)
+   ============================================================ */
 if ($tipo === "payment") {
 
     $payment_id = $data["data"]["id"] ?? null;
+    file_put_contents("log.txt", "PAGO RECIBIDO ID=$payment_id\n", FILE_APPEND);
 
     if ($payment_id) {
-        $payment = Payment::find_by_id($payment_id);
+        try {
+            $payment = Payment::find_by_id($payment_id);
 
-        if ($payment && $payment->status === "approved") {
+            if ($payment && $payment->status === "approved") {
 
-            $user_id = $payment->external_reference;
+                $email = $payment->payer->email;
+                file_put_contents("log.txt", "PAGO APROBADO DE $email\n", FILE_APPEND);
 
-            if ($user_id) {
-
-                // Traer fecha actual y vencimiento anterior
-                $stmt = $pdo->prepare("SELECT subscription_end FROM users WHERE id = ?");
-                $stmt->execute([$user_id]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                $today = strtotime(date('Y-m-d'));
-                $end   = $user && $user['subscription_end'] ? strtotime($user['subscription_end']) : 0;
-
-                if ($end > $today) {
-                    $new_end = date('Y-m-d', strtotime($user['subscription_end'] . ' +1 month'));
-                } else {
-                    $new_end = date('Y-m-d', strtotime('+1 month'));
-                }
-
-                $stmt2 = $pdo->prepare("
+                // Activar usuario por email
+                $stmt = $pdo->prepare("
                     UPDATE users
                     SET 
-                        subscription_start = CURDATE(),
-                        subscription_end   = ?,
-                        is_active          = 1,
-                        mp_subscription_status = 'active'
-                    WHERE id = ?
+                        is_active = 1,
+                        mp_subscription_status = 'active',
+                        subscription_end = DATE_ADD(CURDATE(), INTERVAL 1 MONTH)
+                    WHERE email = ?
                 ");
-                $stmt2->execute([$new_end, $user_id]);
+                $stmt->execute([$email]);
 
-                file_put_contents(__DIR__ . "/log.txt", "PAGO APROBADO → ACTIVADO user_id=$user_id hasta $new_end\n", FILE_APPEND);
+                file_put_contents("log.txt", "USUARIO ACTIVADO: $email\n", FILE_APPEND);
             }
+
+        } catch (Exception $e) {
+            file_put_contents("log.txt", "ERROR PAYMENT: " . $e->getMessage() . "\n", FILE_APPEND);
         }
     }
 
@@ -68,94 +66,67 @@ if ($tipo === "payment") {
     exit;
 }
 
-// -----------------------------
-// 🔥 EVENTO DE SUSCRIPCIÓN (preapproval)
-// -----------------------------
-if (!in_array($tipo, ["preapproval", "subscription_preapproval"])) {
-    file_put_contents(__DIR__ . "/log.txt", "IGNORADO type=$tipo\n", FILE_APPEND);
-    http_response_code(200);
-    exit;
-}
+/* ============================================================
+   2) EVENTOS DE SUSCRIPCIÓN (preapproval)
+   ============================================================ */
+if (in_array($tipo, ["preapproval", "subscription_preapproval"])) {
 
-$preapproval_id =
-    $data["data"]["id"]
-    ?? $data["data"]["preapproval_id"]
-    ?? $data["resource"]
-    ?? null;
+    $preapproval_id = $data["data"]["id"] ?? null;
+    file_put_contents("log.txt", "PREAPPROVAL ID=$preapproval_id\n", FILE_APPEND);
 
-if (!$preapproval_id) {
-    file_put_contents(__DIR__ . "/log.txt", "SIN preapproval_id\n", FILE_APPEND);
-    http_response_code(200);
-    exit;
-}
+    if ($preapproval_id) {
+        try {
+            $pre = Preapproval::find_by_id($preapproval_id);
 
-$preapproval = Preapproval::find_by_id($preapproval_id);
+            if ($pre) {
+                $email = $pre->payer_email;
+                $status = $pre->status;
 
-if (!$preapproval) {
-    file_put_contents(__DIR__ . "/log.txt", "NO SE ENCONTRÓ PREAPPROVAL\n", FILE_APPEND);
-    http_response_code(200);
-    exit;
-}
+                file_put_contents("log.txt", "PREAPPROVAL STATUS=$status EMAIL=$email\n", FILE_APPEND);
 
-$user_id = $preapproval->external_reference;
+                if ($status === "authorized" || $status === "active") {
 
-if (!$user_id) {
-    file_put_contents(__DIR__ . "/log.txt", "SIN external_reference\n", FILE_APPEND);
-    http_response_code(200);
-    exit;
-}
+                    // Activar usuario
+                    $stmt = $pdo->prepare("
+                        UPDATE users
+                        SET 
+                            is_active = 1,
+                            mp_subscription_status = 'active',
+                            subscription_end = DATE_ADD(CURDATE(), INTERVAL 1 MONTH)
+                        WHERE email = ?
+                    ");
+                    $stmt->execute([$email]);
 
-$status = $preapproval->status;
-file_put_contents(__DIR__ . "/log.txt", "STATUS=$status user_id=$user_id\n", FILE_APPEND);
+                    file_put_contents("log.txt", "USUARIO ACTIVADO POR PREAPPROVAL: $email\n", FILE_APPEND);
 
-// ACTIVAR
-if (in_array($status, ["authorized", "active"])) {
+                } elseif ($status === "cancelled") {
 
-    $stmt = $pdo->prepare("SELECT subscription_end FROM users WHERE id = ?");
-    $stmt->execute([$user_id]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                    // Desactivar usuario
+                    $stmt = $pdo->prepare("
+                        UPDATE users
+                        SET 
+                            is_active = 0,
+                            mp_subscription_status = 'inactive'
+                        WHERE email = ?
+                    ");
+                    $stmt->execute([$email]);
 
-    $today = strtotime(date('Y-m-d'));
-    $end   = $user && $user['subscription_end'] ? strtotime($user['subscription_end']) : 0;
+                    file_put_contents("log.txt", "USUARIO DESACTIVADO POR CANCELACIÓN: $email\n", FILE_APPEND);
+                }
+            }
 
-    if ($end > $today) {
-        $new_end = date('Y-m-d', strtotime($user['subscription_end'] . ' +1 month'));
-    } else {
-        $new_end = date('Y-m-d', strtotime('+1 month'));
+        } catch (Exception $e) {
+            file_put_contents("log.txt", "ERROR PREAPPROVAL: " . $e->getMessage() . "\n", FILE_APPEND);
+        }
     }
 
-    $stmt2 = $pdo->prepare("
-        UPDATE users
-        SET 
-            subscription_start = CURDATE(),
-            subscription_end   = ?,
-            is_active          = 1,
-            mp_subscription_status = 'active'
-        WHERE id = ?
-    ");
-    $stmt2->execute([$new_end, $user_id]);
-
-    file_put_contents(__DIR__ . "/log.txt", "ACTIVADO user_id=$user_id hasta $new_end\n", FILE_APPEND);
     http_response_code(200);
     exit;
 }
 
-// CANCELAR
-if ($status === "cancelled") {
-
-    $stmt3 = $pdo->prepare("
-        UPDATE users
-        SET 
-            is_active = 0,
-            mp_subscription_status = 'inactive'
-        WHERE id = ?
-    ");
-    $stmt3->execute([$user_id]);
-
-    file_put_contents(__DIR__ . "/log.txt", "CANCELADO user_id=$user_id\n", FILE_APPEND);
-    http_response_code(200);
-    exit;
-}
-
+/* ============================================================
+   3) CUALQUIER OTRO EVENTO → IGNORAR
+   ============================================================ */
+file_put_contents("log.txt", "IGNORADO type=$tipo\n", FILE_APPEND);
 http_response_code(200);
 exit;

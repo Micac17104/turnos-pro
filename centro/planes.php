@@ -14,6 +14,12 @@ require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';
 
 ?>
+<?php if (isset($_GET['cancelada'])): ?>
+    <div class="mb-4 p-3 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded">
+        Tu suscripción fue cancelada en Aura. Para evitar futuros cobros, cancelala también desde Mercado Pago.
+    </div>
+<?php endif; ?>
+
 
 <main class="flex-1 p-8">
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Planes para centros</h1>

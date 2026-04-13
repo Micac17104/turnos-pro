@@ -43,5 +43,10 @@ $stmt2 = $pdo->prepare("
 ");
 $stmt2->execute([$user_id]);
 
-header("Location: /pro/suscripcion-cancelada.php");
+// Cerrar sesión para bloquear acceso
+session_unset();
+session_destroy();
+
+// Redirigir a página de planes
+header("Location: /planes.php?cancelada=1");
 exit;

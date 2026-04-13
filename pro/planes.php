@@ -17,11 +17,12 @@ $plan = 1;
 $precio = 8000;
 ?>
 
-<?php if (isset($_GET['expired'])): ?>
-    <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
-        Tu suscripción está inactiva. Pagá para recuperar acceso.
+<?php if (isset($_GET['cancelada'])): ?>
+    <div class="mb-4 p-3 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded">
+        Tu suscripción fue cancelada en Aura. Para evitar futuros cobros, cancelala también desde Mercado Pago.
     </div>
 <?php endif; ?>
+
 
 <main class="flex-1 p-8">
     <h1 class="text-2xl font-semibold text-slate-900 mb-6">Suscripción profesional</h1>
