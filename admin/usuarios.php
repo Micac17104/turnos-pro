@@ -1,55 +1,105 @@
 <?php
-require __DIR__ . '/auth-admin.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require __DIR__ . '/../pro/includes/db.php';
 
+// Solo admin
+if (!isset($_SESSION['user_id']) || $_SESSION['account_type'] !== 'admin') {
+    die("Acceso denegado");
+}
+
+// Obtener usuarios
 $stmt = $pdo->query("
-    SELECT id, name, email, account_type, is_active
+    SELECT id, name, email, account_type, is_active, subscription_end, mp_subscription_status, chosen_plan
     FROM users
     ORDER BY id DESC
 ");
-$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuarios - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
 
-<?php include __DIR__ . '/includes/header.php'; ?>
-<?php include __DIR__ . '/includes/sidebar.php'; ?>
+<div class="max-w-6xl mx-auto mt-10 bg-white shadow rounded p-6">
 
-<div class="ml-72 p-8">
+    <h1 class="text-2xl font-bold mb-6">Usuarios del sistema</h1>
 
-    <h1 class="text-3xl font-bold mb-6">Usuarios</h1>
-
-    <table class="w-full bg-white shadow rounded-lg overflow-hidden">
-        <thead class="bg-slate-900 text-white">
-            <tr>
-                <th class="p-3 text-left">Nombre</th>
-                <th class="p-3 text-left">Email</th>
-                <th class="p-3 text-left">Tipo</th>
-                <th class="p-3 text-left">Estado</th>
+    <table class="w-full border-collapse">
+        <thead>
+            <tr class="bg-gray-200 text-left">
+                <th class="p-3">ID</th>
+                <th class="p-3">Nombre</th>
+                <th class="p-3">Email</th>
+                <th class="p-3">Tipo</th>
+                <th class="p-3">Estado</th>
+                <th class="p-3">Plan</th>
+                <th class="p-3">Acciones</th>
             </tr>
         </thead>
 
         <tbody>
-            <?php foreach ($users as $u): ?>
-                <tr class="border-b">
-                    <td class="p-3"><?= $u['name'] ?></td>
-                    <td class="p-3"><?= $u['email'] ?></td>
-                    <td class="p-3"><?= ucfirst($u['account_type']) ?></td>
-                    <td class="p-3">
-    <?= $u['is_active'] ? '<span class="text-emerald-600">Activo</span>' : '<span class="text-red-600">Suspendido</span>' ?>
+        <?php foreach ($usuarios as $u): ?>
 
-    <!-- Botón Resetear Suscripción -->
-    <form action="/admin/resetear-suscripcion.php" method="POST" style="display:inline-block; margin-left:10px;"
-          onsubmit="return confirm('¿Seguro que querés resetear la suscripción de este usuario?');">
-        <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-        <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded text-sm">
-            Resetear
-        </button>
-    </form>
-</td>
+            <tr class="border-b hover:bg-gray-50">
+                <td class="p-3"><?= $u['id'] ?></td>
+                <td class="p-3"><?= htmlspecialchars($u['name']) ?></td>
+                <td class="p-3"><?= htmlspecialchars($u['email']) ?></td>
+                <td class="p-3 capitalize"><?= $u['account_type'] ?></td>
 
-            <?php endforeach; ?>
+                <!-- Estado visual -->
+                <td class="p-3">
+                    <?php if ($u['is_active'] == 1): ?>
+                        <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">Activo</span>
+                    <?php else: ?>
+                        <span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded">Inactivo</span>
+                    <?php endif; ?>
+                </td>
+
+                <!-- Plan -->
+                <td class="p-3">
+                    <?php if ($u['chosen_plan']): ?>
+                        Plan <?= $u['chosen_plan'] ?>
+                    <?php else: ?>
+                        -
+                    <?php endif; ?>
+                </td>
+
+                <!-- Botones -->
+                <td class="p-3">
+                    <div class="flex flex-wrap gap-2">
+
+                        <a href="admin_acciones.php?action=activar&id=<?= $u['id'] ?>"
+                           class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700">
+                           Activar
+                        </a>
+
+                        <a href="admin_acciones.php?action=desactivar&id=<?= $u['id'] ?>"
+                           class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700">
+                           Desactivar
+                        </a>
+
+                        <a href="admin_acciones.php?action=sumar_mes&id=<?= $u['id'] ?>"
+                           class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
+                           +1 mes
+                        </a>
+
+                    </div>
+                </td>
+
+            </tr>
+
+        <?php endforeach; ?>
         </tbody>
     </table>
 
 </div>
 
-<?php include __DIR__ . '/../pro/includes/footer.php'; ?>
+</body>
+</html>
