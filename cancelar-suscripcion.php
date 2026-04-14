@@ -16,30 +16,34 @@ if (!$user_id) {
     exit;
 }
 
+// Traer datos del usuario
 $stmt = $pdo->prepare("SELECT mp_preapproval_id, account_type FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$user || empty($user['mp_preapproval_id'])) {
-    die("No tenés una suscripción activa.");
+if (!$user) {
+    header("Location: /planes.php");
+    exit;
 }
 
-$preapproval_id = $user['mp_preapproval_id'];
+// Cancelar en Mercado Pago si existe
+if (!empty($user['mp_preapproval_id'])) {
+    SDK::setAccessToken("APP_USR-XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
-SDK::setAccessToken("APP_USR-XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    try {
+        $pre = Preapproval::find_by_id($user['mp_preapproval_id']);
 
-try {
-    $pre = Preapproval::find_by_id($preapproval_id);
+        if ($pre && $pre->status !== "cancelled") {
+            $pre->status = "cancelled";
+            $pre->update();
+        }
 
-    if ($pre && $pre->status !== "cancelled") {
-        $pre->status = "cancelled";
-        $pre->update();
+    } catch (Exception $e) {
+        // log opcional
     }
-
-} catch (Exception $e) {
-    // si querés loguear, lo hacés acá
 }
 
+// Desactivar usuario en Aura
 $stmt2 = $pdo->prepare("
     UPDATE users
     SET 
@@ -50,9 +54,10 @@ $stmt2 = $pdo->prepare("
 ");
 $stmt2->execute([$user_id]);
 
-if ($user['account_type'] === 'center') {
-    header("Location: /centro/suscripcion-vencida.php");
-} else {
-    header("Location: /pro/suscripcion-vencida.php");
-}
+// Cerrar sesión COMPLETAMENTE
+session_unset();
+session_destroy();
+
+// Redirigir a planes
+header("Location: /planes.php?cancelada=1");
 exit;
