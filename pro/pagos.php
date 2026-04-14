@@ -11,8 +11,6 @@ require __DIR__ . '/includes/helpers.php';
 require __DIR__ . '/includes/auth-profesional.php';
 
 
-?>
-
 
 $page_title = 'Pagos';
 $current = 'pagos';
