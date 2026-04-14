@@ -22,7 +22,7 @@ $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
-    header("Location: /planes.php");
+    header("Location: /auth/login.php");
     exit;
 }
 
@@ -58,6 +58,10 @@ $stmt2->execute([$user_id]);
 session_unset();
 session_destroy();
 
-// Redirigir a planes
-header("Location: /planes.php?cancelada=1");
+// Redirigir al archivo de planes correcto
+if ($user['account_type'] === 'professional') {
+    header("Location: /pro/planes.php?cancelada=1");
+} else {
+    header("Location: /centro/planes.php?cancelada=1");
+}
 exit;
