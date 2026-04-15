@@ -1,7 +1,8 @@
 <?php
 
 // 1) Detectar la URL solicitada
-$request = trim($_SERVER['REQUEST_URI'], '/');
+$request = strtok($_SERVER['REQUEST_URI'], '?');
+$request = trim($request, '/');
 
 // 2) Evitar error fatal cuando Railway pide /favicon.ico
 if ($request === 'favicon.ico') {
