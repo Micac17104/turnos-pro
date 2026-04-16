@@ -2,7 +2,6 @@
 session_save_path(__DIR__ . '/../sessions');
 session_start();
 
-require __DIR__ . '/paciente-layout.php';
 require __DIR__ . '/../config.php';
 
 // Validar sesión del paciente
@@ -25,11 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? null;
     $phone = $_POST['phone'] ?? null;
     $city  = $_POST['city']  ?? null;
-    $dni   = $_POST['dni']   ?? null;   // ← AGREGADO
+    $dni   = $_POST['dni']   ?? null;
 
-    // Construcción dinámica del SQL si cambia contraseña
     $password_sql = "";
-    $params = [$name, $email, $phone, $city, $dni]; // ← AGREGADO
+    $params = [$name, $email, $phone, $city, $dni];
 
     if (!empty($_POST['password'])) {
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
@@ -50,6 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: paciente-perfil.php?ok=1");
     exit;
 }
+
+// 👉 AHORA recién incluimos el layout
+require __DIR__ . '/paciente-layout.php';
 ?>
 
 <h1 class="text-2xl font-bold text-slate-900 mb-6">Mi perfil</h1>
@@ -77,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            value="<?= htmlspecialchars($paciente['phone']) ?>"
            class="w-full border rounded-lg p-2 mb-4">
 
-    <!-- DNI AGREGADO -->
     <label class="block text-sm font-medium text-slate-700 mb-1">DNI</label>
     <input type="text" name="dni"
            value="<?= htmlspecialchars($paciente['dni'] ?? '') ?>"
