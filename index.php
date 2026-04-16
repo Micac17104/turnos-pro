@@ -162,12 +162,12 @@ if ($request === '') {
         <div class="h-[70px]"></div>
 
         <!-- HERO NUEVO -->
-        <section id="inicio" class="max-w-7xl mx-auto px-6 py-10 lg:py-20 flex flex-col lg:flex-row items-center gap-12">
+        <section id="inicio" class="min-h-[90vh] lg:min-h-0 max-w-7xl mx-auto px-6 py-16 lg:py-20 flex flex-col justify-center lg:flex-row items-center gap-12">
 
             <!-- IZQUIERDA -->
             <div class="flex-1">
 
-                <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-4">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-4">
                     Gestión de turnos simple,<br>
                     moderna y profesional.
                 </h1>
@@ -189,7 +189,7 @@ if ($request === '') {
             </div>
 
             <!-- DERECHA: PANEL COMPACTO -->
-            <div class="side-panel bg-white border border-slate-200 shadow-xl p-6 rounded-xl">
+           <div class="side-panel bg-white border border-slate-200 shadow-xl p-6 rounded-xl mt-6 lg:mt-0">
 
                 <h2 class="text-xl font-semibold text-slate-900 mb-5 text-center">
                     Ingresar como
