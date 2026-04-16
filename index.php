@@ -288,6 +288,86 @@ if ($request === '') {
             </div>
         </section>
 
+        <!-- PREGUNTAS FRECUENTES WOW -->
+<section class="py-16 lg:py-20 bg-slate-50">
+  <div class="max-w-3xl mx-auto px-6">
+
+    <h2 class="text-3xl font-bold text-slate-900 text-center mb-10">
+      Preguntas frecuentes
+    </h2>
+
+    <div class="space-y-4">
+
+      <!-- ITEM -->
+      <div class="faq-item border border-slate-200 rounded-xl bg-white overflow-hidden">
+        <button class="faq-btn w-full text-left px-5 py-4 flex justify-between items-center">
+          <span class="font-semibold text-slate-900">¿Tengo que instalar algo?</span>
+          <span class="faq-icon transition-transform">+</span>
+        </button>
+        <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="text-slate-600 pb-4">
+            No. TurnosAura funciona directamente desde el navegador, tanto en computadora como en celular.
+          </p>
+        </div>
+      </div>
+
+      <!-- ITEM -->
+      <div class="faq-item border border-slate-200 rounded-xl bg-white overflow-hidden">
+        <button class="faq-btn w-full text-left px-5 py-4 flex justify-between items-center">
+          <span class="font-semibold text-slate-900">¿Mis pacientes tienen que descargar una app?</span>
+          <span class="faq-icon transition-transform">+</span>
+        </button>
+        <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="text-slate-600 pb-4">
+            No. Pueden reservar turnos desde un link simple, sin instalar nada.
+          </p>
+        </div>
+      </div>
+
+      <!-- ITEM -->
+      <div class="faq-item border border-slate-200 rounded-xl bg-white overflow-hidden">
+        <button class="faq-btn w-full text-left px-5 py-4 flex justify-between items-center">
+          <span class="font-semibold text-slate-900">¿Puedo usarlo si trabajo solo?</span>
+          <span class="faq-icon transition-transform">+</span>
+        </button>
+        <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="text-slate-600 pb-4">
+            Sí, está pensado tanto para profesionales independientes como para centros.
+          </p>
+        </div>
+      </div>
+
+      <!-- ITEM -->
+      <div class="faq-item border border-slate-200 rounded-xl bg-white overflow-hidden">
+        <button class="faq-btn w-full text-left px-5 py-4 flex justify-between items-center">
+          <span class="font-semibold text-slate-900">¿Se envían recordatorios automáticos?</span>
+          <span class="faq-icon transition-transform">+</span>
+        </button>
+        <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="text-slate-600 pb-4">
+            Sí, el sistema envía recordatorios para reducir ausencias y mejorar la organización.
+          </p>
+        </div>
+      </div>
+
+      <!-- ITEM -->
+      <div class="faq-item border border-slate-200 rounded-xl bg-white overflow-hidden">
+        <button class="faq-btn w-full text-left px-5 py-4 flex justify-between items-center">
+          <span class="font-semibold text-slate-900">¿Cuánto tarda en configurarse?</span>
+          <span class="faq-icon transition-transform">+</span>
+        </button>
+        <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 px-5">
+          <p class="text-slate-600 pb-4">
+            Es rápido. Podés empezar a usarlo el mismo día.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
         <!-- CTA FINAL -->
         <section class="py-16 lg:py-20 bg-white text-center">
             <h2 class="text-3xl font-bold text-slate-900 mb-4">
