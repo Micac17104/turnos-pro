@@ -1,9 +1,10 @@
 <?php
 session_start();
 
-require __DIR__ . '/../config.php';
 require __DIR__ . '/includes/auth.php';
+require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/auth-centro.php';
+
 
 // ESTA LÍNEA ES LA QUE TE FALTABA
 $center_id = $_SESSION['user_id'];
