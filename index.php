@@ -159,7 +159,7 @@ if ($request === '') {
         </header>
 
         <!-- ESPACIADO POR EL HEADER FIJO -->
-        <div class="h-[70px]"></div>
+        <div class="h-[50px] lg:h-[70px]"></div>
 
         <!-- HERO NUEVO -->
        <section id="inicio" class="min-h-[70vh] lg:min-h-0 max-w-7xl mx-auto px-6 py-10 lg:py-20 flex flex-col justify-start lg:flex-row items-center gap-8">
