@@ -162,7 +162,7 @@ if ($request === '') {
         <div class="h-[20px] lg:h-[70px]"></div>
 
         <!-- HERO NUEVO -->
-       <section id="inicio" class="min-h-[70vh] lg:min-h-0 max-w-7xl mx-auto px-6 py-10 lg:py-20 flex flex-col justify-start lg:flex-row items-center gap-8">
+       <section id="inicio" class="max-w-7xl mx-auto px-6 py-6 lg:py-20 flex flex-col justify-start lg:flex-row items-start lg:items-center gap-6">
             <!-- IZQUIERDA -->
             <div class="flex-1">
 
@@ -175,7 +175,7 @@ if ($request === '') {
                     Un sistema que trabaja por vos.
                 </p>
 
-                <p class="text-lg text-slate-600 mb-8 max-w-xl">
+                <p class="text-lg text-slate-600 mb-5 max-w-xl">
                     Una plataforma pensada para centros, profesionales independientes y pacientes.
                     Agenda online, recordatorios automáticos y una experiencia clara y moderna.
                 </p>
