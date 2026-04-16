@@ -16,9 +16,12 @@ if ($request === '') {
     <!DOCTYPE html>
     <html lang="es">
     <head>
-        <meta charset="UTF-8">
-        <title>TurnosAura - Gestión moderna de turnos</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <title>TurnosAura - Gestión moderna de turnos</title>
+
+    <?php include __DIR__ . '/includes/head.php'; ?>
+
+    <script src="https://cdn.tailwindcss.com"></script>
 
         <style>
             .logo-img {
