@@ -104,6 +104,10 @@ if ($request === '') {
             .hamburger.active span:nth-child(3) {
                 transform: translateY(-9px) rotate(-45deg);
             }
+
+            html {
+  scroll-behavior: smooth;
+}
         </style>
     </head>
 
@@ -119,6 +123,7 @@ if ($request === '') {
                 <a href="#como-funciona" class="hover:text-slate-900">Cómo funciona</a>
                 <a href="#fotos" class="hover:text-slate-900">Fotos</a>
                 <a href="#testimonios" class="hover:text-slate-900">Testimonios</a>
+                <a href="#faq" class="hover:text-slate-900">FAQ</a>
                 <a href="auth/login.php" class="hover:text-slate-900">Ingresar</a>
             </nav>
         </div>
@@ -137,6 +142,7 @@ if ($request === '') {
                     <a href="#como-funciona" class="hover:text-slate-900">Cómo funciona</a>
                     <a href="#fotos" class="hover:text-slate-900">Fotos</a>
                     <a href="#testimonios" class="hover:text-slate-900">Testimonios</a>
+                    <a href="#faq" class="hover:text-slate-900">FAQ</a>
                     <a href="auth/login.php" class="hover:text-slate-900">Ingresar</a>
                 </nav>
 
@@ -289,7 +295,7 @@ if ($request === '') {
         </section>
 
         <!-- PREGUNTAS FRECUENTES WOW -->
-<section class="py-16 lg:py-20 bg-slate-50">
+<section id="faq" class="py-16 lg:py-20 bg-slate-50">
   <div class="max-w-3xl mx-auto px-6">
 
     <h2 class="text-3xl font-bold text-slate-900 text-center mb-10">
@@ -420,6 +426,40 @@ if ($request === '') {
             hamburger.addEventListener('click', toggleMenu);
             overlay.addEventListener('click', toggleMenu);
         </script>
+
+        <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const faqButtons = document.querySelectorAll(".faq-btn");
+
+  faqButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+
+      const content = btn.nextElementSibling;
+      const icon = btn.querySelector(".faq-icon");
+
+      const isOpen = content.style.maxHeight;
+
+      // cerrar todos
+      document.querySelectorAll(".faq-content").forEach(c => {
+        c.style.maxHeight = null;
+      });
+
+      document.querySelectorAll(".faq-icon").forEach(i => {
+        i.style.transform = "rotate(0deg)";
+      });
+
+      // abrir este
+      if (!isOpen) {
+        content.style.maxHeight = content.scrollHeight + "px";
+        icon.style.transform = "rotate(45deg)";
+      }
+
+    });
+  });
+
+});
+</script>
 
     </body>
     </html>
