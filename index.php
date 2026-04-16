@@ -162,8 +162,7 @@ if ($request === '') {
         <div class="h-[70px]"></div>
 
         <!-- HERO NUEVO -->
-       <section id="inicio" class="min-h-[90vh] lg:min-h-0 max-w-7xl mx-auto px-6 py-16 lg:py-20 flex flex-col justify-start lg:flex-row items-center gap-12">
-
+       <section id="inicio" class="min-h-[70vh] lg:min-h-0 max-w-7xl mx-auto px-6 py-10 lg:py-20 flex flex-col justify-start lg:flex-row items-center gap-8">
             <!-- IZQUIERDA -->
             <div class="flex-1">
 
