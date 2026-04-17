@@ -78,11 +78,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
 
         // INSERT CORRECTO SEGÚN TU BASE
-        $stmt = $pdo->prepare("
-            INSERT INTO appointments (user_id, client_id, center_id, date, time, status, motivo)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([$prof_id, $client_id, $center_id, $date, $time, $status, $motivo]);
+     $stmt = $pdo->prepare("
+    INSERT INTO appointments (user_id, client_id, center_id, date, time, status, motivo)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+");
+$stmt->execute([$prof_id, $client_id, $center_id, $date, $time, $status, $motivo]);
+
+
 
         // Enviar email
         $stmt = $pdo->prepare("SELECT name, email FROM clients WHERE id = ?");
