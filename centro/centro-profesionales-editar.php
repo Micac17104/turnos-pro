@@ -2,6 +2,7 @@
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
 
+$center_id = $_SESSION['user_id'];
 $prof_id = $_GET['id'] ?? null;
 
 if (!$prof_id) {
