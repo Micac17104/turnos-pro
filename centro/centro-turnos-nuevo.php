@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/auth-centro.php';
@@ -26,7 +28,6 @@ $stmt = $pdo->prepare("
     WHERE center_id = ?
     ORDER BY name
 ");
-
 $stmt->execute([$center_id]);
 $pacientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -39,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $time = $_POST['time'] ?? '';
     $status = $_POST['status'] ?? 'pending';
     $motivo = trim($_POST['motivo'] ?? '');
-
 
     if ($prof_id === '' || $client_id === '' || $date === '' || $time === '') {
         $errors[] = "Todos los campos son obligatorios.";
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validar turno libre
     $stmt = $pdo->prepare("
         SELECT id FROM appointments
-        WHERE user_id = ? AND date = ? AND time = ? AND status IN ('confirmed','pending')
+        WHERE professional_id = ? AND date = ? AND time = ? AND status IN ('confirmed','pending')
     ");
     $stmt->execute([$prof_id, $date, $time]);
 
@@ -78,117 +78,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
 
-    $stmt = $pdo->prepare("
-    INSERT INTO appointments (user_id, client_id, date, time, status, center_id, motivo)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-");
-$stmt->execute([$prof_id, $client_id, $date, $time, $status, $center_id, $motivo]);
+        $stmt = $pdo->prepare("
+            INSERT INTO appointments (professional_id, client_id, center_id, date, time, status, motivo)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([$prof_id, $client_id, $center_id, $date, $time, $status, $motivo]);
 
-    
+        // Enviar email
+        $stmt = $pdo->prepare("SELECT name, email FROM clients WHERE id = ?");
+        $stmt->execute([$client_id]);
+        $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// --------------------------------------
-// ENVIAR EMAIL AL PACIENTE
-// --------------------------------------
-$stmt = $pdo->prepare("SELECT name, email FROM clients WHERE id = ?");
-$stmt->execute([$client_id]);
-$paciente = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($paciente && !empty($paciente['email'])) {
+            require __DIR__ . '/../auth/mailer.php';
 
-if ($paciente && !empty($paciente['email'])) {
+            $asunto = "Nuevo turno asignado - TurnosAura";
+            $mensaje = "
+                Hola {$paciente['name']},<br><br>
+                Se te asignó un turno:<br><br>
+                <strong>Fecha:</strong> " . date('d/m/Y', strtotime($date)) . "<br>
+                <strong>Hora:</strong> " . substr($time, 0, 5) . " hs<br><br>
+                Gracias por usar TurnosAura.
+            ";
 
-    require __DIR__ . '/../auth/mailer.php'; // mailer correcto
+            enviarEmail($paciente['email'], $asunto, $mensaje);
+        }
 
-    $asunto = "Nuevo turno asignado - TurnosAura";
-
-    $mensaje = "
-        Hola {$paciente['name']},<br><br>
-        Se te asignó un turno en el centro:<br><br>
-        <strong>Fecha:</strong> " . date('d/m/Y', strtotime($date)) . "<br>
-        <strong>Hora:</strong> " . substr($time, 0, 5) . " hs<br><br>
-        Gracias por usar TurnosAura.
-    ";
-
-    enviarEmail($paciente['email'], $asunto, $mensaje);
-}
-
-$success = "Turno creado correctamente.";
-
+        $success = "Turno creado correctamente.";
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Nuevo turno</title>
-<style>
-body{background:#f1f5f9;font-family:Arial;display:flex;justify-content:center;align-items:center;padding:40px;}
-.box{background:white;padding:40px;border-radius:20px;width:420px;box-shadow:0 10px 30px rgba(15,23,42,0.06);}
-input, select{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #cbd5e1;}
-button{width:100%;padding:14px;background:#0ea5e9;color:white;border:none;border-radius:12px;font-weight:600;cursor:pointer;}
-button:hover{opacity:0.9;}
-.error{color:#b00020;margin-bottom:10px;}
-.success{color:#22c55e;margin-bottom:10px;}
-a{color:#0ea5e9;text-decoration:none;font-size:14px;}
-</style>
-</head>
-<body>
-
-<?php include __DIR__ . '/includes/sidebar.php'; ?>
-<div style="margin-left:260px; padding:24px;">
-
-<div class="box">
-    <h2>Crear nuevo turno</h2>
-
-    <?php if (!empty($errors)): ?>
-        <div class="error">
-            <?php foreach ($errors as $e) echo "<p>$e</p>"; ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if (!empty($success)): ?>
-        <div class="success"><?= $success ?></div>
-    <?php endif; ?>
-
-    <form method="post">
-
-        <label>Profesional</label>
-        <select name="professional_id" required>
-            <option value="">Seleccionar profesional</option>
-            <?php foreach ($profesionales as $p): ?>
-                <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['name']) ?></option>
-            <?php endforeach; ?>
-        </select>
-
-        <label>Paciente</label>
-        <select name="client_id" required>
-            <option value="">Seleccionar paciente</option>
-            <?php foreach ($pacientes as $c): ?>
-                <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['name']) ?></option>
-            <?php endforeach; ?>
-        </select>
-
-        <label>Fecha</label>
-        <input type="date" name="date" required>
-
-        <label>Hora</label>
-        <input type="time" name="time" required>
-
-        <label>Estado</label>
-        <select name="status">
-            <option value="pending">Pendiente</option>
-            <option value="confirmed">Confirmado</option>
-            <option value="cancelled">Cancelado</option>
-        </select>
-
-        <label>Motivo (opcional)</label>
-<textarea name="motivo" style="width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #cbd5e1;"></textarea>
-
-        <button>Crear turno</button>
-    </form>
-
-    <p style="margin-top:10px;"><a href="centro-turnos.php">Volver</a></p>
-</div>
-
-</div>
-</body>
-</html>
