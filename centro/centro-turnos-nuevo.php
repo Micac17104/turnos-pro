@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validar turno libre
     $stmt = $pdo->prepare("
         SELECT id FROM appointments
-        WHERE professional_id = ? AND date = ? AND time = ? AND status IN ('confirmed','pending')
+        WHERE user_id = ? AND date = ? AND time = ? AND status IN ('confirmed','pending')
     ");
     $stmt->execute([$prof_id, $date, $time]);
 
@@ -77,9 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
 
-        // INSERT CORRECTO
+        // INSERT CORRECTO SEGÚN TU BASE
         $stmt = $pdo->prepare("
-            INSERT INTO appointments (professional_id, client_id, center_id, date, time, status, motivo)
+            INSERT INTO appointments (user_id, client_id, center_id, date, time, status, motivo)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([$prof_id, $client_id, $center_id, $date, $time, $status, $motivo]);
