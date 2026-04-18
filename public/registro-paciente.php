@@ -1,6 +1,18 @@
 <?php
-session_save_path(__DIR__ . '/../sessions');
+// --- FIX DEFINITIVO PARA RAILWAY ---
+$path = __DIR__ . '/../sessions';
+
+if (!is_dir($path)) {
+    mkdir($path, 0777, true);
+}
+
+if (!is_writable($path)) {
+    chmod($path, 0777);
+}
+
+session_save_path($path);
 session_start();
+// -----------------------------------
 
 require __DIR__ . '/../config.php';
 
@@ -25,7 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
-        // 1️⃣ Buscar si el centro ya creó a este paciente por DNI o email
+        /*
+        ---------------------------------------------------------
+         1️⃣ Buscar si el centro ya creó a este paciente
+            por DNI o email
+        ---------------------------------------------------------
+        */
         $stmt = $pdo->prepare("
             SELECT * FROM clients 
             WHERE dni = ? OR email = ?
@@ -36,14 +53,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($clienteCentro) {
 
-            // 2️⃣ Si existe, lo vinculamos al usuario recién creado
+            /*
+            ---------------------------------------------------------
+             2️⃣ Actualizar ese registro y vincularlo
+            ---------------------------------------------------------
+            */
             $stmt = $pdo->prepare("
                 UPDATE clients
                 SET user_id = ?, name = ?, phone = ?, dni = ?, email = ?, password = ?
                 WHERE id = ?
             ");
             $stmt->execute([
-                $clienteCentro['id'], // user_id = id del cliente del centro
+                $clienteCentro['id'], // user_id = id del cliente
                 $nombre,
                 $telefono,
                 $dni,
@@ -52,13 +73,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $clienteCentro['id']
             ]);
 
-            // 3️⃣ Guardamos en sesión el ID del cliente del centro
             $_SESSION['paciente_id'] = $clienteCentro['id'];
             $_SESSION['paciente_nombre'] = $nombre;
 
         } else {
 
-            // 4️⃣ Si no existe, lo creamos como nuevo paciente
+            /*
+            ---------------------------------------------------------
+             3️⃣ Crear un nuevo paciente (sin centro asignado)
+            ---------------------------------------------------------
+            */
             $stmt = $pdo->prepare("
                 INSERT INTO clients (user_id, name, phone, dni, email, password)
                 VALUES (0, ?, ?, ?, ?, ?)
@@ -74,3 +98,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear cuenta</title>
+
+    <style>
+        body { background:#f5f5f5; font-family:Arial; }
+        .container { max-width:400px; margin:60px auto; background:white; padding:30px; border-radius:14px; }
+        h2 { text-align:center; color:#0f172a; margin-bottom:20px; }
+
+        input {
+            width:100%;
+            padding:12px;
+            margin-bottom:15px;
+            border-radius:10px;
+            border:1px solid #cbd5e1;
+            font-size:16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #22c55e, #0ea5e9);
+            padding: 12px;
+            border-radius: 999px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display:block;
+            text-align:center;
+            border:none;
+            cursor:pointer;
+            width:100%;
+        }
+
+        .error {
+            background:#fee2e2;
+            padding:10px;
+            border-radius:8px;
+            color:#b91c1c;
+            margin-bottom:15px;
+            text-align:center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Crear cuenta</h2>
+
+    <?php if ($mensaje): ?>
+        <div class="error"><?= htmlspecialchars($mensaje) ?></div>
+    <?php endif; ?>
+
+    <form method="post">
+        <input type="text" name="nombre" placeholder="Nombre completo" required>
+        <input type="text" name="telefono" placeholder="Teléfono" required>
+
+        <input type="text" name="dni" placeholder="DNI" required>
+
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+
+        <button class="btn-primary">Registrarme</button>
+    </form>
+
+</div>
+
+</body>
+</html>

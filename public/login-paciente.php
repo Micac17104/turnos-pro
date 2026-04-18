@@ -23,11 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    /*
-    ---------------------------------------------------------
-     1️⃣ BUSCAR PACIENTE POR EMAIL (VINCULADO O NO)
-    ---------------------------------------------------------
-    */
+    // Buscar paciente por email
     $stmt = $pdo->prepare("
         SELECT * FROM clients 
         WHERE email = ?
@@ -40,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensaje = "Email o contraseña incorrectos.";
     } else {
 
-        // Si no tiene contraseña → no puede loguear
         if (empty($paciente['password'])) {
             $mensaje = "Tu cuenta aún no tiene contraseña. Si sos paciente cargado por un profesional, creá tu cuenta desde el enlace que te enviaron.";
 
@@ -49,13 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } else {
 
-            /*
-            ---------------------------------------------------------
-             2️⃣ SI NO ESTÁ VINCULADO, VINCULAR AHORA
-            ---------------------------------------------------------
-            */
-            if ($paciente['user_id'] == 0) {
-
+            // Si no está vinculado, lo vinculamos a sí mismo
+            if ((int)$paciente['user_id'] === 0) {
                 $stmt2 = $pdo->prepare("
                     UPDATE clients
                     SET user_id = ?
@@ -64,11 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt2->execute([$paciente['id'], $paciente['id']]);
             }
 
-            /*
-            ---------------------------------------------------------
-             3️⃣ GUARDAR EL client_id REAL EN SESIÓN
-            ---------------------------------------------------------
-            */
             $_SESSION['paciente_id'] = $paciente['id'];
             $_SESSION['paciente_nombre'] = $paciente['name'];
 
@@ -78,3 +63,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar sesión</title>
+
+    <style>
+        body { background:#f5f5f5; font-family:Arial; }
+        .container { max-width:400px; margin:60px auto; background:white; padding:30px; border-radius:14px; }
+        h2 { text-align:center; color:#0f172a; margin-bottom:20px; }
+
+        input {
+            width:100%;
+            padding:12px;
+            margin-bottom:15px;
+            border-radius:10px;
+            border:1px solid #cbd5e1;
+            font-size:16px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #22c55e, #0ea5e9);
+            padding: 12px;
+            border-radius: 999px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display:block;
+            text-align:center;
+            border:none;
+            cursor:pointer;
+            width:100%;
+        }
+
+        .link {
+            display:block;
+            margin-top:15px;
+            text-align:center;
+            color:#0ea5e9;
+            text-decoration:none;
+        }
+
+        .error {
+            background:#fee2e2;
+            padding:10px;
+            border-radius:8px;
+            color:#b91c1c;
+            margin-bottom:15px;
+            text-align:center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Iniciar sesión</h2>
+
+    <?php if ($mensaje): ?>
+        <div class="error"><?= htmlspecialchars($mensaje) ?></div>
+    <?php endif; ?>
+
+    <form method="post">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+
+        <button class="btn-primary">Ingresar</button>
+    </form>
+
+    <a class="link" href="registro-paciente.php">Crear cuenta</a>
+
+</div>
+
+</body>
+</html>
