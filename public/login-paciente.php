@@ -23,27 +23,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // 1️⃣ Buscar primero un paciente vinculado (user_id != 0)
+    /*
+    ---------------------------------------------------------
+     1️⃣ BUSCAR PACIENTE POR EMAIL (VINCULADO O NO)
+    ---------------------------------------------------------
+    */
     $stmt = $pdo->prepare("
         SELECT * FROM clients 
-        WHERE email = ? AND user_id != 0
+        WHERE email = ?
         LIMIT 1
     ");
     $stmt->execute([$email]);
     $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // 2️⃣ Si no existe, buscar uno sin vincular (user_id = 0)
     if (!$paciente) {
-        $stmt = $pdo->prepare("
-            SELECT * FROM clients 
-            WHERE email = ? AND user_id = 0
-            LIMIT 1
-        ");
-        $stmt->execute([$email]);
-        $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    if ($paciente) {
+        $mensaje = "Email o contraseña incorrectos.";
+    } else {
 
         // Si no tiene contraseña → no puede loguear
         if (empty($paciente['password'])) {
@@ -54,7 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } else {
 
-            // 3️⃣ Si el paciente NO está vinculado, lo vinculamos ahora
+            /*
+            ---------------------------------------------------------
+             2️⃣ SI NO ESTÁ VINCULADO, VINCULAR AHORA
+            ---------------------------------------------------------
+            */
             if ($paciente['user_id'] == 0) {
 
                 $stmt2 = $pdo->prepare("
@@ -65,16 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt2->execute([$paciente['id'], $paciente['id']]);
             }
 
-            // 4️⃣ Guardar SIEMPRE el client_id correcto
+            /*
+            ---------------------------------------------------------
+             3️⃣ GUARDAR EL client_id REAL EN SESIÓN
+            ---------------------------------------------------------
+            */
             $_SESSION['paciente_id'] = $paciente['id'];
             $_SESSION['paciente_nombre'] = $paciente['name'];
 
             header("Location: paciente-dashboard.php");
             exit;
         }
-
-    } else {
-        $mensaje = "Email o contraseña incorrectos.";
     }
 }
 ?>
