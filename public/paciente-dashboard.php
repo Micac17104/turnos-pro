@@ -24,9 +24,32 @@ if (!isset($_SESSION['paciente_id'])) {
 
 require __DIR__ . '/paciente-layout.php';
 
+// ID que quedó guardado en sesión
 $paciente_id = $_SESSION['paciente_id'];
 
-// Obtener próximos turnos
+/*
+---------------------------------------------------------
+ FIX CRÍTICO:
+ Obtener el client_id REAL vinculado al usuario
+---------------------------------------------------------
+*/
+$stmt = $pdo->prepare("
+    SELECT id 
+    FROM clients 
+    WHERE user_id = ?
+    LIMIT 1
+");
+$stmt->execute([$paciente_id]);
+$clienteVinculado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Si existe un cliente vinculado, usar ese ID
+$client_id_real = $clienteVinculado['id'] ?? $paciente_id;
+
+/*
+---------------------------------------------------------
+ Obtener próximos turnos usando el client_id REAL
+---------------------------------------------------------
+*/
 $stmt = $pdo->prepare("
     SELECT a.*, u.name AS profesional
     FROM appointments a
@@ -37,7 +60,7 @@ $stmt = $pdo->prepare("
     ORDER BY a.date ASC, a.time ASC
     LIMIT 5
 ");
-$stmt->execute([$paciente_id]);
+$stmt->execute([$client_id_real]);
 $turnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $hoy = date("Y-m-d");
