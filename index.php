@@ -129,6 +129,8 @@ if ($request === '') {
                 <a href="#faq" class="hover:text-slate-900">FAQ</a>
                <a href="auth/login.php"
    class="inline-block bg-slate-900 text-white px-8 py-3 rounded-lg text-lg shadow hover:bg-slate-800 transition mx-auto lg:mx-0">
+   Ingresar
+</a>
             </nav>
         </div>
 
