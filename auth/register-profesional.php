@@ -1,4 +1,5 @@
 <?php
+session_start();
 require __DIR__ . '/../pro/includes/db.php';
 
 $errors = [];
@@ -85,7 +86,12 @@ if ($_POST) {
             $dni
         ]);
 
-        header("Location: login.php?registered=1");
+        // INICIAR SESIÓN AUTOMÁTICAMENTE
+        $new_id = $pdo->lastInsertId();
+        $_SESSION['user_id'] = $new_id;
+
+        // REDIRIGIR AL DASHBOARD DEL PROFESIONAL
+        header("Location: /pro/dashboard.php");
         exit;
     }
 }
