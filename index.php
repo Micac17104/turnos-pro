@@ -127,7 +127,8 @@ if ($request === '') {
                 <a href="#fotos" class="hover:text-slate-900">Fotos</a>
                 <a href="#testimonios" class="hover:text-slate-900">Testimonios</a>
                 <a href="#faq" class="hover:text-slate-900">FAQ</a>
-                <a href="auth/login.php" class="hover:text-slate-900">Ingresar</a>
+               <a href="auth/login.php"
+   class="inline-block bg-slate-900 text-white px-8 py-3 rounded-lg text-lg shadow hover:bg-slate-800 transition mx-auto lg:mx-0">
             </nav>
         </div>
 
@@ -165,9 +166,9 @@ if ($request === '') {
         <div class="h-[50px] lg:h-[70px]"></div>
 
         <!-- HERO NUEVO -->
-       <section id="inicio" class="max-w-7xl mx-auto px-6 py-6 lg:py-20 flex flex-col justify-start lg:flex-row items-start lg:items-center gap-6">
+       <section id="inicio" class="max-w-7xl mx-auto px-6 py-8 lg:py-20 flex flex-col items-center text-center lg:flex-row lg:items-center lg:text-left gap-6">
             <!-- IZQUIERDA -->
-            <div class="flex-1">
+            <div class="flex-1 flex flex-col items-center lg:items-start">
 
                 <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-4">
                     Gestión de turnos simple,<br>
@@ -191,7 +192,7 @@ if ($request === '') {
             </div>
 
             <!-- DERECHA: PANEL COMPACTO -->
-           <div class="side-panel bg-white border border-slate-200 shadow-xl p-6 rounded-xl mt-6 lg:mt-0">
+           <div class="side-panel bg-white border border-slate-200 shadow-xl p-6 rounded-xl mt-6 lg:mt-0 mx-auto">
 
                 <h2 class="text-xl font-semibold text-slate-900 mb-5 text-center">
                     Ingresar como
