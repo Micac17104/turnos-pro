@@ -54,10 +54,20 @@ if ($_POST) {
         $today = date('Y-m-d');
         $end   = date('Y-m-d', strtotime('+1 month'));
 
+        /*
+        ------------------------------------------------------------------
+        FIX CRÍTICO:
+        Agregar mp_subscription_status y subscription_expires_at
+        ------------------------------------------------------------------
+        */
         $stmt = $pdo->prepare("
             INSERT INTO users 
-            (name, email, password, profession, phone, city, accepts_insurance, account_type, subscription_start, subscription_end, is_active, last_payment, dni) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'professional', ?, ?, 1, NULL, ?)
+            (name, email, password, profession, phone, city, accepts_insurance, account_type,
+             subscription_start, subscription_end, is_active, last_payment, dni,
+             mp_subscription_status, subscription_expires_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'professional',
+                    ?, ?, 1, NULL, ?,
+                    'active', ?)
         ");
 
         $stmt->execute([
@@ -70,7 +80,8 @@ if ($_POST) {
             $accepts_insurance,
             $today,
             $end,
-            $dni
+            $dni,
+            $end // ← fecha de expiración real
         ]);
 
         header("Location: login.php?registered=1");
