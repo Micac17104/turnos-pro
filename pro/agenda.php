@@ -5,14 +5,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';
-
-
-
-
 
 $page_title = 'Agenda';
 $current    = 'agenda';
@@ -542,8 +537,11 @@ require __DIR__ . '/includes/sidebar.php';
     <?php endif; ?>
 
     <!-- VISTA MENSUAL -->
-    <?php if ($view === 'month'): ?>
-        <div class="grid grid-cols-7 gap-3 mb-2 text-xs">
+   <?php if ($view === 'month'): ?>
+
+    <!-- DÍAS -->
+    <div class="overflow-x-auto">
+        <div class="grid grid-cols-7 gap-3 mb-2 text-xs min-w-[700px]">
             <div class="text-center font-semibold text-slate-700">Lun</div>
             <div class="text-center font-semibold text-slate-700">Mar</div>
             <div class="text-center font-semibold text-slate-700">Mié</div>
@@ -552,10 +550,13 @@ require __DIR__ . '/includes/sidebar.php';
             <div class="text-center font-semibold text-slate-700">Sáb</div>
             <div class="text-center font-semibold text-slate-700">Dom</div>
         </div>
+    </div>
 
-        <div class="grid grid-cols-7 gap-3 text-xs">
+    <!-- GRID -->
+    <div class="overflow-x-auto">
+        <div class="grid grid-cols-7 gap-3 text-xs min-w-[700px]">
             <?php foreach ($grid as $dia): ?>
-                <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200 min-h-[120px]">
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200 min-h-[140px] sm:min-h-[120px]">
                     <?php if ($dia): ?>
                         <p class="font-semibold text-slate-900 mb-2">
                             <?= date('j', strtotime($dia)) ?>
@@ -568,20 +569,23 @@ require __DIR__ . '/includes/sidebar.php';
 
                         <?php foreach ($turnosDiaMes as $t): ?>
                             <?php $clase = claseTurnoEstado($t['status']); ?>
-                            <div class="flex justify-between items-center mb-1 border rounded px-1 py-[2px] <?= $clase ?>">
-                                <span class="text-[11px]">
-                                    <?= substr($t['time'], 0, 5) ?> — <?= h($t['paciente'] ?? 'Paciente sin registrar') ?>
+                            <div class="flex flex-col mb-1 border rounded px-2 py-1 <?= $clase ?>">
+                                
+                                <span class="text-[12px] leading-tight font-medium">
+                                    <?= substr($t['time'], 0, 5) ?> — <?= h($t['paciente'] ?? 'Paciente') ?>
                                 </span>
+
                                 <?php if (!empty($t['motivo'])): ?>
-    <span class="block text-[10px] text-slate-500 mt-1">
-        <?= h($t['motivo']) ?>
-    </span>
-<?php endif; ?>
+                                    <span class="text-[10px] text-slate-500 mt-1">
+                                        <?= h($t['motivo']) ?>
+                                    </span>
+                                <?php endif; ?>
 
                                 <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>"
-                                   class="text-red-600 hover:underline text-[11px]">
+                                   class="text-red-600 hover:underline text-[10px] mt-1">
                                     Cancelar
                                 </a>
+
                             </div>
                         <?php endforeach; ?>
 
@@ -590,11 +594,14 @@ require __DIR__ . '/includes/sidebar.php';
                                 • <?= h($task['title']) ?>
                             </p>
                         <?php endforeach; ?>
+
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
-    <?php endif; ?>
+    </div>
+
+<?php endif; ?>
 
     <!-- MODAL NUEVA TAREA -->
     <div id="modalTarea" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">

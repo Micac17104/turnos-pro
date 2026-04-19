@@ -172,7 +172,7 @@ require __DIR__ . '/includes/sidebar.php';
                     <input type="file" name="profile_image" accept="image/*" class="text-sm">
 
                     <?php if ($user['profile_image']): ?>
-                        <img src="../uploads/<?= h($user['profile_image']) ?>"
+                        <img src="../public/uploads/<?= h($user['profile_image']) ?>"
                              class="mt-3 w-24 h-24 rounded-full object-cover border">
                     <?php endif; ?>
                 </div>
