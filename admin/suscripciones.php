@@ -92,22 +92,27 @@ include __DIR__ . '/includes/sidebar.php';
                 $end = $u['subscription_end'] ? strtotime($u['subscription_end']) : null;
 
                 // Estado lógico
-                if ($u['mp_subscription_status'] === 'inactive') {
-                    $status_key = 'cancelada';
-                    $estado = "<span class='text-red-600 font-semibold'>Cancelada por el usuario</span>";
-                } elseif ($end !== null && $end < $today) {
-                    $status_key = 'vencida';
-                    $estado = "<span class='text-orange-600 font-semibold'>Vencida</span>";
-                } elseif ($u['is_active'] == 0) {
-                    $status_key = 'suspendida';
-                    $estado = "<span class='text-red-600 font-semibold'>Suspendida</span>";
-                } elseif (empty($u['subscription_start'])) {
-                    $status_key = 'sin';
-                    $estado = "<span class='text-gray-600 font-semibold'>Sin suscripción</span>";
-                } else {
-                    $status_key = 'activa';
-                    $estado = "<span class='text-green-600 font-semibold'>Activa</span>";
-                }
+              if ($u['is_active'] == 0) {
+    $status_key = 'suspendida';
+    $estado = "<span class='text-red-600 font-semibold'>Suspendida</span>";
+
+} elseif ($end !== null && $end < $today) {
+    $status_key = 'vencida';
+    $estado = "<span class='text-orange-600 font-semibold'>Vencida</span>";
+
+} elseif (!empty($u['subscription_start'])) {
+    $status_key = 'activa';
+    $estado = "<span class='text-green-600 font-semibold'>Activa</span>";
+
+    // Info adicional (no bloquea)
+    if ($u['mp_subscription_status'] === 'inactive') {
+        $estado .= "<br><span class='text-xs text-gray-500'>(cancelada en MP)</span>";
+    }
+
+} else {
+    $status_key = 'sin';
+    $estado = "<span class='text-gray-600 font-semibold'>Sin suscripción</span>";
+}
 
                 // Filtro por texto
                 if ($q) {

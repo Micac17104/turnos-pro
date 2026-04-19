@@ -24,8 +24,13 @@ switch ($action) {
             UPDATE users 
             SET 
                 is_active = 1,
-                mp_subscription_status = 'active',
-                subscription_end = DATE_ADD(CURDATE(), INTERVAL 1 MONTH)
+                subscription_start = IFNULL(subscription_start, CURDATE()),
+                subscription_end = 
+                    CASE 
+                        WHEN subscription_end IS NULL OR subscription_end < CURDATE()
+                        THEN DATE_ADD(CURDATE(), INTERVAL 1 MONTH)
+                        ELSE DATE_ADD(subscription_end, INTERVAL 1 MONTH)
+                    END
             WHERE id = ?
         ");
         $stmt->execute([$id]);
@@ -35,8 +40,7 @@ switch ($action) {
         $stmt = $pdo->prepare("
             UPDATE users 
             SET 
-                is_active = 0,
-                mp_subscription_status = 'inactive'
+                is_active = 0
             WHERE id = ?
         ");
         $stmt->execute([$id]);
@@ -46,7 +50,12 @@ switch ($action) {
         $stmt = $pdo->prepare("
             UPDATE users 
             SET 
-                subscription_end = DATE_ADD(subscription_end, INTERVAL 1 MONTH)
+                subscription_end = 
+                    CASE 
+                        WHEN subscription_end IS NULL
+                        THEN DATE_ADD(CURDATE(), INTERVAL 1 MONTH)
+                        ELSE DATE_ADD(subscription_end, INTERVAL 1 MONTH)
+                    END
             WHERE id = ?
         ");
         $stmt->execute([$id]);
@@ -56,5 +65,6 @@ switch ($action) {
         die("Acción no válida");
 }
 
-header("Location: /admin/usuarios.php");
+// Volver a suscripciones (no usuarios)
+header("Location: /admin/suscripciones.php");
 exit;
