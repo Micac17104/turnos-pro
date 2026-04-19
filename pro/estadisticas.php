@@ -103,13 +103,17 @@ require __DIR__ . '/includes/sidebar.php';
         <!-- TURNOS POR MES -->
         <div class="bg-white p-6 rounded-xl shadow border">
             <h3 class="font-semibold mb-3 text-sm">Turnos por mes</h3>
-            <canvas id="chartTurnosMes" style="height:300px;"></canvas>
+            <div class="relative w-full h-[250px] md:h-[300px]">
+    <canvas id="chartTurnosMes"></canvas>
+</div>
         </div>
 
         <!-- INGRESOS POR MES -->
         <div class="bg-white p-6 rounded-xl shadow border">
             <h3 class="font-semibold mb-3 text-sm">Ingresos por mes</h3>
-            <canvas id="chartIngresosMes" style="height:300px;"></canvas>
+            <div class="relative w-full h-[250px] md:h-[300px]">
+    <canvas id="chartIngresosMes"></canvas>
+</div>
         </div>
 
     </div>
