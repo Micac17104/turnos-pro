@@ -12,10 +12,11 @@ $time      = $_POST['hora'] ?? null;
 $name      = trim($_POST['nombre'] ?? '');
 $email     = trim($_POST['email'] ?? '');
 $phone     = trim($_POST['telefono'] ?? '');
+$dni       = trim($_POST['dni'] ?? '');   // ← AGREGADO
 $center_id = !empty($_POST['center_id']) ? (int)$_POST['center_id'] : null;
 $motivo    = trim($_POST['motivo'] ?? '');
 
-if (!$pro_id || !$date || !$time || !$name || !$email) {
+if (!$pro_id || !$date || !$time || !$name || !$email || !$dni) {
     die("Datos incompletos.");
 }
 
@@ -44,12 +45,16 @@ if ($paciente_id) {
 }
 
 if (!$paciente) {
+
+    // 🔥 INSERT CORREGIDO CON DNI
     $stmt = $pdo->prepare("
-        INSERT INTO clients (name, email, phone, center_id)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO clients (name, email, phone, dni, center_id)
+        VALUES (?, ?, ?, ?, ?)
     ");
-    $stmt->execute([$name, $email, $phone, $center_id]);
+    $stmt->execute([$name, $email, $phone, $dni, $center_id]);
+
     $paciente_id = $pdo->lastInsertId();
+
 } else {
     $paciente_id = $paciente['id'];
 }
@@ -102,7 +107,6 @@ $telefono_normalizado = preg_replace('/\D/', '', $phone);
 
 $confirm_link = "https://www.turnosaura.com/public/turno-confirmar-email.php?id=$turno_id&token=$confirm_token";
 $cancel_link  = "https://www.turnosaura.com/public/turno-cancelar-email.php?id=$turno_id&token=$cancel_token";
-
 
 $mensaje_final = "
     Hola $name,<br><br>

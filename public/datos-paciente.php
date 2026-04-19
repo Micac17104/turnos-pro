@@ -90,6 +90,9 @@ if (!$pro) {
         <input type="text" name="telefono" placeholder="Teléfono" required>
         <input type="email" name="email" placeholder="Email" required>
 
+        <!-- DNI AGREGADO -->
+        <input type="text" name="dni" placeholder="DNI" required>
+
         <!-- MOTIVO OBLIGATORIO -->
         <textarea name="motivo" placeholder="Motivo de la consulta (obligatorio)" required></textarea>
 
