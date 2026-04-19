@@ -103,13 +103,13 @@ require __DIR__ . '/includes/sidebar.php';
         <!-- TURNOS POR MES -->
         <div class="bg-white p-6 rounded-xl shadow border">
             <h3 class="font-semibold mb-3 text-sm">Turnos por mes</h3>
-            <canvas id="chartTurnosMes"></canvas>
+            <canvas id="chartTurnosMes" style="height:300px;"></canvas>
         </div>
 
         <!-- INGRESOS POR MES -->
         <div class="bg-white p-6 rounded-xl shadow border">
             <h3 class="font-semibold mb-3 text-sm">Ingresos por mes</h3>
-            <canvas id="chartIngresosMes"></canvas>
+            <canvas id="chartIngresosMes" style="height:300px;"></canvas>
         </div>
 
     </div>
@@ -119,8 +119,11 @@ require __DIR__ . '/includes/sidebar.php';
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-Chart.defaults.font.size = 13;
+Chart.defaults.font.size = 12;
 Chart.defaults.color = '#334155';
+
+// Detectar si es mobile
+const isMobile = window.innerWidth < 640;
 
 // TURNOS POR MES
 new Chart(document.getElementById('chartTurnosMes'), {
@@ -133,8 +136,26 @@ new Chart(document.getElementById('chartTurnosMes'), {
             borderColor: '#3b82f6',
             backgroundColor: 'rgba(59,130,246,0.2)',
             borderWidth: 2,
-            tension: 0.3
+            tension: 0.3,
+            pointRadius: isMobile ? 2 : 4
         }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: !isMobile
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    maxRotation: isMobile ? 45 : 0,
+                    minRotation: isMobile ? 45 : 0
+                }
+            }
+        }
     }
 });
 
@@ -150,6 +171,23 @@ new Chart(document.getElementById('chartIngresosMes'), {
             borderColor: '#059669',
             borderWidth: 2
         }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: !isMobile
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    maxRotation: isMobile ? 45 : 0,
+                    minRotation: isMobile ? 45 : 0
+                }
+            }
+        }
     }
 });
 </script>
