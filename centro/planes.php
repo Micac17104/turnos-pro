@@ -81,6 +81,17 @@ require __DIR__ . '/includes/sidebar.php';
             </a>
         </div>
 
+        <!-- Plan 6 -->
+        <div class="bg-white shadow rounded-xl p-6 text-center border">
+            <h2 class="text-xl font-bold mb-2">Plan 6</h2>
+            <p class="text-3xl font-semibold mb-4">$100</p>
+
+            <a href="/centro/suscribirse-centro.php?plan=5"
+               class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+               Contratar
+            </a>
+        </div>
+
     </div>
 </main>
 
