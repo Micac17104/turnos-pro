@@ -26,6 +26,17 @@ SDK::setAccessToken("APP_USR-2199782378550930-041311-34b2c0ffa4f9d11ea7bf9a45982
 // ===============================
 // LEER EVENTO
 // ===============================
+$log = __DIR__ . "/log.txt";
+
+file_put_contents($log, "\n====================\n", FILE_APPEND);
+file_put_contents($log, "ENTRO AL WEBHOOK\n", FILE_APPEND);
+
+// TODO el request
+file_put_contents($log, "METHOD: " . $_SERVER['REQUEST_METHOD'] . "\n", FILE_APPEND);
+file_put_contents($log, "GET: " . json_encode($_GET) . "\n", FILE_APPEND);
+file_put_contents($log, "POST: " . json_encode($_POST) . "\n", FILE_APPEND);
+
+// RAW real
 $raw = file_get_contents("php://input");
 file_put_contents($log, "RAW: $raw\n", FILE_APPEND);
 
@@ -37,7 +48,8 @@ if (!$data) {
     exit;
 }
 
-$tipo = $data["type"] ?? null;
+$tipo = $data["type"] ?? $_GET["type"] ?? null;
+$payment_id = $data["data"]["id"] ?? $_GET["data.id"] ?? null;
 file_put_contents($log, "EVENTO: $tipo\n", FILE_APPEND);
 
 // ===============================
