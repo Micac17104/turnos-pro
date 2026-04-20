@@ -2,6 +2,9 @@
 session_save_path(__DIR__ . '/../sessions');
 session_start();
 
+$log = __DIR__ . "/log.txt";
+file_put_contents($log, "ENTRO AL WEBHOOK\n", FILE_APPEND);
+
 require __DIR__ . '/../pro/includes/db.php';
 require __DIR__ . '/../vendor/autoload.php';
 
