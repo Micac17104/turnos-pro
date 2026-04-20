@@ -26,7 +26,8 @@ $links = [
     2 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=c72a2d4ced534679a0c48f8bb84cd732",
     3 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=03243356a81d4ba3b38ccfcc8f44c7d8",
     4 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=e1ae4c66754c4f698861d36232bf4d75",
-    5 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=e5926fccaa294ee28b91f0b7dcae5814"
+    5 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=e5926fccaa294ee28b91f0b7dcae5814",
+    6=> "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=c793f098f40043ffb5135d0cab885355"
 ];
 
 if (!isset($links[$plan])) {

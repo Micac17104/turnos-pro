@@ -47,6 +47,7 @@ if ($user['mp_subscription_status'] === 'active' && $end >= $today) {
 // ID DEL PLAN PROFESIONAL
 $plan_id = "2de9bafc8c3143f385aea398afcbbea9";
 
+
 // URL de MercadoPago
 $checkout_url = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=" . $plan_id;
 
