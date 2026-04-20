@@ -71,6 +71,23 @@ if ($_POST) {
     // Convertir lista de obras sociales a JSON
     $insurance_json = json_encode($insurance_list);
 
+    // ===============================
+// 🚨 CONTROL DE LÍMITE DE PLAN (CENTRO)
+// ===============================
+$stmt = $pdo->prepare("SELECT max_professionals FROM users WHERE id = ?");
+$stmt->execute([$center_id]);
+$limite = $stmt->fetchColumn();
+
+// Contar profesionales actuales del centro
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE parent_center_id = ?");
+$stmt->execute([$center_id]);
+$cantidad = $stmt->fetchColumn();
+
+// Bloquear si supera el límite
+if ($cantidad >= $limite) {
+    $errors[] = "Llegaste al límite de profesionales de tu plan.";
+}
+
     // Guardar profesional
     if (empty($errors)) {
 

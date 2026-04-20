@@ -20,22 +20,44 @@ if (!$action || !$id) {
 switch ($action) {
 
     case 'activar':
-        $stmt = $pdo->prepare("
-            UPDATE users 
-            SET 
-                is_active = 1,
-                subscription_start = IFNULL(subscription_start, CURDATE()),
-                subscription_end = 
-                    CASE 
-                        WHEN subscription_end IS NULL OR subscription_end < CURDATE()
-                        THEN DATE_ADD(CURDATE(), INTERVAL 1 MONTH)
-                        ELSE DATE_ADD(subscription_end, INTERVAL 1 MONTH)
-                    END
-            WHERE id = ?
-        ");
-        $stmt->execute([$id]);
-        break;
 
+    // Obtener tipo de cuenta y plan
+    $stmtUser = $pdo->prepare("SELECT account_type, chosen_plan FROM users WHERE id = ?");
+    $stmtUser->execute([$id]);
+    $userData = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+    $limite = 1; // default
+
+    // SOLO si es centro aplicamos límite
+    if ($userData['account_type'] === 'center') {
+
+        switch ($userData['chosen_plan']) {
+            case '1': $limite = 1; break;
+            case '2': $limite = 2; break;
+            case '3': $limite = 3; break;
+            case '4': $limite = 4; break;
+            case '5': $limite = 5; break;
+            default:  $limite = 1;
+        }
+
+    } else {
+        // Profesional individual → sin límite (o 1 si querés ser estricta)
+        $limite = 1;
+    }
+
+    $stmt = $pdo->prepare("
+        UPDATE users 
+        SET 
+            is_active = 1,
+            mp_subscription_status = 'active',
+            subscription_end = DATE_ADD(CURDATE(), INTERVAL 1 MONTH),
+            max_professionals = ?
+        WHERE id = ?
+    ");
+    $stmt->execute([$limite, $id]);
+
+    break;
+    
     case 'desactivar':
         $stmt = $pdo->prepare("
             UPDATE users 
