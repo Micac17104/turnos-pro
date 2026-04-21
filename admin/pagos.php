@@ -78,19 +78,27 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $end = $u['subscription_end'] ? strtotime($u['subscription_end']) : null;
 
-            if ($u['mp_subscription_status'] === 'inactive') {
-                $status_key = 'cancelada';
-                $estado = "<span class='text-red-600 font-semibold'>Cancelada por el usuario</span>";
-            } elseif ($end !== null && $end < $today) {
-                $status_key = 'vencida';
-                $estado = "<span class='text-orange-600 font-semibold'>Vencida</span>";
-            } elseif ($u['is_active'] == 0) {
-                $status_key = 'suspendida';
-                $estado = "<span class='text-red-600 font-semibold'>Suspendida</span>";
-            } else {
-                $status_key = 'activa';
-                $estado = "<span class='text-green-600 font-semibold'>Activa</span>";
-            }
+            if ($u['is_active'] == 1) {
+
+    // SI ESTÁ ACTIVO → SIEMPRE ACTIVO (aunque MP diga inactive)
+    $status_key = 'activa';
+    $estado = "<span class='text-green-600 font-semibold'>Activa</span>";
+
+} elseif ($end !== null && $end < $today) {
+
+    $status_key = 'vencida';
+    $estado = "<span class='text-orange-600 font-semibold'>Vencida</span>";
+
+} elseif ($u['mp_subscription_status'] === 'inactive') {
+
+    $status_key = 'cancelada';
+    $estado = "<span class='text-red-600 font-semibold'>Cancelada por el usuario</span>";
+
+} else {
+
+    $status_key = 'suspendida';
+    $estado = "<span class='text-red-600 font-semibold'>Suspendida</span>";
+}
 
             // Filtro por texto
             if ($q) {
