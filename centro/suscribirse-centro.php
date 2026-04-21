@@ -20,14 +20,9 @@ if (!isset($_GET['plan'])) {
 
 $plan = (int) $_GET['plan'];
 
-// 🔥 LINKS DIRECTOS DE MERCADO PAGO (sin API)
+// 🔥 ÚNICO PLAN DE CENTRO
 $links = [
-    1 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=7f1ce42b25614fbf82a8de0cd86634d7",
-    2 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=c72a2d4ced534679a0c48f8bb84cd732",
-    3 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=03243356a81d4ba3b38ccfcc8f44c7d8",
-    4 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=e1ae4c66754c4f698861d36232bf4d75",
-    5 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=e5926fccaa294ee28b91f0b7dcae5814",
-    6=> "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=c793f098f40043ffb5135d0cab885355"
+    1 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=bc987ac37a2e491cb23f87ea9b7b8540"
 ];
 
 if (!isset($links[$plan])) {
