@@ -35,11 +35,19 @@ if (!$turno) {
     die("Token inválido o turno no encontrado.");
 }
 
-if ($turno['status'] === 'cancelled') {
-    echo "<h2>Este turno ya estaba cancelado.</h2>";
+$estado_actual = $turno['status'];
+
+if ($estado_actual === 'cancelled') {
+    echo "<h2>Este turno ya estaba cancelado anteriormente.</h2>";
     exit;
 }
 
+if ($estado_actual === 'confirmed') {
+    echo "<h2>Este turno ya estaba confirmado, no se puede cancelar desde este enlace.</h2>";
+    exit;
+}
+
+// Si estaba pending → cancelar AHORA
 $stmt = $pdo->prepare("UPDATE appointments SET status='cancelled' WHERE id=?");
 $stmt->execute([$turno_id]);
 
@@ -47,20 +55,16 @@ $paciente = $turno['paciente_nombre'] ?: 'Paciente';
 $fecha = date('d/m/Y', strtotime($turno['date']));
 $hora = substr($turno['time'], 0, 5);
 
-$isCentro = !empty($turno['parent_center_id']);
-
-$msgPro = "
-    Hola {$turno['profesional']},<br><br>
-    El paciente <strong>{$paciente}</strong> canceló su turno:<br><br>
-    <strong>Fecha:</strong> {$fecha}<br>
-    <strong>Hora:</strong> {$hora}<br><br>
-    TurnosAura
-";
-
 if (!empty($turno['notify_professional_email'])) {
+    $msgPro = "
+        Hola {$turno['profesional']},<br><br>
+        El paciente <strong>{$paciente}</strong> canceló su turno:<br><br>
+        <strong>Fecha:</strong> {$fecha}<br>
+        <strong>Hora:</strong> {$hora}<br><br>
+        TurnosAura
+    ";
     enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", $msgPro);
 }
 
 echo "<h2>Tu turno fue cancelado correctamente.</h2>";
 echo "<a href='/'>Volver al inicio</a>";
-
