@@ -1,5 +1,5 @@
 <?php
-// /pro/agenda.php
+// /pro/turno-guardar.php
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -81,7 +81,6 @@ if ($turno_id) {
 $stmt = $pdo->prepare("
  INSERT INTO appointments (user_id, client_id, date, time, motivo)
 VALUES (?, ?, ?, ?, ?)
-
 ");
 $stmt->execute([$user_id, $client_id, $date, $time, $motivo]);
 
@@ -96,9 +95,13 @@ if (!empty($client_id)) {
     $stmt->execute([$client_id]);
     $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // 🔥 AGREGADO: obtener video_link del profesional
+    $stmt = $pdo->prepare("SELECT video_link FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $pro = $stmt->fetch(PDO::FETCH_ASSOC);
+
     if ($paciente && !empty($paciente['email'])) {
 
-        // USAR EL MAILER QUE FUNCIONA
         require __DIR__ . '/../auth/mailer.php';
 
         $asunto = "Nuevo turno asignado - TurnosAura";
@@ -108,12 +111,20 @@ if (!empty($client_id)) {
             Tu profesional te asignó un turno:<br><br>
             <strong>Fecha:</strong> " . date('d/m/Y', strtotime($date)) . "<br>
             <strong>Hora:</strong> " . substr($time, 0, 5) . " hs<br><br>
-            Gracias por usar TurnosAura.
         ";
+
+        // 🔥 AGREGADO: link de videollamada
+        if (!empty($pro['video_link'])) {
+            $mensaje .= "
+                <strong>Link de videollamada:</strong><br>
+                <a href='{$pro['video_link']}'>{$pro['video_link']}</a><br><br>
+            ";
+        }
+
+        $mensaje .= "Gracias por usar TurnosAura.";
 
         enviarEmail($paciente['email'], $asunto, $mensaje);
     }
 }
 
-// Redirección corregida
 redirect('agenda.php?ok=1');
