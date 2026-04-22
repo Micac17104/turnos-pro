@@ -14,11 +14,17 @@ require __DIR__ . '/../auth/mailer.php';
 
 $turno_id = require_param($_GET, 'turno_id');
 
-// Obtener turno
+// Obtener turno + 🔥 AGREGADO: video_link
 $stmt = $pdo->prepare("
-    SELECT t.date, t.time, c.name, c.email
+    SELECT 
+        t.date, 
+        t.time, 
+        c.name, 
+        c.email,
+        u.video_link   -- 🔥 AGREGADO
     FROM appointments t
     JOIN clients c ON c.id = t.client_id
+    JOIN users u ON u.id = t.user_id
     WHERE t.id = ? AND t.user_id = ?
 ");
 $stmt->execute([$turno_id, $user_id]);
@@ -30,6 +36,12 @@ if (!$turno) {
 
 $subject = "Recordatorio de turno";
 $message = "Hola {$turno['name']}, te recordamos tu turno el {$turno['date']} a las {$turno['time']}.";
+
+// 🔥 AGREGADO: LINK DE VIDEOLLAMADA (solo si existe)
+if (!empty($turno['video_link'])) {
+    $message .= "<br><br><strong>Link de videollamada:</strong><br>
+                 <a href='{$turno['video_link']}'>{$turno['video_link']}</a>";
+}
 
 $ok = enviarEmail($turno['email'], $subject, $message);
 

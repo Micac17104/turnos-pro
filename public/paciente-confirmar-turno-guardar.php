@@ -118,8 +118,17 @@ $mensaje_final = "
     ❌ <a href='$cancel_link'>Cancelar turno</a><br><br>
 
     Si no realizás ninguna acción, el turno quedará pendiente.<br><br>
-    TurnosAura
 ";
+
+// 🔥 AGREGADO: LINK DE VIDEOLLAMADA
+if (!empty($pro['video_link'])) {
+    $mensaje_final .= "
+        <br><strong>Link de videollamada:</strong><br>
+        <a href='{$pro['video_link']}'>{$pro['video_link']}</a><br><br>
+    ";
+}
+
+$mensaje_final .= "TurnosAura";
 
 enviarEmail($email, "Confirmación de turno", $mensaje_final);
 

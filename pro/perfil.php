@@ -9,8 +9,6 @@ require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';
 
-
-
 $page_title = 'Mi perfil';
 $current    = 'perfil';
 
@@ -33,7 +31,8 @@ $defaults = [
     'slug' => '',
     'profile_image' => '',
     'accepts_insurance' => 0,
-    'insurance_list' => ''
+    'insurance_list' => '',
+    'video_link' => '' // ← AGREGADO
 ];
 
 $user = array_merge($defaults, $user ?: []);
@@ -148,6 +147,7 @@ require __DIR__ . '/includes/sidebar.php';
                     </p>
                 </div>
 
+                <!-- SLUG -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">URL pública (slug)</label>
                     <input type="text" name="slug"
@@ -167,15 +167,24 @@ require __DIR__ . '/includes/sidebar.php';
                     </button>
                 </div>
 
+                <!-- FOTO -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Foto de perfil</label>
                     <input type="file" name="profile_image" accept="image/*" class="text-sm">
 
                     <?php if ($user['profile_image']): ?>
-    <img src="/public/uploads/<?= h($user['profile_image']) ?>"
-         class="mt-3 w-24 h-24 rounded-full object-cover border">
-<?php endif; ?>
+                        <img src="/public/uploads/<?= h($user['profile_image']) ?>"
+                             class="mt-3 w-24 h-24 rounded-full object-cover border">
+                    <?php endif; ?>
+                </div>
 
+                <!-- 🔥 NUEVO: LINK DE VIDEOLLAMADA -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Link de videollamada</label>
+                    <input type="text" name="video_link"
+                           value="<?= h($user['video_link']) ?>"
+                           class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm"
+                           placeholder="https://meet.google.com/xxx-xxxx-xxx">
                 </div>
 
             </div>

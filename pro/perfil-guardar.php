@@ -23,6 +23,9 @@ $slug        = trim($_POST['slug'] ?? '');
 $accepts_insurance = isset($_POST['accepts_insurance']) ? 1 : 0;
 $insurance_list = trim($_POST['insurance_list'] ?? '');
 
+// 🔥 NUEVO: link de videollamada
+$video_link = trim($_POST['video_link'] ?? '');
+
 // ===============================
 // 2) Validaciones básicas
 // ===============================
@@ -54,7 +57,7 @@ if ($slug !== '') {
 $stmt = $pdo->prepare("
     UPDATE users
     SET name=?, profession=?, phone=?, email=?, address=?, city=?, province=?, 
-        public_description=?, specialties=?, slug=?, accepts_insurance=?, insurance_list=?
+        public_description=?, specialties=?, slug=?, accepts_insurance=?, insurance_list=?, video_link=?
     WHERE id=?
 ");
 
@@ -71,6 +74,7 @@ $stmt->execute([
     $slug,
     $accepts_insurance,
     $insurance_list,
+    $video_link,   // ← AGREGADO
     $user_id
 ]);
 

@@ -3,13 +3,12 @@ require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
-
 $center_id = $_SESSION['user_id'];
-
 
 // Obtener profesionales del centro
 $stmt = $pdo->prepare("
-    SELECT id, name, email, profession, accepts_insurance, slug
+    SELECT id, name, email, profession, accepts_insurance, slug,
+           video_link   -- 🔥 AGREGADO: video_link
     FROM users
     WHERE account_type='professional'
     AND parent_center_id=?
@@ -64,6 +63,10 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                 <th>Profesión</th>
                 <th>Email</th>
                 <th>Obra social</th>
+
+                <!-- 🔥 COLUMNA VIDEOLLAMADA -->
+                <th>Videollamada</th>
+
                 <th>Acciones</th>
             </tr>
 
@@ -72,6 +75,7 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                 <td><?= htmlspecialchars($p['name']) ?></td>
                 <td><?= htmlspecialchars($p['profession'] ?? '-') ?></td>
                 <td><?= htmlspecialchars($p['email']) ?></td>
+
                 <td>
                     <?php if ($p['accepts_insurance']): ?>
                         <span class="badge badge-yes">Sí</span>
@@ -79,21 +83,26 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                         <span class="badge badge-no">No</span>
                     <?php endif; ?>
                 </td>
+
+                <!-- 🔥 MOSTRAR SI TIENE LINK -->
+                <td>
+                    <?php if (!empty($p['video_link'])): ?>
+                        <span class="badge badge-yes">Sí</span>
+                    <?php else: ?>
+                        <span class="badge badge-no">No</span>
+                    <?php endif; ?>
+                </td>
+
                 <td>
 
-                    <!-- Ver datos básicos -->
                     <a class="action-link" href="centro-profesional-ver.php?id=<?= $p['id'] ?>">Ver</a>
 
-                    <!-- Editar datos básicos -->
                     <a class="action-link" href="centro-profesionales-editar.php?id=<?= $p['id'] ?>">Editar</a>
 
-                    <!-- Editar perfil público -->
                     <a class="action-link" href="centro-profesional-publico.php?id=<?= $p['id'] ?>">
                         Perfil público
                     </a>
 
-
-                    <!-- Ver landing pública -->
                     <?php if (!empty($p['slug'])): ?>
                         <a class="action-link" href="/<?= htmlspecialchars($p['slug']) ?>" target="_blank">
                             Ver landing
@@ -105,7 +114,7 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
             <?php endforeach; ?>
 
             <?php if (empty($profesionales)): ?>
-            <tr><td colspan="5">Todavía no agregaste profesionales.</td></tr>
+            <tr><td colspan="6">Todavía no agregaste profesionales.</td></tr>
             <?php endif; ?>
         </table>
     </div>

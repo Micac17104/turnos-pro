@@ -22,6 +22,7 @@ $sql = "
         c.email AS paciente_email,
         u.name AS profesional_nombre,
         u.email AS profesional_email,
+        u.video_link AS video_link,   -- 🔥 AGREGADO EN SELECT
         ns.reminder_enabled,
         COALESCE(ns.reminder_hours_before, 24) AS horas_antes,
         ns.reminder_message
@@ -84,6 +85,16 @@ foreach ($turnos as $t) {
         $confirmUrl = $BASE_URL . "/public/turno-confirmar-email.php?id={$id}&token={$confirm_token}";
         $cancelUrl  = $BASE_URL . "/public/turno-cancelar-email.php?id={$id}&token={$cancel_token}";
 
+        // 🔥 AGREGADO EN EL EMAIL
+        $video_html = "";
+        if (!empty($t['video_link'])) {
+            $video_html = "
+<br><br>
+<strong>Link de videollamada:</strong><br>
+<a href='{$t['video_link']}'>{$t['video_link']}</a><br>
+";
+        }
+
         $body = "
 Hola {$pacienteNombre},<br><br>
 
@@ -91,6 +102,8 @@ Hola {$pacienteNombre},<br><br>
 
 <a href='{$confirmUrl}'>✔ Confirmar turno</a><br>
 <a href='{$cancelUrl}'>✖ Cancelar turno</a><br><br>
+
+{$video_html}
 
 Gracias.
 ";

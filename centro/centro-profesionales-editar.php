@@ -13,7 +13,8 @@ if (!$prof_id) {
 // Obtener datos actuales del profesional
 $stmt = $pdo->prepare("
     SELECT id, name, email, profession, phone, city, description, specialties,
-           accepts_insurance, insurance_list, slug
+           accepts_insurance, insurance_list, slug,
+           video_link   -- 🔥 AGREGADO: video_link
     FROM users
     WHERE id = ? AND parent_center_id = ? AND account_type='professional'
 ");
@@ -39,10 +40,12 @@ if ($_POST) {
     $specialties = trim($_POST['specialties'] ?? '');
     $accepts_insurance = isset($_POST['accepts_insurance']) ? 1 : 0;
 
+    // 🔥 AGREGADO: video_link
+    $video_link = trim($_POST['video_link'] ?? '');
+
     // Lista de obras sociales seleccionadas
     $insurance_list = $_POST['insurance_list'] ?? [];
 
-    // Si eligió "otra", agregamos lo que escribió
     if (isset($_POST['insurance_other']) && $_POST['insurance_other'] !== '') {
         $insurance_list[] = trim($_POST['insurance_other']);
     }
@@ -79,14 +82,14 @@ if ($_POST) {
             UPDATE users SET
                 name=?, email=?, profession=?, phone=?, city=?, 
                 description=?, specialties=?, accepts_insurance=?, 
-                insurance_list=?, slug=?
+                insurance_list=?, slug=?, video_link=?   -- 🔥 AGREGADO
             WHERE id=? AND parent_center_id=?
         ");
 
         $stmt->execute([
             $name, $email, $profession, $phone, $city,
             $description, $specialties, $accepts_insurance,
-            $insurance_json, $slug,
+            $insurance_json, $slug, $video_link,   // 🔥 AGREGADO
             $prof_id, $center_id
         ]);
 
@@ -97,7 +100,8 @@ if ($_POST) {
 // Recargar datos actualizados
 $stmt = $pdo->prepare("
     SELECT id, name, email, profession, phone, city, description, specialties,
-           accepts_insurance, insurance_list, slug
+           accepts_insurance, insurance_list, slug,
+           video_link   -- 🔥 AGREGADO
     FROM users
     WHERE id = ? AND parent_center_id = ? AND account_type='professional'
 ");
@@ -154,6 +158,11 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
         <textarea name="description" placeholder="Descripción pública"><?= htmlspecialchars($prof['description']) ?></textarea>
 
         <textarea name="specialties" placeholder="Especialidades (separadas por coma)"><?= htmlspecialchars($prof['specialties']) ?></textarea>
+
+        <!-- 🔥 CAMPO: Link de videollamada -->
+        <input name="video_link"
+               value="<?= htmlspecialchars($prof['video_link']) ?>"
+               placeholder="Link de videollamada (Meet, Zoom, etc.)">
 
         <label>
             <input type="checkbox" name="accepts_insurance" id="accepts_insurance" <?= $prof['accepts_insurance'] ? 'checked' : '' ?> onclick="toggleInsurance()">

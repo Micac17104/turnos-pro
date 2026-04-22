@@ -18,6 +18,7 @@ $stmt = $pdo->prepare("
         a.*,
         u.name AS profesional,
         u.email AS profesional_email,
+        u.video_link AS video_link,   -- 🔥 AGREGADO
         u.parent_center_id,
         c.name AS paciente_nombre,
         ns.notify_professional_email,
@@ -55,6 +56,21 @@ $paciente = $turno['paciente_nombre'] ?: 'Paciente';
 $fecha = date('d/m/Y', strtotime($turno['date']));
 $hora = substr($turno['time'], 0, 5);
 
+// 🔥 AGREGADO: LINK DE VIDEOLLAMADA (por si querés mostrarlo igual)
+$video_html = "";
+if (!empty($turno['video_link'])) {
+    $video_html = "
+        <br><br><strong>Link de videollamada (si lo necesitás):</strong><br>
+        <a href='{$turno['video_link']}'>{$turno['video_link']}</a>
+    ";
+}
+
+echo "<h2>Tu turno fue cancelado correctamente.</h2>";
+echo "<p>Fecha: $fecha<br>Hora: $hora</p>";
+echo $video_html;
+echo "<br><br><a href='/'>Volver al inicio</a>";
+
+// EMAIL AL PROFESIONAL
 if (!empty($turno['notify_professional_email'])) {
     $msgPro = "
         Hola {$turno['profesional']},<br><br>
@@ -65,6 +81,3 @@ if (!empty($turno['notify_professional_email'])) {
     ";
     enviarEmail($turno['profesional_email'], "Turno cancelado por el paciente", $msgPro);
 }
-
-echo "<h2>Tu turno fue cancelado correctamente.</h2>";
-echo "<a href='/'>Volver al inicio</a>";

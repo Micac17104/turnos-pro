@@ -13,7 +13,8 @@ if (!$prof_id) {
 // Obtener datos del profesional
 $stmt = $pdo->prepare("
     SELECT id, name, email, profession, phone, city, description, specialties,
-           accepts_insurance, insurance_list, slug
+           accepts_insurance, insurance_list, slug,
+           video_link   -- 🔥 AGREGADO: video_link
     FROM users
     WHERE id = ? AND parent_center_id = ? AND account_type='professional'
 ");
@@ -82,6 +83,15 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
         <p><strong>Ciudad:</strong> <?= htmlspecialchars($prof['city'] ?: '-') ?></p>
         <p><strong>Especialidades:</strong> <?= htmlspecialchars($prof['specialties'] ?: '-') ?></p>
         <p><strong>Descripción:</strong> <?= nl2br(htmlspecialchars($prof['description'] ?: '-')) ?></p>
+
+        <!-- 🔥 MOSTRAR LINK DE VIDEOLLAMADA -->
+        <?php if (!empty($prof['video_link'])): ?>
+            <p><strong>Link de videollamada:</strong><br>
+                <a href="<?= htmlspecialchars($prof['video_link']) ?>" target="_blank">
+                    <?= htmlspecialchars($prof['video_link']) ?>
+                </a>
+            </p>
+        <?php endif; ?>
 
         <p><strong>Obra social:</strong>
             <?php if ($prof['accepts_insurance']): ?>

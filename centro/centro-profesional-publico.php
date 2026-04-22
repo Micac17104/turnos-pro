@@ -13,7 +13,7 @@ if (!$pro_id) {
 
 // Obtener datos del profesional
 $stmt = $pdo->prepare("
-    SELECT *
+    SELECT *, video_link
     FROM users
     WHERE id = ? AND account_type = 'professional' AND parent_center_id = ?
 ");
@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
     $accepts_insurance = isset($_POST['accepts_insurance']) ? 1 : 0;
     $insurance_list = trim($_POST['insurance_list'] ?? '');
     $slug = trim($_POST['slug'] ?? '');
+    $video_link = trim($_POST['video_link'] ?? '');
 
     if ($name === '') $errors[] = "El nombre es obligatorio.";
     if ($profession === '') $errors[] = "La profesión es obligatoria.";
@@ -75,16 +76,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
 
         $stmt = $pdo->prepare("
             UPDATE users SET
-                name = ?, profession = ?, phone = ?, email = ?,
-                public_description = ?, specialties = ?, accepts_insurance = ?,
-                insurance_list = ?, slug = ?
+    name = ?, profession = ?, phone = ?, email = ?,
+    public_description = ?, specialties = ?, accepts_insurance = ?,
+    insurance_list = ?, slug = ?, video_link = ?
             WHERE id = ? AND parent_center_id = ?
         ");
 
         $stmt->execute([
             $name, $profession, $phone, $email,
             $public_description, $specialties, $accepts_insurance,
-            $insurance_list, $slug,
+            $insurance_list, $slug, $video_link,
             $pro_id, $center_id
         ]);
 
@@ -100,7 +101,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
             'specialties' => $specialties,
             'accepts_insurance' => $accepts_insurance,
             'insurance_list' => $insurance_list,
-            'slug' => $slug
+            'slug' => $slug,
+            'video_link' => $video_link
         ]);
     }
 }
@@ -223,6 +225,9 @@ button:hover{opacity:0.9;}
 
             <label class="label">Slug público</label>
             <input name="slug" value="<?= htmlspecialchars($pro['slug']) ?>" required>
+
+            <label class="label">Link de videollamada (Google Meet, Zoom, etc.)</label>
+<input name="video_link" value="<?= htmlspecialchars($pro['video_link'] ?? '') ?>" placeholder="https://meet.google.com/...">
 
             <label class="label">Foto del profesional</label>
             <input type="file" name="profile_image" accept="image/*">

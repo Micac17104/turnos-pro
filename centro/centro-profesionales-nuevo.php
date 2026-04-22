@@ -5,7 +5,6 @@ require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
-
 // ESTA LÍNEA ES LA QUE TE FALTABA
 $center_id = $_SESSION['user_id'];
 
@@ -25,10 +24,12 @@ if ($_POST) {
     $specialties = trim($_POST['specialties'] ?? '');
     $accepts_insurance = isset($_POST['accepts_insurance']) ? 1 : 0;
 
+    // 🔥 AGREGADO: video_link
+    $video_link = trim($_POST['video_link'] ?? '');
+
     // Lista de obras sociales seleccionadas
     $insurance_list = $_POST['insurance_list'] ?? [];
 
-    // Si eligió "otra", agregamos lo que escribió
     if (isset($_POST['insurance_other']) && $_POST['insurance_other'] !== '') {
         $insurance_list[] = trim($_POST['insurance_other']);
     }
@@ -72,29 +73,28 @@ if ($_POST) {
     $insurance_json = json_encode($insurance_list);
 
     // ===============================
-// 🚨 CONTROL DE LÍMITE DE PLAN (CENTRO)
-// ===============================
-$stmt = $pdo->prepare("SELECT max_professionals FROM users WHERE id = ?");
-$stmt->execute([$center_id]);
-$limite = $stmt->fetchColumn();
+    // 🚨 CONTROL DE LÍMITE DE PLAN (CENTRO)
+    // ===============================
+    $stmt = $pdo->prepare("SELECT max_professionals FROM users WHERE id = ?");
+    $stmt->execute([$center_id]);
+    $limite = $stmt->fetchColumn();
 
-// Contar profesionales actuales del centro
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE parent_center_id = ?");
-$stmt->execute([$center_id]);
-$cantidad = $stmt->fetchColumn();
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE parent_center_id = ?");
+    $stmt->execute([$center_id]);
+    $cantidad = $stmt->fetchColumn();
 
-// Bloquear si supera el límite
-if ($cantidad >= $limite) {
-    $errors[] = "Llegaste al límite de profesionales de tu plan.";
-}
+    if ($cantidad >= $limite) {
+        $errors[] = "Llegaste al límite de profesionales de tu plan.";
+    }
 
     // Guardar profesional
     if (empty($errors)) {
 
         $stmt = $pdo->prepare("
             INSERT INTO users 
-            (name, email, password, profession, phone, city, description, specialties, accepts_insurance, insurance_list, slug, account_type, parent_center_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'professional', ?)
+            (name, email, password, profession, phone, city, description, specialties, 
+             accepts_insurance, insurance_list, slug, account_type, parent_center_id, video_link)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'professional', ?, ?)
         ");
 
         $stmt->execute([
@@ -109,7 +109,8 @@ if ($cantidad >= $limite) {
             $accepts_insurance,
             $insurance_json,
             $slug,
-            $center_id
+            $center_id,
+            $video_link   // 🔥 AGREGADO
         ]);
 
         header("Location: centro-profesionales.php?ok=1");
@@ -161,6 +162,9 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
 
         <textarea name="specialties" placeholder="Especialidades (separadas por coma)"></textarea>
 
+        <!-- 🔥 CAMPO: Link de videollamada -->
+        <input name="video_link" placeholder="Link de videollamada (Meet, Zoom, etc.)">
+
         <label>
             <input type="checkbox" name="accepts_insurance" id="accepts_insurance" onclick="toggleInsurance()"> Acepta obra social
         </label>
@@ -179,7 +183,6 @@ a{color:#0ea5e9;text-decoration:none;font-size:14px;}
 
             <input name="insurance_other" id="insurance_other" placeholder="Escribí otra obra social" style="display:none;">
         </div>
-
 
         <button>Crear profesional</button>
     </form>
