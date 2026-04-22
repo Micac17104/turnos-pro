@@ -20,9 +20,10 @@ if (!isset($_GET['plan'])) {
 
 $plan = (int) $_GET['plan'];
 
-// 🔥 ÚNICO PLAN DE CENTRO
+// 🔥 DOS PLANES PARA CENTROS
 $links = [
-    1 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=bc987ac37a2e491cb23f87ea9b7b8540"
+    1 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=bc987ac37a2e491cb23f87ea9b7b8540", // Plan hasta 4 profesionales
+    2 => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=297c7d39a7d247f38ff65790644e9333"  // Plan adicional (el que vos quieras)
 ];
 
 if (!isset($links[$plan])) {

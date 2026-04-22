@@ -36,6 +36,17 @@ require __DIR__ . '/includes/sidebar.php';
             </a>
         </div>
 
+         <div class="bg-white shadow rounded-xl p-6 text-center border">
+            <h2 class="text-xl font-bold mb-2">Plan Centro (hasta 8 profesionales)</h2>
+            <p class="text-3xl font-semibold mb-4">$38.000</p>
+
+            <a href="/centro/suscribirse-centro.php?plan=2"
+               class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+               Contratar
+            </a>
+        </div>
+
+
     </div>
 </main>
 
