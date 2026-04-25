@@ -14,6 +14,11 @@ session_save_path($path);
 session_start();
 // -----------------------------------
 
+// 🔐 Seguridad de cookies de sesión
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1); // solo si usás HTTPS
+ini_set('session.cookie_samesite', 'Strict');
+
 require __DIR__ . '/../config.php';
 
 $mensaje = "";

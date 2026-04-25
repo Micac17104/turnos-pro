@@ -4,6 +4,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1); // solo si usás HTTPS
+ini_set('session.cookie_samesite', 'Strict');
+
+
 require __DIR__ . '/../pro/includes/db.php';
 
 // Si ya está logueado como admin → redirigir

@@ -3,6 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// 🔐 Seguridad de cookies de sesión
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1); // solo si usás HTTPS
+ini_set('session.cookie_samesite', 'Strict');
+
 require __DIR__ . '/../pro/includes/db.php';
 
 // Si ya está logueado → redirigir según tipo
@@ -24,6 +29,8 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['account_type'])) {
     }
 }
 
+$error = "";
+
 // Procesar login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -35,6 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user && password_verify($password, $user['password'])) {
+
+        // 🔐 Regenerar ID de sesión para evitar session fixation
+        session_regenerate_id(true);
 
         // Guardar sesión
         $_SESSION['user_id'] = $user['id'];
@@ -81,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p class="text-red-600 text-sm mb-4 text-center">
         Tu suscripción fue cancelada. Podés volver a activarla pagando nuevamente.
     </p>
-<?php endif; ?>
+    <?php endif; ?>
 
     <?php if (!empty($error)): ?>
         <p class="text-red-600 text-sm mb-4 text-center"><?= $error ?></p>
