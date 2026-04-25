@@ -1,12 +1,12 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// 🔐 Seguridad de cookies de sesión
+// 🔐 Seguridad de cookies de sesión (ANTES de session_start)
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1); // solo si usás HTTPS
 ini_set('session.cookie_samesite', 'Strict');
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require __DIR__ . '/../pro/includes/db.php';
 
@@ -137,4 +137,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
-
