@@ -11,13 +11,14 @@ if (!is_writable($path)) {
 }
 
 session_save_path($path);
-session_start();
-// -----------------------------------
 
-// 🔐 Seguridad de cookies de sesión
+// 🔐 Seguridad de cookies de sesión (ANTES de session_start)
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1); // solo si usás HTTPS
 ini_set('session.cookie_samesite', 'Strict');
+
+session_start();
+// -----------------------------------
 
 require __DIR__ . '/../config.php';
 
@@ -48,6 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje = "Email o contraseña incorrectos.";
 
         } else {
+
+            // 🔐 Regenerar ID de sesión para evitar session fixation
+            session_regenerate_id(true);
 
             // Si no está vinculado, lo vinculamos a sí mismo
             if ((int)$paciente['user_id'] === 0) {

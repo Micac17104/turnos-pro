@@ -1,13 +1,13 @@
+
 <?php
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+// 🔐 Seguridad de cookies de sesión (ANTES de session_start)
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1); // solo si usás HTTPS
 ini_set('session.cookie_samesite', 'Strict');
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require __DIR__ . '/../pro/includes/db.php';
 
@@ -28,8 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
     if ($user && $user['account_type'] === 'admin' && password_verify($password, $user['password'])) {
+
+        // 🔐 Regenerar ID de sesión para evitar session fixation
+        session_regenerate_id(true);
 
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['account_type'] = 'admin';
