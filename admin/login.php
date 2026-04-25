@@ -1,4 +1,3 @@
-
 <?php
 // 🔐 Seguridad de cookies de sesión (ANTES de session_start)
 ini_set('session.cookie_httponly', 1);
@@ -30,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user && $user['account_type'] === 'admin' && password_verify($password, $user['password'])) {
 
-        // 🔐 Regenerar ID de sesión para evitar session fixation
+        // 🔐 Regenerar ID de sesión
         session_regenerate_id(true);
 
         $_SESSION['user_id'] = $user['id'];
