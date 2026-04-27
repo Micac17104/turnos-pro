@@ -77,12 +77,76 @@ if ($turno_id) {
     redirect('agenda.php?edit=1');
 }
 
+// --------------------------------------
+// BLOQUEAR SI NO TIENE SESIONES DISPONIBLES
+// --------------------------------------
+if (!empty($client_id)) {
+
+    $stmt = $pdo->prepare("
+        SELECT pc.id AS pc_id, p.total_sessions, pc.sessions_used
+        FROM packs_clients pc
+        JOIN packs p ON p.id = pc.pack_id
+        WHERE pc.client_id = ?
+          AND p.owner_type = 'professional'
+          AND p.owner_id = ?
+        ORDER BY pc.id DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$client_id, $user_id]);
+    $pack = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($pack) {
+        $restantes = $pack['total_sessions'] - $pack['sessions_used'];
+
+        if ($restantes <= 0) {
+            die("Este paciente no tiene sesiones disponibles en su pack.");
+        }
+    }
+}
+
+
 // SI ES NUEVO → INSERT
 $stmt = $pdo->prepare("
  INSERT INTO appointments (user_id, client_id, date, time, motivo)
 VALUES (?, ?, ?, ?, ?)
 ");
 $stmt->execute([$user_id, $client_id, $date, $time, $motivo]);
+
+// --------------------------------------
+// DESCONTAR SESIÓN DE PACK (si aplica)
+// --------------------------------------
+if (!empty($client_id)) {
+
+    // Buscar pack activo del paciente
+    $stmt = $pdo->prepare("
+        SELECT pc.id AS pc_id, p.total_sessions, pc.sessions_used
+        FROM packs_clients pc
+        JOIN packs p ON p.id = pc.pack_id
+        WHERE pc.client_id = ?
+          AND p.owner_type = 'professional'
+          AND p.owner_id = ?
+        ORDER BY pc.id DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$client_id, $user_id]);
+    $pack = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($pack) {
+        $restantes = $pack['total_sessions'] - $pack['sessions_used'];
+
+        if ($restantes > 0) {
+            // Descontar sesión
+            $stmt = $pdo->prepare("
+                UPDATE packs_clients
+                SET sessions_used = sessions_used + 1
+                WHERE id = ?
+            ");
+            $stmt->execute([$pack['pc_id']]);
+        }
+        // Si no hay sesiones restantes, NO rompemos nada.
+        // Podés decidir bloquear la reserva si querés.
+    }
+}
 
 
 // --------------------------------------

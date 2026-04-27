@@ -27,6 +27,31 @@ if (!$paciente) {
     die("Paciente no pertenece a este profesional.");
 }
 
+// Preguntas personalizadas del profesional
+$stmt = $pdo->prepare("
+    SELECT id, question_text, type, required
+    FROM clinical_questions
+    WHERE professional_id = ?
+    ORDER BY id ASC
+");
+$stmt->execute([$user_id]);
+$preguntas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Respuestas del paciente a esas preguntas
+$answers = [];
+if (!empty($preguntas)) {
+    $stmt = $pdo->prepare("
+        SELECT question_id, answer
+        FROM clinical_answers
+        WHERE client_id = ? AND professional_id = ?
+    ");
+    $stmt->execute([$patient_id, $user_id]);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $answers[$row['question_id']] = $row['answer'];
+    }
+}
+
+
 // Datos clínicos extra
 $stmt = $pdo->prepare("
     SELECT antecedentes, alergias, medicacion, patologias, obra_social, nro_afiliado
@@ -131,7 +156,16 @@ require __DIR__ . '/includes/sidebar.php';
            class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 text-sm hover:bg-slate-300">
             ← Volver
         </a>
+
+        <a href="paciente-editar.php?id=<?= $patient_id ?>"
+   class="px-3 py-2 bg-slate-900 text-white rounded-lg text-sm">
+    Editar datos personales
+</a>
+
     </div>
+
+    
+
 
     <!-- DATOS CLÍNICOS FIJOS -->
     <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
@@ -153,6 +187,91 @@ require __DIR__ . '/includes/sidebar.php';
             <p><strong>Nro afiliado:</strong> <?= h($extra['nro_afiliado'] ?? 'No registrado') ?></p>
         </div>
     </section>
+
+    <?php
+$stmt = $pdo->prepare("
+    SELECT pc.id, p.name, p.total_sessions, pc.sessions_used
+    FROM packs_clients pc
+    JOIN packs p ON p.id = pc.pack_id
+    WHERE pc.client_id = ?
+      AND p.owner_type = 'professional'
+      AND p.owner_id = ?
+    ORDER BY pc.id DESC
+");
+$stmt->execute([$patient_id, $user_id]);
+$packs_activos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+<?php if (!empty($packs_activos)): ?>
+<section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">Packs de sesiones</h2>
+
+    <?php foreach ($packs_activos as $p): ?>
+        <?php $restantes = $p['total_sessions'] - $p['sessions_used']; ?>
+        <p class="text-sm text-slate-700">
+            <strong><?= h($p['name']) ?>:</strong>
+            <?= $p['sessions_used'] ?>/<?= $p['total_sessions'] ?> usadas
+            (<?= $restantes ?> restantes)
+        </p>
+    <?php endforeach; ?>
+</section>
+<?php endif; ?>
+
+
+        <!-- PREGUNTAS PERSONALIZADAS -->
+    <?php if (!empty($preguntas)): ?>
+    <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-slate-900">Datos clínicos personalizados</h2>
+        </div>
+
+        <form method="post" action="paciente-preguntas-guardar.php" class="space-y-4">
+            <input type="hidden" name="patient_id" value="<?= $patient_id ?>">
+
+            <?php foreach ($preguntas as $q): ?>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        <?= h($q['question_text']) ?>
+                        <?php if ($q['required']): ?>
+                            <span class="text-red-500">*</span>
+                        <?php endif; ?>
+                    </label>
+
+                    <?php
+                        $field_name = 'q_' . $q['id'];
+                        $value = $answers[$q['id']] ?? '';
+                    ?>
+
+                    <?php if ($q['type'] === 'textarea'): ?>
+                        <textarea name="<?= $field_name ?>" rows="3"
+                                  class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900/80"
+                                  <?= $q['required'] ? 'required' : '' ?>><?= h($value) ?></textarea>
+
+                    <?php elseif ($q['type'] === 'number'): ?>
+                        <input type="number" name="<?= $field_name ?>"
+                               value="<?= h($value) ?>"
+                               class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900/80"
+                               <?= $q['required'] ? 'required' : '' ?>>
+
+                    <?php else: ?>
+                        <input type="text" name="<?= $field_name ?>"
+                               value="<?= h($value) ?>"
+                               class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900/80"
+                               <?= $q['required'] ? 'required' : '' ?>>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+
+            <div class="flex justify-end pt-2">
+                <button type="submit"
+                        class="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800">
+                    Guardar datos personalizados
+                </button>
+            </div>
+        </form>
+    </section>
+    <?php endif; ?>
+
         <!-- HISTORIA CLÍNICA PERSONALIZADA -->
     <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
         <div class="flex items-center justify-between mb-4">

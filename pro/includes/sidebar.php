@@ -40,6 +40,18 @@ if (isset($_SESSION['user_id'])) {
             Pacientes
         </a>
 
+        <!-- 🟩 PACKS DE SESIONES -->
+        <a href="/pro/packs.php"
+           class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'packs' ? 'bg-slate-100 font-semibold' : '' ?>">
+            Packs de sesiones
+        </a>
+
+        <a href="/pro/packs-asignar.php"
+           class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'packs-asignar' ? 'bg-slate-100 font-semibold' : '' ?>">
+            Asignar pack a paciente
+        </a>
+        <!-- 🟩 FIN PACKS -->
+
         <a href="/pro/pagos.php"
            class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'pagos' ? 'bg-slate-100 font-semibold' : '' ?>">
             Pagos

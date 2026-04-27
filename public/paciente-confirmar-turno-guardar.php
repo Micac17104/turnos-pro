@@ -74,6 +74,31 @@ if ($stmt->fetch()) {
 $confirm_token = bin2hex(random_bytes(16));
 $cancel_token  = bin2hex(random_bytes(16));
 
+// --------------------------------------
+// BLOQUEAR SI NO TIENE SESIONES DISPONIBLES
+// --------------------------------------
+$stmt = $pdo->prepare("
+    SELECT pc.id AS pc_id, p.total_sessions, pc.sessions_used
+    FROM packs_clients pc
+    JOIN packs p ON p.id = pc.pack_id
+    WHERE pc.client_id = ?
+      AND p.owner_type = 'professional'
+      AND p.owner_id = ?
+    ORDER BY pc.id DESC
+    LIMIT 1
+");
+$stmt->execute([$paciente_id, $pro_id]);
+$pack = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($pack) {
+    $restantes = $pack['total_sessions'] - $pack['sessions_used'];
+
+    if ($restantes <= 0) {
+        die("No tenés sesiones disponibles en tu pack. Contactá a tu profesional.");
+    }
+}
+
+
 // 🔥 CREAR TURNO COMO PENDING
 $stmt = $pdo->prepare("
     INSERT INTO appointments 
@@ -91,6 +116,38 @@ $stmt->execute([
     $confirm_token,
     $cancel_token
 ]);
+
+// --------------------------------------
+// DESCONTAR SESIÓN DE PACK (si aplica)
+// --------------------------------------
+$client_id = $paciente_id; // para unificar nombres
+
+$stmt = $pdo->prepare("
+    SELECT pc.id AS pc_id, p.total_sessions, pc.sessions_used
+    FROM packs_clients pc
+    JOIN packs p ON p.id = pc.pack_id
+    WHERE pc.client_id = ?
+      AND p.owner_type = 'professional'
+      AND p.owner_id = ?
+    ORDER BY pc.id DESC
+    LIMIT 1
+");
+$stmt->execute([$client_id, $pro_id]);
+$pack = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($pack) {
+    $restantes = $pack['total_sessions'] - $pack['sessions_used'];
+
+    if ($restantes > 0) {
+        $stmt = $pdo->prepare("
+            UPDATE packs_clients
+            SET sessions_used = sessions_used + 1
+            WHERE id = ?
+        ");
+        $stmt->execute([$pack['pc_id']]);
+    }
+}
+
 
 $turno_id = $pdo->lastInsertId();
 
