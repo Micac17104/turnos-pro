@@ -5,7 +5,6 @@ require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
-
 $center_id = $_SESSION['user_id'];
 
 // Fecha seleccionada
@@ -132,6 +131,13 @@ input,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;margin-right
             </select>
 
             <button class="btn">Filtrar</button>
+
+            <!-- 🟩 BOTÓN DE TURNO RÁPIDO -->
+            <a href="turno-rapido.php"
+               class="btn"
+               style="background:#22c55e;margin-left:10px;">
+               Turno rápido
+            </a>
         </form>
 
         <!-- Turnos del día -->
