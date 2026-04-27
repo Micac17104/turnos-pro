@@ -3,7 +3,8 @@ session_start();
 
 require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../config.php';
-require __DIR__ . '/../includes/db.php';
+require __DIR__ . '/../pro/includes/db.php';
+
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
 $sesion_id = $_GET['id'];

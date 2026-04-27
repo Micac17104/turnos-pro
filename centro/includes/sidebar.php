@@ -44,7 +44,7 @@
     Tratamientos realizados
 </a>
 
-<a href="/centro/planes.php"
+<a href="/centro/planes-estetica.php"
    class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'planes' ? 'bg-slate-100 font-semibold' : '' ?>">
     Planes de sesiones
 </a>

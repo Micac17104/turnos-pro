@@ -1,6 +1,7 @@
 <?php
 session_start();
-require __DIR__ . '/../includes/db.php';
+require __DIR__ . '/../pro/includes/db.php';
+
 
 $center_id = $_SESSION['center_id'];
 
