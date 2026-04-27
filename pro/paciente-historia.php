@@ -188,6 +188,43 @@ require __DIR__ . '/includes/sidebar.php';
         </div>
     </section>
 
+<!-- CREAR NUEVA PREGUNTA PERSONALIZADA -->
+<section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">Agregar pregunta personalizada</h2>
+
+    <form action="pregunta-crear.php" method="post" class="space-y-4">
+
+        <input type="hidden" name="professional_id" value="<?= $user_id ?>">
+
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Texto de la pregunta</label>
+            <input type="text" name="question_text" class="w-full px-3 py-2 border rounded-lg" required>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Tipo de respuesta</label>
+            <select name="type" class="w-full px-3 py-2 border rounded-lg">
+                <option value="text">Texto</option>
+                <option value="number">Número</option>
+                <option value="textarea">Texto largo</option>
+            </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <input type="checkbox" name="required" value="1">
+            <label class="text-sm text-slate-700">Obligatoria</label>
+        </div>
+
+        <button class="px-4 py-2 bg-slate-900 text-white rounded-lg">
+            Crear pregunta
+        </button>
+
+    </form>
+
+</section>
+
+
     <?php
 $stmt = $pdo->prepare("
     SELECT pc.id, p.name, p.total_sessions, pc.sessions_used

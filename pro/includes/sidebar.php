@@ -48,7 +48,7 @@ if (isset($_SESSION['user_id'])) {
 
         <a href="/pro/packs-asignar.php"
            class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'packs-asignar' ? 'bg-slate-100 font-semibold' : '' ?>">
-            Asignar pack a paciente
+            Asignar pack al paciente
         </a>
         <!-- 🟩 FIN PACKS -->
 
