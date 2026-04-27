@@ -33,22 +33,6 @@
     Recordatorios
 </a>
 
-<!-- 🟩 MÓDULOS ESTÉTICA -->
-<a href="/centro/ficha-estetica.php"
-   class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'ficha-estetica' ? 'bg-slate-100 font-semibold' : '' ?>">
-    Ficha estética
-</a>
-
-<a href="/centro/tratamientos.php"
-   class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'tratamientos' ? 'bg-slate-100 font-semibold' : '' ?>">
-    Tratamientos realizados
-</a>
-
-<a href="/centro/planes-estetica.php"
-   class="block px-4 py-2 rounded-lg hover:bg-slate-100 <?= $current === 'planes' ? 'bg-slate-100 font-semibold' : '' ?>">
-    Planes de sesiones
-</a>
-<!-- 🟩 FIN MÓDULOS ESTÉTICA -->
 
 
 <li>

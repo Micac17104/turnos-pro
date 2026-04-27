@@ -7,7 +7,6 @@ require __DIR__ . '/../pro/includes/auth-centro.php';
 require __DIR__ . '/../pro/includes/helpers.php';
 require __DIR__ . '/../pro/includes/db.php';
 
-
 $center_id = $_SESSION['user_id'];
 $patient_id = $_GET['id'] ?? null;
 
@@ -93,7 +92,7 @@ $evoluciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 body{margin:0;font-family:Arial;background:#f1f5f9;}
 .card{background:white;border-radius:16px;padding:20px;margin-bottom:20px;box-shadow:0 10px 30px rgba(15,23,42,0.06);}
 input,textarea,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;width:100%;}
-.btn{padding:8px 14px;border-radius:8px;background:#0ea5e9;color:white;text-decoration:none;display:inline-block;}
+.btn{padding:8px 14px;border-radius:8px;background:#0ea5e9;color:white;text-decoration:none;display:inline-block;margin-right:10px;margin-bottom:10px;}
 </style>
 </head>
 <body>
@@ -103,11 +102,18 @@ input,textarea,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;wid
 
 <h2 style="margin-bottom:20px;">Historia clínica de <?= h($paciente['name']) ?></h2>
 
+<!-- BOTONES DE ACCESO A MÓDULOS ESTÉTICOS -->
+<div style="margin-bottom:20px;">
+    <a href="ficha-estetica.php?id=<?= $patient_id ?>" class="btn">Ficha estética</a>
+    <a href="tratamientos.php?id=<?= $patient_id ?>" class="btn">Tratamientos realizados</a>
+    <a href="planes.php?id=<?= $patient_id ?>" class="btn">Planes de sesiones</a>
+</div>
+
 <!-- DATOS CLÍNICOS FIJOS -->
 <div class="card">
     <h3>Datos clínicos</h3>
 
-    <a href="paciente-datos-editar.php?id=<?= $patient_id ?>" class="btn" style="margin-bottom:10px;">
+    <a href="paciente-datos-editar.php?id=<?= $patient_id ?>" class="btn">
         Editar datos clínicos
     </a>
 
@@ -118,19 +124,6 @@ input,textarea,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;wid
     <p><strong>Obra social:</strong> <?= h($extra['obra_social'] ?? 'No registrado') ?></p>
     <p><strong>Nro afiliado:</strong> <?= h($extra['nro_afiliado'] ?? 'No registrado') ?></p>
 </div>
-
-<a href="ficha-estetica.php?id=<?= $patient_id ?>" class="btn" style="margin-bottom:10px;">
-    Ver ficha estética
-</a>
-
-<a href="tratamientos.php?id=<?= $patient_id ?>" class="btn" style="margin-bottom:10px;">
-    Ver tratamientos realizados
-</a>
-
-<a href="planes.php?id=<?= $patient_id ?>" class="btn" style="margin-bottom:10px;">
-    Ver planes de sesiones
-</a>
-
 
 <!-- PACKS -->
 <?php if (!empty($packs)): ?>

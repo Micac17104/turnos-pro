@@ -92,6 +92,13 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                 <td>
                     <a href="centro-paciente-ver.php?id=<?= $p['id'] ?>">Ver historial</a>
                 </td>
+
+                <a href="paciente-historia.php?id=<?= $p['id'] ?>" 
+   class="btn" 
+   style="background:#0ea5e9; padding:6px 10px; font-size:12px;">
+   Ver historia clínica
+</a>
+
             </tr>
             <?php endforeach; ?>
 
