@@ -19,3 +19,4 @@ $client_id = $pdo->lastInsertId();
 // Redirigir al archivo REAL de creación de turnos del centro
 header("Location: centro-turnos-nuevo.php?client_id=" . $client_id);
 exit;
+
