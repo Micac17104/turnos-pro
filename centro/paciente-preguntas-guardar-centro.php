@@ -5,6 +5,7 @@ require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/../pro/includes/db.php';
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
+$center_id  = $_SESSION['user_id'];
 $patient_id = $_POST['patient_id'] ?? null;
 
 if (!$patient_id) {
@@ -30,21 +31,21 @@ foreach ($_POST as $key => $value) {
     $exists = $stmt->fetchColumn();
 
     if ($exists) {
-        // Actualizar
+        // Actualizar respuesta existente
         $stmt = $pdo->prepare("
             UPDATE clinical_answers
-            SET answer = ?
+            SET answer = ?, professional_id = ?
             WHERE id = ?
         ");
-        $stmt->execute([$value, $exists]);
+        $stmt->execute([$value, $center_id, $exists]);
 
     } else {
-        // Insertar
+        // Insertar nueva respuesta
         $stmt = $pdo->prepare("
-            INSERT INTO clinical_answers (client_id, question_id, answer)
-            VALUES (?, ?, ?)
+            INSERT INTO clinical_answers (client_id, question_id, answer, professional_id)
+            VALUES (?, ?, ?, ?)
         ");
-        $stmt->execute([$patient_id, $question_id, $value]);
+        $stmt->execute([$patient_id, $question_id, $value, $center_id]);
     }
 }
 
