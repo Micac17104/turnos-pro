@@ -36,7 +36,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$patient_id]);
 $extra = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-// Preguntas personalizadas del centro
+// PREGUNTAS PERSONALIZADAS DEL CENTRO (usa professional_id = center_id)
 $stmt = $pdo->prepare("
     SELECT *
     FROM clinical_questions
@@ -44,24 +44,22 @@ $stmt = $pdo->prepare("
     ORDER BY id ASC
 ");
 $stmt->execute([$center_id]);
-
 $preguntas_centro = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Respuestas del paciente a preguntas del centro
+// RESPUESTAS DEL PACIENTE (NO usa center_id)
 $answers_centro = [];
-if (!empty($preguntas_centro)) {
-    $stmt = $pdo->prepare("
-        SELECT question_id, answer
-        FROM clinical_answers
-        WHERE client_id = ? AND center_id = ?
-    ");
-    $stmt->execute([$patient_id, $center_id]);
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $answers_centro[$row['question_id']] = $row['answer'];
-    }
+$stmt = $pdo->prepare("
+    SELECT question_id, answer
+    FROM clinical_answers
+    WHERE client_id = ?
+");
+$stmt->execute([$patient_id]);
+
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $answers_centro[$row['question_id']] = $row['answer'];
 }
 
-// Packs asignados (centro o profesionales)
+// Packs asignados
 $stmt = $pdo->prepare("
     SELECT pc.id, p.name, p.total_sessions, pc.sessions_used
     FROM packs_clients pc
@@ -72,7 +70,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$patient_id]);
 $packs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Evoluciones de todos los profesionales del centro
+// Evoluciones
 $stmt = $pdo->prepare("
     SELECT e.*, u.name AS profesional
     FROM evoluciones e
@@ -108,7 +106,6 @@ input,textarea,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;wid
     <a href="ficha-estetica.php?id=<?= $patient_id ?>" class="btn">Ficha estética</a>
     <a href="tratamientos.php?id=<?= $patient_id ?>" class="btn">Tratamientos realizados</a>
     <a href="planes-estetica.php?id=<?= $patient_id ?>" class="btn">Planes de sesiones</a>
-
 </div>
 
 <!-- DATOS CLÍNICOS FIJOS -->
@@ -127,49 +124,7 @@ input,textarea,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;wid
     <p><strong>Nro afiliado:</strong> <?= h($extra['nro_afiliado'] ?? 'No registrado') ?></p>
 </div>
 
-<!-- PACKS -->
-<?php if (!empty($packs)): ?>
-<div class="card">
-    <h3>Packs de sesiones</h3>
-
-    <?php foreach ($packs as $p): ?>
-        <?php $restantes = $p['total_sessions'] - $p['sessions_used']; ?>
-        <p>
-            <strong><?= h($p['name']) ?>:</strong>
-            <?= $p['sessions_used'] ?>/<?= $p['total_sessions'] ?> usadas
-            (<?= $restantes ?> restantes)
-        </p>
-    <?php endforeach; ?>
-</div>
-<?php endif; ?>
-
-<!-- AGREGAR PREGUNTA PERSONALIZADA DEL CENTRO -->
-<div class="card">
-    <h3>Agregar pregunta personalizada</h3>
-
-    <form action="pregunta-crear-centro.php" method="post">
-        <input type="hidden" name="center_id" value="<?= $center_id ?>">
-        <input type="hidden" name="patient_id" value="<?= $patient_id ?>">
-
-        <label>Texto de la pregunta</label>
-        <input type="text" name="question_text" required>
-
-        <label>Tipo</label>
-        <select name="type">
-            <option value="text">Texto</option>
-            <option value="number">Número</option>
-            <option value="textarea">Texto largo</option>
-        </select>
-
-        <label>
-            <input type="checkbox" name="required" value="1"> Obligatoria
-        </label>
-
-        <button class="btn">Crear pregunta</button>
-    </form>
-</div>
-
-<!-- RESPUESTAS A PREGUNTAS PERSONALIZADAS DEL CENTRO -->
+<!-- PREGUNTAS PERSONALIZADAS DEL CENTRO -->
 <?php if (!empty($preguntas_centro)): ?>
 <div class="card">
     <h3>Datos personalizados del centro</h3>
@@ -197,6 +152,31 @@ input,textarea,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;wid
     </form>
 </div>
 <?php endif; ?>
+
+<!-- AGREGAR PREGUNTA PERSONALIZADA -->
+<div class="card">
+    <h3>Agregar pregunta personalizada</h3>
+
+    <form action="pregunta-crear-centro.php" method="post">
+        <input type="hidden" name="patient_id" value="<?= $patient_id ?>">
+
+        <label>Texto de la pregunta</label>
+        <input type="text" name="question_text" required>
+
+        <label>Tipo</label>
+        <select name="type">
+            <option value="text">Texto</option>
+            <option value="number">Número</option>
+            <option value="textarea">Texto largo</option>
+        </select>
+
+        <label>
+            <input type="checkbox" name="required" value="1"> Obligatoria
+        </label>
+
+        <button class="btn">Crear pregunta</button>
+    </form>
+</div>
 
 <!-- EVOLUCIONES -->
 <div class="card">
