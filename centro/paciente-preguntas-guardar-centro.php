@@ -2,59 +2,51 @@
 session_start();
 
 require __DIR__ . '/includes/auth.php';
-require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/db.php';
-
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
-$center_id = $_SESSION['user_id'];
 $patient_id = $_POST['patient_id'] ?? null;
 
 if (!$patient_id) {
-    die("Paciente inválido.");
+    die("Paciente no encontrado.");
 }
 
-// Obtener todas las preguntas del centro
-$stmt = $pdo->prepare("
-    SELECT id
-    FROM clinical_questions
-    WHERE center_id = ?
-");
-$stmt->execute([$center_id]);
-$preguntas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Guardar respuestas
+foreach ($_POST as $key => $value) {
 
-// Guardar cada respuesta
-foreach ($preguntas as $q) {
-    $qid = $q['id'];
-    $field = "q_" . $qid;
-    $answer = trim($_POST[$field] ?? '');
+    if (strpos($key, 'q_') !== 0) {
+        continue;
+    }
 
-    // Verificar si ya existe respuesta
+    $question_id = str_replace('q_', '', $key);
+
+    // Ver si ya existe respuesta
     $stmt = $pdo->prepare("
-        SELECT id
+        SELECT id 
         FROM clinical_answers
-        WHERE client_id = ? AND center_id = ? AND question_id = ?
+        WHERE client_id = ? AND question_id = ?
     ");
-    $stmt->execute([$patient_id, $center_id, $qid]);
-    $existe = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->execute([$patient_id, $question_id]);
+    $exists = $stmt->fetchColumn();
 
-    if ($existe) {
-        // Update
+    if ($exists) {
+        // Actualizar
         $stmt = $pdo->prepare("
             UPDATE clinical_answers
             SET answer = ?
             WHERE id = ?
         ");
-        $stmt->execute([$answer, $existe['id']]);
+        $stmt->execute([$value, $exists]);
+
     } else {
-        // Insert
+        // Insertar
         $stmt = $pdo->prepare("
-            INSERT INTO clinical_answers (client_id, center_id, question_id, answer)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO clinical_answers (client_id, question_id, answer)
+            VALUES (?, ?, ?)
         ");
-        $stmt->execute([$patient_id, $center_id, $qid, $answer]);
+        $stmt->execute([$patient_id, $question_id, $value]);
     }
 }
 
-header("Location: paciente-historia.php?id=" . $patient_id . "&ok=1");
+header("Location: paciente-historia.php?id=" . $patient_id);
 exit;
