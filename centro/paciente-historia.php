@@ -106,7 +106,8 @@ input,textarea,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;wid
 <div style="margin-bottom:20px;">
     <a href="ficha-estetica.php?id=<?= $patient_id ?>" class="btn">Ficha estética</a>
     <a href="tratamientos.php?id=<?= $patient_id ?>" class="btn">Tratamientos realizados</a>
-    <a href="planes.php?id=<?= $patient_id ?>" class="btn">Planes de sesiones</a>
+    <a href="planes-estetica.php?id=<?= $patient_id ?>" class="btn">Planes de sesiones</a>
+
 </div>
 
 <!-- DATOS CLÍNICOS FIJOS -->

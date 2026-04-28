@@ -59,5 +59,6 @@ if ($existe) {
     ]);
 }
 
-header("Location: ficha-estetica.php?id=" . $patient_id . "&ok=1");
+header("Location: paciente-historia.php?id=" . $patient_id . "&ok=1");
+
 exit;
