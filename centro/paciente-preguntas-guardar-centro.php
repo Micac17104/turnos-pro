@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 
@@ -14,6 +15,7 @@ if (!$patient_id) {
 // Guardar respuestas
 foreach ($_POST as $key => $value) {
 
+    // Solo procesar campos que empiezan con q_
     if (strpos($key, 'q_') !== 0) {
         continue;
     }
@@ -30,7 +32,7 @@ foreach ($_POST as $key => $value) {
     $exists = $stmt->fetchColumn();
 
     if ($exists) {
-        // Actualizar
+        // Actualizar respuesta existente
         $stmt = $pdo->prepare("
             UPDATE clinical_answers
             SET answer = ?
@@ -39,7 +41,7 @@ foreach ($_POST as $key => $value) {
         $stmt->execute([$value, $exists]);
 
     } else {
-        // Insertar
+        // Insertar nueva respuesta
         $stmt = $pdo->prepare("
             INSERT INTO clinical_answers (client_id, question_id, answer)
             VALUES (?, ?, ?)
