@@ -2,24 +2,34 @@
 session_start();
 
 require __DIR__ . '/includes/auth.php';
+require __DIR__ . '/../config.php';
 require __DIR__ . '/../pro/includes/db.php';
+
 require __DIR__ . '/../pro/includes/auth-centro.php';
 
 $center_id = $_SESSION['user_id'];
-$patient_id = $_POST['patient_id'];
 
-// Crear pregunta del centro (professional_id = 0)
+$text = trim($_POST['question_text'] ?? '');
+$type = $_POST['type'] ?? 'text';
+$required = isset($_POST['required']) ? 1 : 0;
+$patient_id = $_POST['patient_id'] ?? null;
+
+if (!$text) {
+    die("La pregunta no puede estar vacía.");
+}
+
+// Insertar pregunta del centro
 $stmt = $pdo->prepare("
-    INSERT INTO clinical_questions (center_id, professional_id, question_text, type, required)
-    VALUES (?, 0, ?, ?, ?)
+    INSERT INTO clinical_questions (center_id, question_text, type, required)
+    VALUES (?, ?, ?, ?)
 ");
+$stmt->execute([$center_id, $text, $type, $required]);
 
-$stmt->execute([
-    $center_id,
-    $_POST['question_text'],
-    $_POST['type'],
-    isset($_POST['required']) ? 1 : 0
-]);
+// Volver a la historia clínica del paciente
+if ($patient_id) {
+    header("Location: paciente-historia.php?id=" . $patient_id);
+} else {
+    header("Location: pacientes.php");
+}
 
-header("Location: paciente-historia.php?id=" . $patient_id);
 exit;
