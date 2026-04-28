@@ -40,10 +40,11 @@ $extra = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 $stmt = $pdo->prepare("
     SELECT *
     FROM clinical_questions
-    WHERE center_id = ?
+    WHERE professional_id = ?
     ORDER BY id ASC
 ");
 $stmt->execute([$center_id]);
+
 $preguntas_centro = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Respuestas del paciente a preguntas del centro
