@@ -51,6 +51,12 @@ body{margin:0;font-family:Arial;background:#f1f5f9;}
 
 <div style="margin-left:260px; padding:24px;">
 
+<a href="paciente-historia.php?id=<?= $patient_id ?>" 
+   class="btn" 
+   style="background:#64748b; margin-bottom:15px; display:inline-block;">
+   ← Volver
+</a>
+
 <h2>Planes de sesiones — <?= h($paciente['name']) ?></h2>
 
 <a href="plan-nuevo.php?id=<?= $patient_id ?>" class="btn" style="margin:10px 0;">

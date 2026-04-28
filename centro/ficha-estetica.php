@@ -55,6 +55,12 @@ input,textarea{padding:8px;border-radius:8px;border:1px solid #cbd5e1;width:100%
 
 <div style="margin-left:260px; padding:24px;">
 
+<a href="paciente-historia.php?id=<?= $patient_id ?>" 
+   class="btn" 
+   style="background:#64748b; margin-bottom:15px; display:inline-block;">
+   ← Volver
+</a>
+
 <h2 style="margin-bottom:20px;">Ficha estética de <?= h($paciente['name']) ?></h2>
 
 <div class="card">
