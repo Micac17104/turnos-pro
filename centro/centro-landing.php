@@ -35,8 +35,13 @@ $profesionales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Dirección completa para el mapa
 $direccion_completa = urlencode(
-    trim($center['address'] . ' ' . $center['city'] . ' ' . $center['province'])
+    trim(($center['address'] ?? '') . ' ' . ($center['city'] ?? '') . ' ' . ($center['province'] ?? ''))
 );
+
+if (empty(trim(urldecode($direccion_completa)))) {
+    $direccion_completa = urlencode("Argentina");
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="es">

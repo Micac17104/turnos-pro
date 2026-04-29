@@ -211,8 +211,9 @@ button:hover{opacity:0.9;}
             <input type="file" name="profile_image" accept="image/*">
 
             <?php if (!empty($center['profile_image'])): ?>
-                <img src="../uploads/<?= htmlspecialchars($center['profile_image']) ?>"
-                     style="width:120px;height:120px;border-radius:16px;object-fit:cover;margin-top:10px;border:2px solid #e2e8f0;">
+                <img src="/uploads/<?= htmlspecialchars($center['profile_image']) ?>"
+     style="width:120px;height:120px;border-radius:16px;object-fit:cover;margin-top:10px;border:2px solid #e2e8f0;">
+
             <?php endif; ?>
 
             <br><br>
