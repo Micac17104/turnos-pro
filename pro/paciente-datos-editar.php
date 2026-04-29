@@ -15,9 +15,9 @@ $current    = 'pacientes';
 
 $patient_id = require_param($_GET, 'id', 'Paciente no encontrado.');
 
-// Obtener paciente
+// Obtener paciente con datos de recurrencia
 $stmt = $pdo->prepare("
-    SELECT id, name
+    SELECT id, name, is_recurring, recurring_day, recurring_time, recurring_until
     FROM clients
     WHERE id = ? AND user_id = ?
 ");
@@ -104,6 +104,50 @@ require __DIR__ . '/includes/sidebar.php';
                 <input type="text" name="nro_afiliado"
                        value="<?= h($extra['nro_afiliado']) ?>"
                        class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-slate-900/80">
+            </div>
+        </div>
+
+        <!-- NUEVO BLOQUE: Turno recurrente -->
+        <div class="border-t pt-6 mt-6">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Turno recurrente</h2>
+
+            <label class="flex items-center gap-2 mb-3">
+                <input type="checkbox" name="is_recurring" value="1"
+                       <?= !empty($paciente['is_recurring']) ? 'checked' : '' ?>
+                       onclick="document.getElementById('recurrenceFields').classList.toggle('hidden', !this.checked)">
+                Paciente recurrente
+            </label>
+
+            <div id="recurrenceFields" class="<?= !empty($paciente['is_recurring']) ? '' : 'hidden' ?>">
+                <label>Día de la semana:</label>
+                <select name="recurring_day" class="w-full p-3 mb-3 border rounded">
+                    <option value="">Seleccionar...</option>
+                    <?php
+                    $dias = [
+                        "Monday" => "Lunes",
+                        "Tuesday" => "Martes",
+                        "Wednesday" => "Miércoles",
+                        "Thursday" => "Jueves",
+                        "Friday" => "Viernes",
+                        "Saturday" => "Sábado",
+                        "Sunday" => "Domingo"
+                    ];
+                    foreach ($dias as $val => $label) {
+                        $sel = ($paciente['recurring_day'] === $val) ? 'selected' : '';
+                        echo "<option value='$val' $sel>$label</option>";
+                    }
+                    ?>
+                </select>
+
+                <label>Hora:</label>
+                <input type="time" name="recurring_time"
+                       value="<?= h($paciente['recurring_time']) ?>"
+                       class="w-full p-3 mb-3 border rounded">
+
+                <label>Hasta (opcional):</label>
+                <input type="date" name="recurring_until"
+                       value="<?= h($paciente['recurring_until']) ?>"
+                       class="w-full p-3 mb-3 border rounded">
             </div>
         </div>
 

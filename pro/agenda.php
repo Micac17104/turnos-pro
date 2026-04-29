@@ -160,6 +160,16 @@ if ($view === 'month') {
     $tareasMes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Pacientes recurrentes
+$stmt = $pdo->prepare("
+    SELECT id, name, recurring_day, recurring_time, recurring_until
+    FROM clients
+    WHERE user_id = ? AND is_recurring = 1
+");
+$stmt->execute([$user_id]);
+$recurrentes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 // Pacientes para modales
 $stmt = $pdo->prepare("SELECT id, name FROM clients WHERE user_id = ? ORDER BY name ASC");
 $stmt->execute([$user_id]);
@@ -307,237 +317,270 @@ require __DIR__ . '/includes/sidebar.php';
     </div>
 
     <!-- VISTA DIARIA -->
-    <?php if ($view === 'day'): ?>
+<?php if ($view === 'day'): ?>
 
-    <div class="grid grid-cols-3 gap-6">
+<div class="grid grid-cols-3 gap-6">
 
-        <!-- COLUMNA PRINCIPAL -->
-        <div class="col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+    <!-- COLUMNA PRINCIPAL -->
+    <div class="col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
 
-            <?php if (count($turnosDia) === 0 && count($tareasDia) === 0): ?>
-                <p class="text-slate-500 text-sm">
-                    No tenés turnos ni tareas para este día.
-                </p>
-            <?php endif; ?>
-
-      
-
-            <div class="space-y-3">
-                <?php foreach ($turnosDia as $t): ?>
-
-                    <?php 
-                        $clase = claseTurnoEstado($t['status']);
-                        $nombre = $t['paciente'] ?: $t['name'];
-                    ?>
-
-                    <div class="flex justify-between items-center p-3 border rounded-lg text-sm <?= $clase ?>">
-                        <div>
-                            <p class="font-semibold text-slate-900">
-                                <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
-                            </p>
-
-                            <p class="text-xs text-slate-600 mt-1">
-    Estado: <?= etiquetaEstado($t['status']) ?>
-</p>
-
-<?php if (!empty($t['motivo'])): ?>
-    <p class="text-xs text-slate-600 mt-1">
-        <strong>Motivo:</strong> <?= nl2br(h($t['motivo'])) ?>
-    </p>
-<?php endif; ?>
-
-                        </div>
-
-                        <div class="flex flex-col items-end text-xs">
-                            <button
-                                class="text-slate-900 hover:underline"
-                                onclick="abrirEditarTurno(
-                                    <?= (int)$t['id'] ?>,
-                                    '<?= h($t['date']) ?>',
-                                    '<?= h($t['time']) ?>',
-                                    '<?= h($nombre, ENT_QUOTES) ?>',
-                                    '<?= (int)$t['client_id'] ?>',
-                                    '<?= h($t['status']) ?>'
-                                )">
-                                Editar
-                            </button>
-
-                            <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>"
-                               class="text-red-600 hover:underline mt-1">
-                                Cancelar
-                            </a>
-                        </div>
-                    </div>
-
-                <?php endforeach; ?>
-
-                <?php if (count($tareasDia) > 0): ?>
-                    <div class="mt-4">
-                        <p class="text-sm font-semibold text-slate-800 mb-2">Tareas</p>
-
-                        <?php foreach ($tareasDia as $task): ?>
-                            <div class="flex justify-between items-start p-3 border rounded-lg bg-slate-50 text-sm">
-                                <div>
-                                    <p class="font-medium text-slate-900">
-                                        <?= h($task['title']) ?>
-                                    </p>
-                                    <?php if ($task['time']): ?>
-                                        <p class="text-xs text-slate-600 mt-1">
-                                            <?= substr($task['time'], 0, 5) ?> hs
-                                        </p>
-                                    <?php endif; ?>
-                                </div>
-
-                                <button
-                                    class="text-slate-900 text-xs hover:underline ml-2"
-                                    onclick="abrirEditarTarea(
-                                        <?= (int)$task['id'] ?>,
-                                        '<?= h($task['title'], ENT_QUOTES) ?>',
-                                        '<?= h($task['date']) ?>',
-                                        '<?= h($task['time']) ?>',
-                                        `<?= h($task['description'] ?? '', ENT_QUOTES) ?>`
-                                    )">
-                                    Editar
-                                </button>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- SIDEBAR DERECHA -->
-        <div class="col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-
-            <h3 class="text-lg font-semibold text-slate-900 mb-4">Turnos del día</h3>
-
-            <?php if (count($turnosDia) === 0): ?>
-                <p class="text-slate-500 text-sm">No hay turnos para hoy.</p>
-            <?php endif; ?>
-
-            <div class="space-y-4">
-                <?php foreach ($turnosDia as $t): ?>
-
-                    <?php 
-                        $nombre = $t['paciente'] ?: $t['name'];
-                    ?>
-
-                    <div class="border rounded-lg p-3 bg-slate-50">
-                        <p class="font-semibold text-slate-900 text-sm">
-                            <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
-                        </p>
-
-                        <?php if ($t['phone']): ?>
-                            <p class="text-xs text-slate-700 mt-1">
-                                Tel: <?= h($t['phone']) ?>
-                            </p>
-                        <?php endif; ?>
-
-                        <?php if ($t['email']): ?>
-                            <p class="text-xs text-slate-700">
-                                Email: <?= h($t['email']) ?>
-                            </p>
-                        <?php endif; ?>
-                    </div>
-
-                <?php endforeach; ?>
-            </div>
-
-        </div>
-
-    </div>
-
-    <?php endif; ?>
-
-    <!-- VISTA SEMANAL -->
-    <?php if ($view === 'week'): ?>
-        <div class="grid grid-cols-1 md:grid-cols-7 gap-4 items-stretch">
-            <?php foreach ($diasSemana as $dia): ?>
-                <?php
-                $turnosDiaSemana = array_filter($turnos, fn($t) => $t['date'] === $dia);
-                $tareasDiaSemana = array_filter($tareas, fn($t) => $t['date'] === $dia);
-                ?>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 min-h-[220px] flex flex-col">
-                    <p class="font-semibold text-slate-900 mb-3 text-sm">
-                        <?= nombreDia($dia) . ' ' . date('j', strtotime($dia)) ?>
-                    </p>
-
-                    <div class="flex-1 space-y-2">
-                        <?php foreach ($turnosDiaSemana as $t): ?>
-                            <?php $clase = claseTurnoEstado($t['status']); ?>
-                            <div class="p-2 border rounded-lg flex justify-between items-center text-xs <?= $clase ?>">
-    <div>
-        <p class="font-medium text-slate-900">
-            <?= substr($t['time'], 0, 5) ?> hs
-        </p>
-        <p class="text-slate-600 text-[11px]">
-            <?= h($t['paciente'] ?? 'Paciente sin registrar') ?>
-        </p>
-
-        <?php if (!empty($t['motivo'])): ?>
-            <p class="text-slate-500 text-[10px] mt-1">
-                <strong>Motivo:</strong> <?= h($t['motivo']) ?>
+        <?php if (count($turnosDia) === 0 && count($tareasDia) === 0): ?>
+            <p class="text-slate-500 text-sm">
+                No tenés turnos ni tareas para este día.
             </p>
         <?php endif; ?>
-    </div>
 
-
-                                <div class="flex flex-col items-end text-[11px]">
-                                    <button
-                                        class="text-slate-900 hover:underline"
-                                        onclick="abrirEditarTurno(
-                                            <?= (int)$t['id'] ?>,
-                                            '<?= h($t['date']) ?>',
-                                            '<?= h($t['time']) ?>',
-                                            '<?= h($t['paciente'] ?? '', ENT_QUOTES) ?>',
-                                            '<?= (int)$t['client_id'] ?>',
-                                            '<?= h($t['status']) ?>'
-                                        )">
-                                        Editar
-                                    </button>
-
-                                    <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>"
-                                       class="text-red-600 hover:underline mt-1">
-                                        Cancelar
-                                    </a>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-
-                        <?php foreach ($tareasDiaSemana as $task): ?>
-                            <div class="p-2 border rounded-lg bg-slate-50 flex justify-between items-start text-[11px]">
-                                <div>
-                                    <p class="font-medium text-slate-900">
-                                        <?= h($task['title']) ?>
-                                    </p>
-                                    <?php if ($task['time']): ?>
-                                        <p class="text-slate-600 mt-1">
-                                            <?= substr($task['time'], 0, 5) ?> hs
-                                        </p>
-                                    <?php endif; ?>
-                                </div>
-
-                                <button
-                                    class="text-slate-900 hover:underline ml-2"
-                                    onclick="abrirEditarTarea(
-                                        <?= (int)$task['id'] ?>,
-                                        '<?= h($task['title'], ENT_QUOTES) ?>',
-                                        '<?= h($task['date']) ?>',
-                                        '<?= h($task['time']) ?>',
-                                        `<?= h($task['description'] ?? '', ENT_QUOTES) ?>`
-                                    )">
-                                    Editar
-                                </button>
-                            </div>
-                        <?php endforeach; ?>
+        <div class="space-y-3">
+            <?php foreach ($turnosDia as $t): ?>
+                <?php 
+                    $clase = claseTurnoEstado($t['status']);
+                    $nombre = $t['paciente'] ?: $t['name'];
+                ?>
+                <div class="flex justify-between items-center p-3 border rounded-lg text-sm <?= $clase ?>">
+                    <div>
+                        <p class="font-semibold text-slate-900">
+                            <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
+                        </p>
+                        <p class="text-xs text-slate-600 mt-1">
+                            Estado: <?= etiquetaEstado($t['status']) ?>
+                        </p>
+                        <?php if (!empty($t['motivo'])): ?>
+                            <p class="text-xs text-slate-600 mt-1">
+                                <strong>Motivo:</strong> <?= nl2br(h($t['motivo'])) ?>
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex flex-col items-end text-xs">
+                        <button
+                            class="text-slate-900 hover:underline"
+                            onclick="abrirEditarTurno(
+                                <?= (int)$t['id'] ?>,
+                                '<?= h($t['date']) ?>',
+                                '<?= h($t['time']) ?>',
+                                '<?= h($nombre, ENT_QUOTES) ?>',
+                                '<?= (int)$t['client_id'] ?>',
+                                '<?= h($t['status']) ?>'
+                            )">
+                            Editar
+                        </button>
+                        <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>"
+                           class="text-red-600 hover:underline mt-1">
+                            Cancelar
+                        </a>
                     </div>
                 </div>
             <?php endforeach; ?>
+
+            <!-- BLOQUE DE TURNOS RECURRENTES -->
+            <?php
+            $diaSemanaIngles = date('l', strtotime($diaSeleccionado ?? date('Y-m-d')));
+            foreach ($recurrentes as $r) {
+                if ($r['recurring_day'] === $diaSemanaIngles &&
+                    (empty($r['recurring_until']) || $diaSeleccionado <= $r['recurring_until'])) {
+                    echo "<div class='flex justify-between items-center p-3 border rounded-lg text-sm bg-blue-50'>
+                            <div>
+                                <p class='font-semibold text-slate-900'>"
+                                    .substr($r['recurring_time'],0,5)." hs — ".h($r['name'])." (Recurrente)</p>
+                            </div>
+                          </div>";
+                }
+            }
+            ?>
+
+            <?php if (count($tareasDia) > 0): ?>
+                <div class="mt-4">
+                    <p class="text-sm font-semibold text-slate-800 mb-2">Tareas</p>
+                    <?php foreach ($tareasDia as $task): ?>
+                        <div class="flex justify-between items-start p-3 border rounded-lg bg-slate-50 text-sm">
+                            <div>
+                                <p class="font-medium text-slate-900">
+                                    <?= h($task['title']) ?>
+                                </p>
+                                <?php if ($task['time']): ?>
+                                    <p class="text-xs text-slate-600 mt-1">
+                                        <?= substr($task['time'], 0, 5) ?> hs
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                            <button
+                                class="text-slate-900 text-xs hover:underline ml-2"
+                                onclick="abrirEditarTarea(
+                                    <?= (int)$task['id'] ?>,
+                                    '<?= h($task['title'], ENT_QUOTES) ?>',
+                                    '<?= h($task['date']) ?>',
+                                    '<?= h($task['time']) ?>',
+                                    `<?= h($task['description'] ?? '', ENT_QUOTES) ?>`
+                                )">
+                                Editar
+                            </button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- SIDEBAR DERECHA -->
+<div class="col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+
+    <h3 class="text-lg font-semibold text-slate-900 mb-4">Turnos del día</h3>
+
+    <?php if (count($turnosDia) === 0): ?>
+        <p class="text-slate-500 text-sm">No hay turnos para hoy.</p>
     <?php endif; ?>
 
-    <!-- VISTA MENSUAL -->
-   <?php if ($view === 'month'): ?>
+    <div class="space-y-4">
+        <?php foreach ($turnosDia as $t): ?>
+            <?php 
+                $nombre = $t['paciente'] ?: $t['name'];
+            ?>
+            <div class="border rounded-lg p-3 bg-slate-50">
+                <p class="font-semibold text-slate-900 text-sm">
+                    <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
+                </p>
+
+                <?php if ($t['phone']): ?>
+                    <p class="text-xs text-slate-700 mt-1">
+                        Tel: <?= h($t['phone']) ?>
+                    </p>
+                <?php endif; ?>
+
+                <?php if ($t['email']): ?>
+                    <p class="text-xs text-slate-700">
+                        Email: <?= h($t['email']) ?>
+                    </p>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+
+        <!-- BLOQUE DE TURNOS RECURRENTES -->
+        <?php
+        $diaSemanaIngles = date('l', strtotime($diaSeleccionado ?? date('Y-m-d')));
+        foreach ($recurrentes as $r) {
+            if ($r['recurring_day'] === $diaSemanaIngles &&
+                (empty($r['recurring_until']) || $diaSeleccionado <= $r['recurring_until'])) {
+                echo "<div class='border rounded-lg p-3 bg-blue-50'>
+                        <p class='font-semibold text-slate-900 text-sm'>"
+                            .substr($r['recurring_time'],0,5)." hs — ".h($r['name'])." (Recurrente)</p>
+                      </div>";
+            }
+        }
+        ?>
+    </div>
+
+</div>
+
+</div>
+
+
+    <!-- VISTA SEMANAL -->
+<?php if ($view === 'week'): ?>
+    <div class="grid grid-cols-1 md:grid-cols-7 gap-4 items-stretch">
+        <?php foreach ($diasSemana as $dia): ?>
+            <?php
+            $turnosDiaSemana = array_filter($turnos, fn($t) => $t['date'] === $dia);
+            $tareasDiaSemana = array_filter($tareas, fn($t) => $t['date'] === $dia);
+            ?>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 min-h-[220px] flex flex-col">
+                <p class="font-semibold text-slate-900 mb-3 text-sm">
+                    <?= nombreDia($dia) . ' ' . date('j', strtotime($dia)) ?>
+                </p>
+
+                <div class="flex-1 space-y-2">
+                    <?php foreach ($turnosDiaSemana as $t): ?>
+                        <?php $clase = claseTurnoEstado($t['status']); ?>
+                        <div class="p-2 border rounded-lg flex justify-between items-center text-xs <?= $clase ?>">
+                            <div>
+                                <p class="font-medium text-slate-900">
+                                    <?= substr($t['time'], 0, 5) ?> hs
+                                </p>
+                                <p class="text-slate-600 text-[11px]">
+                                    <?= h($t['paciente'] ?? 'Paciente sin registrar') ?>
+                                </p>
+
+                                <?php if (!empty($t['motivo'])): ?>
+                                    <p class="text-slate-500 text-[10px] mt-1">
+                                        <strong>Motivo:</strong> <?= h($t['motivo']) ?>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="flex flex-col items-end text-[11px]">
+                                <button
+                                    class="text-slate-900 hover:underline"
+                                    onclick="abrirEditarTurno(
+                                        <?= (int)$t['id'] ?>,
+                                        '<?= h($t['date']) ?>',
+                                        '<?= h($t['time']) ?>',
+                                        '<?= h($t['paciente'] ?? '', ENT_QUOTES) ?>',
+                                        '<?= (int)$t['client_id'] ?>',
+                                        '<?= h($t['status']) ?>'
+                                    )">
+                                    Editar
+                                </button>
+
+                                <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>"
+                                   class="text-red-600 hover:underline mt-1">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+
+                    <!-- BLOQUE DE TURNOS RECURRENTES -->
+                    <?php
+                    $diaSemanaIngles = date('l', strtotime($dia));
+                    foreach ($recurrentes as $r) {
+                        if ($r['recurring_day'] === $diaSemanaIngles &&
+                            (empty($r['recurring_until']) || $dia <= $r['recurring_until'])) {
+                            echo "<div class='p-2 border rounded-lg flex justify-between items-center text-xs bg-blue-50'>
+                                    <div>
+                                        <p class='font-medium text-slate-900'>"
+                                            .substr($r['recurring_time'],0,5)." hs</p>
+                                        <p class='text-slate-600 text-[11px]'>".h($r['name'])." (Recurrente)</p>
+                                    </div>
+                                  </div>";
+                        }
+                    }
+                    ?>
+
+                    <?php foreach ($tareasDiaSemana as $task): ?>
+                        <div class="p-2 border rounded-lg bg-slate-50 flex justify-between items-start text-[11px]">
+                            <div>
+                                <p class="font-medium text-slate-900">
+                                    <?= h($task['title']) ?>
+                                </p>
+                                <?php if ($task['time']): ?>
+                                    <p class="text-slate-600 mt-1">
+                                        <?= substr($task['time'], 0, 5) ?> hs
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+
+                            <button
+                                class="text-slate-900 hover:underline ml-2"
+                                onclick="abrirEditarTarea(
+                                    <?= (int)$task['id'] ?>,
+                                    '<?= h($task['title'], ENT_QUOTES) ?>',
+                                    '<?= h($task['date']) ?>',
+                                    '<?= h($task['time']) ?>',
+                                    `<?= h($task['description'] ?? '', ENT_QUOTES) ?>`
+                                )">
+                                Editar
+                            </button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+
+   <!-- VISTA MENSUAL -->
+<?php if ($view === 'month'): ?>
 
     <!-- DÍAS -->
     <div class="overflow-x-auto">
@@ -570,7 +613,6 @@ require __DIR__ . '/includes/sidebar.php';
                         <?php foreach ($turnosDiaMes as $t): ?>
                             <?php $clase = claseTurnoEstado($t['status']); ?>
                             <div class="flex flex-col mb-1 border rounded px-2 py-1 <?= $clase ?>">
-                                
                                 <span class="text-[12px] leading-tight font-medium">
                                     <?= substr($t['time'], 0, 5) ?> — <?= h($t['paciente'] ?? 'Paciente') ?>
                                 </span>
@@ -585,9 +627,22 @@ require __DIR__ . '/includes/sidebar.php';
                                    class="text-red-600 hover:underline text-[10px] mt-1">
                                     Cancelar
                                 </a>
-
                             </div>
                         <?php endforeach; ?>
+
+                        <!-- BLOQUE DE TURNOS RECURRENTES -->
+                        <?php
+                        $diaSemanaIngles = date('l', strtotime($dia));
+                        foreach ($recurrentes as $r) {
+                            if ($r['recurring_day'] === $diaSemanaIngles &&
+                                (empty($r['recurring_until']) || $dia <= $r['recurring_until'])) {
+                                echo "<div class='flex flex-col mb-1 border rounded px-2 py-1 bg-blue-50'>
+                                        <span class='text-[12px] leading-tight font-medium'>"
+                                            .substr($r['recurring_time'],0,5)." — ".h($r['name'])." (Recurrente)</span>
+                                      </div>";
+                            }
+                        }
+                        ?>
 
                         <?php foreach ($tareasDiaMes as $task): ?>
                             <p class="text-[11px] text-slate-800">

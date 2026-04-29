@@ -9,8 +9,6 @@ require __DIR__ . '/includes/auth.php';
 require __DIR__ . '/includes/db.php';
 require __DIR__ . '/includes/helpers.php';
 
-
-
 $page_title = 'Pacientes';
 $current    = 'pacientes';
 
@@ -127,16 +125,46 @@ require __DIR__ . '/includes/sidebar.php';
         <form method="POST" action="paciente-guardar.php">
 
             <input type="text" name="name" placeholder="Nombre completo" required
-       class="w-full p-3 mb-3 border rounded">
+                   class="w-full p-3 mb-3 border rounded">
 
-<input type="text" name="dni" placeholder="DNI" required
-       class="w-full p-3 mb-3 border rounded">
+            <input type="text" name="dni" placeholder="DNI" required
+                   class="w-full p-3 mb-3 border rounded">
 
-<input type="text" name="phone" placeholder="Teléfono" required
-       class="w-full p-3 mb-3 border rounded">
+            <input type="text" name="phone" placeholder="Teléfono" required
+                   class="w-full p-3 mb-3 border rounded">
 
-<input type="email" name="email" placeholder="Email"
-       class="w-full p-3 mb-3 border rounded">
+            <input type="email" name="email" placeholder="Email"
+                   class="w-full p-3 mb-3 border rounded">
+
+            <!-- NUEVO: Paciente recurrente -->
+            <div class="mb-3">
+                <label class="flex items-center gap-2">
+                    <input type="checkbox" name="is_recurring" value="1"
+                           onclick="document.getElementById('recurrenceFields').classList.toggle('hidden', !this.checked)">
+                    Paciente recurrente
+                </label>
+            </div>
+
+            <!-- Campos de recurrencia -->
+            <div id="recurrenceFields" class="hidden">
+                <label>Día de la semana:</label>
+                <select name="recurring_day" class="w-full p-3 mb-3 border rounded">
+                    <option value="">Seleccionar...</option>
+                    <option value="Monday">Lunes</option>
+                    <option value="Tuesday">Martes</option>
+                    <option value="Wednesday">Miércoles</option>
+                    <option value="Thursday">Jueves</option>
+                    <option value="Friday">Viernes</option>
+                    <option value="Saturday">Sábado</option>
+                    <option value="Sunday">Domingo</option>
+                </select>
+
+                <label>Hora:</label>
+                <input type="time" name="recurring_time" class="w-full p-3 mb-3 border rounded">
+
+                <label>Hasta (opcional):</label>
+                <input type="date" name="recurring_until" class="w-full p-3 mb-3 border rounded">
+            </div>
 
             <div class="flex justify-end gap-3 mt-4">
                 <button type="button"
@@ -186,4 +214,4 @@ function closeDeleteModal() {
 }
 </script>
 
-<?php require __DIR__ . '/includes/footer.php'; ?> 
+<?php require __DIR__ . '/includes/footer.php'; ?>
