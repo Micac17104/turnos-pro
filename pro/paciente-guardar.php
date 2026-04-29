@@ -39,7 +39,10 @@ if ($email !== '') {
 
 // Insertar paciente con datos de recurrencia
 $stmt = $pdo->prepare("
-    INSERT INTO clients (user_id, name, dni, phone, email, password, is_recurring, recurring_day, recurring_time, recurring_until)
+    INSERT INTO clients (
+        user_id, name, dni, phone, email, password,
+        is_recurring, recurring_day, recurring_time, recurring_until
+    )
     VALUES (?, ?, ?, ?, ?, NULL, ?, ?, ?, ?)
 ");
 $stmt->execute([

@@ -79,6 +79,9 @@ require __DIR__ . '/includes/sidebar.php';
                     <div>
                         <p class="font-semibold text-slate-900"><?= h($c['name']) ?></p>
                         <p class="text-slate-500 text-sm"><?= h($c['phone']) ?></p>
+                        <?php if (!empty($c['is_recurring'])): ?>
+                            <p class="text-xs text-blue-600 mt-1">Paciente recurrente</p>
+                        <?php endif; ?>
                     </div>
 
                     <div class="flex gap-2">

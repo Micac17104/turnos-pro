@@ -11,7 +11,7 @@ $patient_id = require_param($_GET, 'id', 'Paciente no encontrado.');
 
 // Verificar que el paciente pertenece al profesional
 $stmt = $pdo->prepare("
-    SELECT id, name, email, phone, dni
+    SELECT id, name, email, phone, dni, is_recurring, recurring_day, recurring_time, recurring_until
     FROM clients
     WHERE id = ? AND user_id = ?
 ");
@@ -59,6 +59,41 @@ require __DIR__ . '/includes/sidebar.php';
             <label class="block text-sm font-medium text-slate-700 mb-1">DNI</label>
             <input type="text" name="dni" value="<?= h($paciente['dni']) ?>"
                    class="w-full px-3 py-2 border rounded-lg">
+        </div>
+
+        <!-- NUEVO: Paciente recurrente -->
+        <div>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="is_recurring" value="1"
+                       <?= !empty($paciente['is_recurring']) ? 'checked' : '' ?>
+                       onclick="document.getElementById('recurrenceFields').classList.toggle('hidden', !this.checked)">
+                Paciente recurrente
+            </label>
+        </div>
+
+        <!-- Campos de recurrencia -->
+        <div id="recurrenceFields" class="<?= !empty($paciente['is_recurring']) ? '' : 'hidden' ?>">
+            <label>Día de la semana:</label>
+            <select name="recurring_day" class="w-full p-3 mb-3 border rounded">
+                <option value="">Seleccionar...</option>
+                <option value="Monday" <?= $paciente['recurring_day']==='Monday'?'selected':'' ?>>Lunes</option>
+                <option value="Tuesday" <?= $paciente['recurring_day']==='Tuesday'?'selected':'' ?>>Martes</option>
+                <option value="Wednesday" <?= $paciente['recurring_day']==='Wednesday'?'selected':'' ?>>Miércoles</option>
+                <option value="Thursday" <?= $paciente['recurring_day']==='Thursday'?'selected':'' ?>>Jueves</option>
+                <option value="Friday" <?= $paciente['recurring_day']==='Friday'?'selected':'' ?>>Viernes</option>
+                <option value="Saturday" <?= $paciente['recurring_day']==='Saturday'?'selected':'' ?>>Sábado</option>
+                <option value="Sunday" <?= $paciente['recurring_day']==='Sunday'?'selected':'' ?>>Domingo</option>
+            </select>
+
+            <label>Hora:</label>
+            <input type="time" name="recurring_time"
+                   value="<?= h($paciente['recurring_time'] ?? '') ?>"
+                   class="w-full p-3 mb-3 border rounded">
+
+            <label>Hasta (opcional):</label>
+            <input type="date" name="recurring_until"
+                   value="<?= h($paciente['recurring_until'] ?? '') ?>"
+                   class="w-full p-3 mb-3 border rounded">
         </div>
 
         <div class="flex justify-end gap-3">
