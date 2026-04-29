@@ -97,7 +97,7 @@ h2 { margin-top:0; font-size:24px; }
             class="map"
             loading="lazy"
             allowfullscreen
-            src="https://www.google.com/maps/embed/v1/place?key=TU_API_KEY_AQUI&q=<?= $direccion_completa ?>">
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyD5-z8qyGQfQVEXLI71BjYZwxrurK2vY3o&q=<?= $direccion_completa ?>">
         </iframe>
 
         <p style="font-size:12px; color:#64748b; margin-top:8px;">
