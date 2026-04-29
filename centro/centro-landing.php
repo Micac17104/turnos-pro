@@ -1,14 +1,8 @@
 <?php
-var_dump($_GET['slug']);
-exit;
-
 require __DIR__ . '/../config.php';
 
-
-
-
+// El slug viene desde index.php
 $slug = $slug_centro ?? null;
-
 
 if (!$slug) {
     die("Centro no encontrado.");
