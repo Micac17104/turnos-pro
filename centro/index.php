@@ -1,13 +1,13 @@
 <?php
-require __DIR__ . '/../config.php';
+echo "INDEX OK<br>";
 
-$slug = $_GET['slug'] ?? null;
+echo "Buscando archivo: " . __DIR__ . "/centro-landing.php<br>";
 
-if (!$slug) {
-    die("Centro no encontrado.");
+if (file_exists(__DIR__ . "/centro-landing.php")) {
+    echo "ARCHIVO ENCONTRADO";
+} else {
+    echo "ARCHIVO NO ENCONTRADO";
 }
 
-// PASAR EL SLUG A centro-landing.php
-$_GET['slug'] = $slug;
-
-require __DIR__ . '/centro-landing.php';
+exit;
+ 
