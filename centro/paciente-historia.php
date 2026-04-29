@@ -36,7 +36,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$patient_id]);
 $extra = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-// PREGUNTAS PERSONALIZADAS DEL CENTRO (usa professional_id = center_id)
+// PREGUNTAS PERSONALIZADAS DEL CENTRO
 $stmt = $pdo->prepare("
     SELECT *
     FROM clinical_questions
@@ -46,7 +46,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$center_id]);
 $preguntas_centro = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// RESPUESTAS DEL PACIENTE (NO usa center_id)
+// RESPUESTAS DEL PACIENTE
 $answers_centro = [];
 $stmt = $pdo->prepare("
     SELECT question_id, answer
@@ -81,6 +81,16 @@ $stmt = $pdo->prepare("
 $stmt->execute([$patient_id]);
 $evoluciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Estudios médicos
+$stmt = $pdo->prepare("
+    SELECT *
+    FROM estudios_medicos
+    WHERE client_id = ?
+    ORDER BY fecha DESC
+");
+$stmt->execute([$patient_id]);
+$estudios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -106,6 +116,12 @@ input,textarea,select{padding:8px;border-radius:8px;border:1px solid #cbd5e1;wid
     <a href="ficha-estetica.php?id=<?= $patient_id ?>" class="btn">Ficha estética</a>
     <a href="tratamientos.php?id=<?= $patient_id ?>" class="btn">Tratamientos realizados</a>
     <a href="planes-estetica.php?id=<?= $patient_id ?>" class="btn">Planes de sesiones</a>
+</div>
+
+<!-- NUEVOS BOTONES -->
+<div style="margin-bottom:20px;">
+    <a href="evolucion-crear.php?id=<?= $patient_id ?>" class="btn" style="background:#10b981;">Agregar evolución</a>
+    <a href="estudios.php?id=<?= $patient_id ?>" class="btn" style="background:#6366f1;">Estudios médicos</a>
 </div>
 
 <!-- DATOS CLÍNICOS FIJOS -->

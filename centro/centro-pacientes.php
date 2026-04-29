@@ -43,6 +43,8 @@ body{margin:0;font-family:Arial;background:#f1f5f9;}
 input{padding:10px;border-radius:10px;border:1px solid #cbd5e1;width:250px;}
 .btn{padding:6px 12px;border-radius:999px;background:#0ea5e9;color:white;text-decoration:none;font-size:12px;}
 .btn-green{background:#22c55e;}
+.btn-purple{background:#6366f1;}
+.btn-yellow{background:#f59e0b;}
 table{width:100%;border-collapse:collapse;font-size:14px;margin-top:15px;}
 th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 </style>
@@ -91,16 +93,20 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
                 <td style="white-space: nowrap;">
                     <!-- Ver historial de turnos -->
                     <a href="centro-paciente-ver.php?id=<?= $p['id'] ?>" 
-                       class="btn" 
-                       style="background:#0ea5e9;">
+                       class="btn">
                        Ver historial
                     </a>
 
                     <!-- Ver historia clínica -->
                     <a href="paciente-historia.php?id=<?= $p['id'] ?>" 
-                       class="btn" 
-                       style="background:#6366f1;">
+                       class="btn btn-purple">
                        Ver historia clínica
+                    </a>
+
+                    <!-- Estudios médicos -->
+                    <a href="estudios.php?id=<?= $p['id'] ?>" 
+                       class="btn btn-yellow">
+                       Estudios médicos
                     </a>
                 </td>
             </tr>
@@ -117,3 +123,4 @@ th,td{padding:8px 6px;border-bottom:1px solid #e5e7eb;text-align:left;}
 </div>
 </body>
 </html>
+
