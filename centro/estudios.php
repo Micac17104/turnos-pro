@@ -50,7 +50,7 @@ body{margin:0;font-family:Arial;background:#f1f5f9;}
     <p><?= nl2br(h($e['descripcion'])) ?></p>
 
     <?php if ($e['archivo']): ?>
-        <a href="../uploads/estudios/<?= h($e['archivo']) ?>" target="_blank">Ver archivo</a>
+        <a href="../uploads/<?= h($e['archivo']) ?>" target="_blank">Ver archivo</a>
     <?php endif; ?>
 </div>
 <?php endforeach; ?>
