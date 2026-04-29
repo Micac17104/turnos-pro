@@ -189,11 +189,20 @@ button:hover{opacity:0.9;}
             <label class="label">Descripción pública</label>
             <textarea name="description" rows="4"><?= htmlspecialchars($center['description'] ?? '') ?></textarea>
 
-            <label class="label">Slug público del centro</label>
-            <input name="slug" value="<?= htmlspecialchars($center['slug'] ?? '') ?>" required>
-            <div class="small">
-                URL pública: <code>tusitio.com/centro/<?= htmlspecialchars($center['slug'] ?: 'mi-centro') ?></code>
-            </div>
+           <label class="label">Slug público del centro</label>
+<input name="slug" value="<?= htmlspecialchars($center['slug'] ?? '') ?>" required>
+
+<div class="small" style="margin-top:4px;">
+    URL pública:
+    <strong>https://www.turnosaura.com/centro/index.php?slug=<?= htmlspecialchars($center['slug']) ?></strong>
+</div>
+
+<button type="button"
+        onclick="navigator.clipboard.writeText('https://www.turnosaura.com/centro/index.php?slug=<?= htmlspecialchars($center['slug']) ?>')"
+        style="margin-top:6px; padding:6px 12px; background:#0f172a; color:white; border-radius:6px; font-size:12px;">
+    Copiar URL
+</button>
+
 
             <br>
 
