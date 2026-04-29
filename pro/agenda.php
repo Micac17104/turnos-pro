@@ -318,44 +318,69 @@ require __DIR__ . '/includes/sidebar.php';
 
   <!-- VISTA DIARIA -->
 <?php if ($view === 'day'): ?>
+
 <div class="grid grid-cols-3 gap-6">
+
     <!-- COLUMNA PRINCIPAL -->
     <div class="col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+
         <?php if (count($turnosDia) === 0 && count($tareasDia) === 0): ?>
-            <p class="text-slate-500 text-sm">No tenés turnos ni tareas para este día.</p>
+            <p class="text-slate-500 text-sm">
+                No tenés turnos ni tareas para este día.
+            </p>
         <?php endif; ?>
 
         <div class="space-y-3">
             <?php foreach ($turnosDia as $t): ?>
-                <?php $clase = claseTurnoEstado($t['status']); $nombre = $t['paciente'] ?: $t['name']; ?>
+                <?php 
+                    $clase = claseTurnoEstado($t['status']);
+                    $nombre = $t['paciente'] ?: $t['name'];
+                ?>
                 <div class="flex justify-between items-center p-3 border rounded-lg text-sm <?= $clase ?>">
                     <div>
                         <p class="font-semibold text-slate-900">
                             <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
                         </p>
-                        <p class="text-xs text-slate-600 mt-1">Estado: <?= etiquetaEstado($t['status']) ?></p>
+                        <p class="text-xs text-slate-600 mt-1">
+                            Estado: <?= etiquetaEstado($t['status']) ?>
+                        </p>
                         <?php if (!empty($t['motivo'])): ?>
-                            <p class="text-xs text-slate-600 mt-1"><strong>Motivo:</strong> <?= nl2br(h($t['motivo'])) ?></p>
+                            <p class="text-xs text-slate-600 mt-1">
+                                <strong>Motivo:</strong> <?= nl2br(h($t['motivo'])) ?>
+                            </p>
                         <?php endif; ?>
                     </div>
                     <div class="flex flex-col items-end text-xs">
-                        <button class="text-slate-900 hover:underline"
-                            onclick="abrirEditarTurno(<?= (int)$t['id'] ?>,'<?= h($t['date']) ?>','<?= h($t['time']) ?>','<?= h($nombre, ENT_QUOTES) ?>','<?= (int)$t['client_id'] ?>','<?= h($t['status']) ?>')">
+                        <button
+                            class="text-slate-900 hover:underline"
+                            onclick="abrirEditarTurno(
+                                <?= (int)$t['id'] ?>,
+                                '<?= h($t['date']) ?>',
+                                '<?= h($t['time']) ?>',
+                                '<?= h($nombre, ENT_QUOTES) ?>',
+                                '<?= (int)$t['client_id'] ?>',
+                                '<?= h($t['status']) ?>'
+                            )">
                             Editar
                         </button>
-                        <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>" class="text-red-600 hover:underline mt-1">Cancelar</a>
+                        <a href="turno-cancelar.php?id=<?= (int)$t['id'] ?>"
+                           class="text-red-600 hover:underline mt-1">
+                            Cancelar
+                        </a>
                     </div>
                 </div>
             <?php endforeach; ?>
 
-            <!-- Turnos recurrentes -->
+            <!-- TURNOS RECURRENTES -->
             <?php
-            $diaSemanaIngles = date('l', strtotime($hoy));
+            $diaSemanaIngles = date('l', strtotime($diaSeleccionado ?? date('Y-m-d')));
             foreach ($recurrentes as $r) {
-                if ($r['recurring_day'] === $diaSemanaIngles && (empty($r['recurring_until']) || $hoy <= $r['recurring_until'])) {
+                if ($r['recurring_day'] === $diaSemanaIngles &&
+                    (empty($r['recurring_until']) || $diaSeleccionado <= $r['recurring_until'])) {
                     echo "<div class='flex justify-between items-center p-3 border rounded-lg text-sm bg-blue-50'>
                             <div>
-                                <p class='font-semibold text-slate-900'>".substr($r['recurring_time'],0,5)." hs — ".h($r['name'])." (Recurrente)</p>
+                                <p class='font-semibold text-slate-900'>"
+                                    .substr($r['recurring_time'],0,5)." hs — ".h($r['name'])." (Recurrente)</p>
                             </div>
                           </div>";
                 }
@@ -368,13 +393,24 @@ require __DIR__ . '/includes/sidebar.php';
                     <?php foreach ($tareasDia as $task): ?>
                         <div class="flex justify-between items-start p-3 border rounded-lg bg-slate-50 text-sm">
                             <div>
-                                <p class="font-medium text-slate-900"><?= h($task['title']) ?></p>
+                                <p class="font-medium text-slate-900">
+                                    <?= h($task['title']) ?>
+                                </p>
                                 <?php if ($task['time']): ?>
-                                    <p class="text-xs text-slate-600 mt-1"><?= substr($task['time'], 0, 5) ?> hs</p>
+                                    <p class="text-xs text-slate-600 mt-1">
+                                        <?= substr($task['time'], 0, 5) ?> hs
+                                    </p>
                                 <?php endif; ?>
                             </div>
-                            <button class="text-slate-900 text-xs hover:underline ml-2"
-                                onclick="abrirEditarTarea(<?= (int)$task['id'] ?>,'<?= h($task['title'], ENT_QUOTES) ?>','<?= h($task['date']) ?>','<?= h($task['time']) ?>',`<?= h($task['description'] ?? '', ENT_QUOTES) ?>`)">
+                            <button
+                                class="text-slate-900 text-xs hover:underline ml-2"
+                                onclick="abrirEditarTarea(
+                                    <?= (int)$task['id'] ?>,
+                                    '<?= h($task['title'], ENT_QUOTES) ?>',
+                                    '<?= h($task['date']) ?>',
+                                    '<?= h($task['time']) ?>',
+                                    `<?= h($task['description'] ?? '', ENT_QUOTES) ?>`
+                                )">
                                 Editar
                             </button>
                         </div>
@@ -383,61 +419,59 @@ require __DIR__ . '/includes/sidebar.php';
             <?php endif; ?>
         </div>
     </div>
-</div>
-<?php endif; ?>
 
+    <!-- SIDEBAR (ARREGLADO ✅) -->
+    <div class="col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
 
-<!-- SIDEBAR DERECHA -->
-<div class="col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Turnos del día</h3>
 
-    <h3 class="text-lg font-semibold text-slate-900 mb-4">Turnos del día</h3>
+        <?php if (count($turnosDia) === 0): ?>
+            <p class="text-slate-500 text-sm">No hay turnos para hoy.</p>
+        <?php endif; ?>
 
-    <?php if (count($turnosDia) === 0): ?>
-        <p class="text-slate-500 text-sm">No hay turnos para hoy.</p>
-    <?php endif; ?>
-
-    <div class="space-y-4">
-        <?php foreach ($turnosDia as $t): ?>
-            <?php 
-                $nombre = $t['paciente'] ?: $t['name'];
-            ?>
-            <div class="border rounded-lg p-3 bg-slate-50">
-                <p class="font-semibold text-slate-900 text-sm">
-                    <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
-                </p>
-
-                <?php if ($t['phone']): ?>
-                    <p class="text-xs text-slate-700 mt-1">
-                        Tel: <?= h($t['phone']) ?>
+        <div class="space-y-4">
+            <?php foreach ($turnosDia as $t): ?>
+                <?php 
+                    $nombre = $t['paciente'] ?: $t['name'];
+                ?>
+                <div class="border rounded-lg p-3 bg-slate-50">
+                    <p class="font-semibold text-slate-900 text-sm">
+                        <?= substr($t['time'], 0, 5) ?> hs — <?= h($nombre) ?>
                     </p>
-                <?php endif; ?>
 
-                <?php if ($t['email']): ?>
-                    <p class="text-xs text-slate-700">
-                        Email: <?= h($t['email']) ?>
-                    </p>
-                <?php endif; ?>
-            </div>
-        <?php endforeach; ?>
+                    <?php if ($t['phone']): ?>
+                        <p class="text-xs text-slate-700 mt-1">
+                            Tel: <?= h($t['phone']) ?>
+                        </p>
+                    <?php endif; ?>
 
-        <!-- BLOQUE DE TURNOS RECURRENTES -->
-        <?php
-        $diaSemanaIngles = date('l', strtotime($diaSeleccionado ?? date('Y-m-d')));
-        foreach ($recurrentes as $r) {
-            if ($r['recurring_day'] === $diaSemanaIngles &&
-                (empty($r['recurring_until']) || $diaSeleccionado <= $r['recurring_until'])) {
-                echo "<div class='border rounded-lg p-3 bg-blue-50'>
-                        <p class='font-semibold text-slate-900 text-sm'>"
-                            .substr($r['recurring_time'],0,5)." hs — ".h($r['name'])." (Recurrente)</p>
-                      </div>";
+                    <?php if ($t['email']): ?>
+                        <p class="text-xs text-slate-700">
+                            Email: <?= h($t['email']) ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+
+            <!-- RECURRENTES -->
+            <?php
+            foreach ($recurrentes as $r) {
+                if ($r['recurring_day'] === $diaSemanaIngles &&
+                    (empty($r['recurring_until']) || $diaSeleccionado <= $r['recurring_until'])) {
+                    echo "<div class='border rounded-lg p-3 bg-blue-50'>
+                            <p class='font-semibold text-slate-900 text-sm'>"
+                                .substr($r['recurring_time'],0,5)." hs — ".h($r['name'])." (Recurrente)</p>
+                          </div>";
+                }
             }
-        }
-        ?>
+            ?>
+        </div>
+
     </div>
 
 </div>
 
-</div>
+<?php endif; ?>
 
 
    <!-- VISTA SEMANAL -->
