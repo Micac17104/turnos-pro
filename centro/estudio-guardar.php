@@ -11,7 +11,7 @@ use Cloudinary\Cloudinary;
 
 $cloudinary = new Cloudinary([
     'cloud' => [
-        'cloud_name' => 'Raíz',
+        'cloud_name' => 'db4xjci65',
         'api_key'    => '456722813821841',
         'api_secret' => '8pWHGWCqvLVzviELSSe_MaFXQ3w',
     ],
