@@ -14,12 +14,24 @@ $fecha      = $_POST['fecha'];
 $archivo = null;
 
 if (!empty($_FILES['archivo']['name'])) {
-    $dir = __DIR__ . '/../uploads/estudios/';
+
+    // Carpeta donde realmente guardás los archivos
+    $dir = __DIR__ . '/../public/uploads/';
     if (!is_dir($dir)) mkdir($dir, 0777, true);
 
-    $archivo = time() . "_" . basename($_FILES['archivo']['name']);
+    // Nombre original
+    $original = $_FILES['archivo']['name'];
+
+    // Limpieza del nombre (sin espacios, acentos ni caracteres raros)
+    $limpio = preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $original);
+
+    // Prefijo único para evitar duplicados
+    $archivo = time() . '_' . $limpio;
+
+    // Guardar archivo
     move_uploaded_file($_FILES['archivo']['tmp_name'], $dir . $archivo);
 }
+
 
 $stmt = $pdo->prepare("
     INSERT INTO estudios_medicos (client_id, professional_id, titulo, descripcion, archivo, fecha, created_at)
