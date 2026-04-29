@@ -1,5 +1,5 @@
 <div class="sidebar">
-    <h2>TurnosPro</h2>
+    <h2>Turnos Aura</h2>
 
    <a href="centro-dashboard.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
     Dashboard
@@ -32,7 +32,6 @@
 <a href="centro-recordatorios.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
     Recordatorios
 </a>
-
 
 
 <li>
