@@ -1,6 +1,10 @@
 <?php
 require __DIR__ . '/../config.php';
 
+var_dump($slug);
+exit;
+
+
 $slug = $_GET['slug'] ?? null;
 
 if (!$slug) {
