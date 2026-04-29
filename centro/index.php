@@ -7,5 +7,7 @@ if (!$slug) {
     die("Centro no encontrado.");
 }
 
-// Cargar la landing real del centro
+// Hacer que centro-landing.php reciba el slug
+$_GET['slug'] = $slug;
+
 require __DIR__ . '/centro-landing.php';
