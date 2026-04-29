@@ -32,6 +32,10 @@ if (!empty($_FILES['archivo']['name'])) {
     move_uploaded_file($_FILES['archivo']['tmp_name'], $dir . $archivo);
 }
 
+if (!move_uploaded_file($_FILES['archivo']['tmp_name'], $dir . $archivo)) {
+    die("ERROR: No se pudo guardar el archivo");
+}
+
 
 $stmt = $pdo->prepare("
     INSERT INTO estudios_medicos (client_id, professional_id, titulo, descripcion, archivo, fecha, created_at)
