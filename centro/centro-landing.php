@@ -1,7 +1,7 @@
 <?php
-
-var_dump($slug);
+var_dump($_GET['slug']);
 exit;
+
 require __DIR__ . '/../config.php';
 
 
